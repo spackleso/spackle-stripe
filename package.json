@@ -13,7 +13,8 @@
   },
   "eslintConfig": {
     "extends": [
-      "./node_modules/@stripe/ui-extension-tools/eslintrc.ui-extension.js"
+      "./node_modules/@stripe/ui-extension-tools/eslintrc.ui-extension.js",
+      "prettier"
     ]
   },
   "scripts": {
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@stripe/ui-extension-tools": "^0.0.1",
     "eslint": "^8.25.0",
+    "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1"
   }
 }

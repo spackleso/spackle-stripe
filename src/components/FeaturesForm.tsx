@@ -1,17 +1,16 @@
 import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import {
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
+  Button,
   Box,
   FocusView,
+  Accordion,
+  AccordionItem,
+  Switch,
 } from '@stripe/ui-extension-sdk/ui'
 import useApi from '../hooks/useApi'
 import { Feature, FeatureType } from '../types'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import FeatureForm from './FeatureForm'
 
 const FeaturesForm = ({
   context,
@@ -23,52 +22,92 @@ const FeaturesForm = ({
   setShown: (val: boolean) => void
 }) => {
   const [features, setFeatures] = useState<Feature[]>([])
+  const [isShowingNewForm, setIsShowingNewForm] = useState<boolean>(false)
   const { post } = useApi(context)
 
+  const fetch = useCallback(async () => {
+    const response = await post(`api/stripe/get_account_features`, {})
+    const data = await response.json()
+    setFeatures(data.data)
+  }, [post])
+
   useEffect(() => {
-    const fetch = async () => {
-      const response = await post(`api/stripe/get_account_features`, {})
-      const data = await response.json()
-      setFeatures(data.data)
-    }
     fetch()
-  }, [post, context.environment.objectContext?.id])
+  }, [fetch])
+
+  const update = useCallback(
+    async (feature) => {
+      await post(`api/stripe/update_account_feature`, feature)
+      await fetch()
+    },
+    [post, fetch],
+  )
+
+  const create = useCallback(
+    async (feature) => {
+      await post(`api/stripe/create_account_feature`, feature)
+      await fetch()
+      setIsShowingNewForm(false)
+    },
+    [post, fetch],
+  )
 
   return (
     <FocusView title={'Features'} shown={shown} setShown={setShown}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell>Name</TableHeaderCell>
-            <TableHeaderCell>Type</TableHeaderCell>
-            <TableHeaderCell>Default Value</TableHeaderCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {features.map((f) => (
-            <TableRow key={f.id}>
-              <TableCell>
-                <Box>
-                  <Box css={{ font: 'bodyEmphasized' }}>{f.name}</Box>
-                  <Box css={{ font: 'body' }}>{f.key}</Box>
-                </Box>
-              </TableCell>
-              <TableCell>
-                <Box>{f.type === 0 ? 'Flag' : 'Limit'}</Box>
-              </TableCell>
-              <TableCell>
-                {f.type === FeatureType.Flag ? (
-                  <Box>{f.value_flag}</Box>
-                ) : f.type === FeatureType.Limit ? (
-                  <Box>{f.value_limit}</Box>
-                ) : (
-                  <></>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {isShowingNewForm ? (
+        <Box>
+          <FeatureForm
+            feature={{
+              name: '',
+              key: '',
+              type: 0,
+              value_flag: false,
+              value_limit: null,
+            }}
+            save={create}
+          />
+        </Box>
+      ) : (
+        <Box>
+          <Box css={{ stack: 'x', alignX: 'end', marginBottom: 'medium' }}>
+            <Button
+              type="secondary"
+              onPress={() => setIsShowingNewForm(!isShowingNewForm)}
+            >
+              + Create New
+            </Button>
+          </Box>
+
+          <Box>
+            <Accordion>
+              {features.map((f) => (
+                <AccordionItem
+                  key={f.key}
+                  title={f.name}
+                  subtitle={f.key}
+                  actions={
+                    <>
+                      {f.type === FeatureType.Flag ? (
+                        <Switch
+                          disabled={true}
+                          checked={!!f.value_flag}
+                          defaultChecked={!!f.value_flag}
+                        ></Switch>
+                      ) : f.type === FeatureType.Limit ? (
+                        <Box css={{ font: 'heading' }}>{f.value_limit}</Box>
+                      ) : (
+                        <></>
+                      )}
+                    </>
+                  }
+                >
+                  <FeatureForm feature={f} save={update} />
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Box>
+        </Box>
+      )}
     </FocusView>
   )
 }

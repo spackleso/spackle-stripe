@@ -12,6 +12,8 @@ import {
   TextField,
   Link,
   Icon,
+  List,
+  ListItem,
 } from '@stripe/ui-extension-sdk/ui'
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import { useEffect, useState } from 'react'
@@ -39,53 +41,54 @@ const Customer = (context: ExtensionContextValue) => {
       brandIcon={BrandIcon}
       actions={
         <>
-          <Link
-            onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
-          >
-            <Icon name="settings" />
-            Manage Features
-          </Link>
+          <Box>
+            <Link
+              onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
+            >
+              <Icon name="settings" />
+              Manage Features
+            </Link>
+          </Box>
         </>
       }
       primaryAction={
         <>
-          <Button type="primary">Save</Button>
+          <Button type="primary" disabled={true}>
+            Save
+          </Button>
         </>
       }
       secondaryAction={
         <>
-          <Button>Cancel</Button>
+          <Button disabled={true}>Cancel</Button>
         </>
       }
     >
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell>Feature</TableHeaderCell>
-            <TableHeaderCell>Value</TableHeaderCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {features.map((f) => (
-            <TableRow key={f.id}>
-              <TableCell>
-                <Box>{f.name}</Box>
-              </TableCell>
-              <TableCell>
-                <Box css={{ alignX: 'end' }}>
-                  {f.type === FeatureType.Flag ? (
-                    <Switch value={f.value_flag!.toString()}></Switch>
-                  ) : f.type === FeatureType.Limit ? (
-                    <TextField value={f.value_limit!.toString()}></TextField>
-                  ) : (
-                    <></>
-                  )}
-                </Box>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <List>
+        {features.map((f) => (
+          <ListItem
+            id={f.key}
+            key={f.key}
+            title={f.name}
+            secondaryTitle={f.key}
+            size="large"
+            value={
+              <>
+                {f.type === FeatureType.Flag ? (
+                  <Switch value={f.value_flag!.toString()}></Switch>
+                ) : f.type === FeatureType.Limit ? (
+                  <TextField
+                    type="number"
+                    value={f.value_limit!.toString()}
+                  ></TextField>
+                ) : (
+                  <></>
+                )}
+              </>
+            }
+          ></ListItem>
+        ))}
+      </List>
       <FeaturesForm
         context={context}
         shown={isShowingFeaturesForm}
