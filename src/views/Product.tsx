@@ -1,156 +1,120 @@
 import {
-  createHttpClient,
-  STRIPE_API_KEY,
-} from '@stripe/ui-extension-sdk/http_client'
-import {
   ContextView,
-  List,
-  ListItem,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  Switch,
-  TableHead,
-  TableHeaderCell,
   Box,
-  Button,
-  TextField,
+  Link,
+  Icon,
+  Accordion,
 } from '@stripe/ui-extension-sdk/ui'
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import BrandIcon from './brand_icon.svg'
 import useApi from '../hooks/useApi'
-import { Feature, FeatureType } from '../types'
+import { Feature, ProductFeature } from '../types'
 import Stripe from 'stripe'
+import FeaturesForm from '../components/FeaturesForm'
+import FeatureList from '../components/FeatureList'
+import PriceAccordianItem from '../components/PriceAccordianItem'
+import stripe from '../stripe'
 
-const stripe = new Stripe(STRIPE_API_KEY, {
-  httpClient: createHttpClient(),
-  apiVersion: '2022-08-01',
-})
-
-const priceDisplay = (price: Stripe.Price): string => {
-  if (price.nickname) {
-    return price.nickname
-  } else if (price.currency !== 'usd') {
-    return price.id
-  } else if (price.unit_amount && price.recurring) {
-    return `$${price.unit_amount / 100} / ${price.recurring.interval}`
-  } else if (price.unit_amount) {
-    return `$${price.unit_amount / 100}`
-  } else {
-    return price.id
-  }
+interface State {
+  prices: Stripe.Price[]
+  accountState: Feature[]
+  productFeatures: ProductFeature[]
+  productState: Feature[]
 }
 
 const Product = (context: ExtensionContextValue) => {
   const productId = context.environment.objectContext?.id
+  const { post } = useApi(context)
   const [prices, setPrices] = useState<Stripe.Price[]>([])
-  const [priceId, setPriceId] = useState<string | null>(null)
+  const [accountState, setAccountState] = useState<Feature[]>([])
+  const [productFeatures, setProductFeatures] = useState<ProductFeature[]>([])
+  const [productState, setProductState] = useState<Feature[]>([])
+  const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
-  useEffect(() => {
+  const fetch = useCallback(async () => {
+    let data = await (await post(`api/stripe/get_account_state`, {})).json()
+    setAccountState(data.data)
+
+    data = await (
+      await post(`api/stripe/get_product_features`, {
+        product_id: productId,
+      })
+    ).json()
+    setProductFeatures(data.data)
+
+    data = await (
+      await post(`api/stripe/get_product_state`, {
+        product_id: productId,
+      })
+    ).json()
+    setProductState(data.data)
+
     if (productId) {
       stripe.prices.list({ product: productId }).then((p) => {
         setPrices(p.data)
       })
     }
-  }, [productId])
+  }, [post, productId])
 
-  if (priceId) {
-    return <Price id={priceId} context={context} />
-  }
-
-  return (
-    <ContextView
-      title="Select Price to Edit Features"
-      brandColor="#F6F8FA"
-      brandIcon={BrandIcon}
-    >
-      <List
-        onAction={(id: string | number) => setPriceId(id.toString())}
-        aria-label="Select Price to Edit Features"
-      >
-        {prices.map((p) => (
-          <ListItem
-            id={p.id}
-            title={<Box>{priceDisplay(p)}</Box>}
-            secondaryTitle={p.id}
-          />
-        ))}
-      </List>
-    </ContextView>
-  )
-}
-
-const Price = ({
-  id,
-  context,
-}: {
-  id: string
-  context: ExtensionContextValue
-}) => {
-  const [price, setPrice] = useState<Stripe.Price | null>(null)
-  const [features, setFeatures] = useState<Feature[]>([])
-  const { post } = useApi(context)
-
-  useEffect(() => {
-    if (id) {
-      stripe.prices.retrieve(id).then((p) => {
-        setPrice(p)
+  const saveOverrides = useCallback(
+    async (overrides) => {
+      await post(`api/stripe/update_product_features`, {
+        product_id: productId,
+        product_features: overrides,
       })
-    }
-  }, [id])
+      await fetch()
+    },
+    [post, fetch, productId],
+  )
 
   useEffect(() => {
-    post(`api/stripe/get_product_features`, {
-      price_id: id,
-    }).then((res) => res.json().then((data) => setFeatures(data.data)))
-  }, [post, id])
+    fetch()
+  }, [fetch])
 
   return (
     <ContextView
-      title={price ? priceDisplay(price) : id}
+      title="Features"
       brandColor="#F6F8FA"
       brandIcon={BrandIcon}
-      primaryAction={
+      actions={
         <>
-          <Button type="primary">Save</Button>
-        </>
-      }
-      secondaryAction={
-        <>
-          <Button>Cancel</Button>
+          <Box>
+            <Link
+              onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
+            >
+              <Icon name="settings" />
+              Manage Features
+            </Link>
+          </Box>
         </>
       }
     >
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell>Name</TableHeaderCell>
-            <TableHeaderCell>Value</TableHeaderCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {features.map((f) => (
-            <TableRow key={f.id}>
-              <TableCell>
-                <Box>{f.name}</Box>
-              </TableCell>
-              <TableCell>
-                <Box css={{ alignX: 'end' }}>
-                  {f.type === FeatureType.Flag ? (
-                    <Switch value={f.value_flag!.toString()}></Switch>
-                  ) : f.type === FeatureType.Limit ? (
-                    <TextField value={f.value_limit!.toString()}></TextField>
-                  ) : (
-                    <></>
-                  )}
-                </Box>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <FeatureList
+        features={accountState}
+        overrides={productFeatures}
+        saveOverrides={(overrides) => saveOverrides(overrides)}
+      />
+
+      <Box css={{ marginTop: 'xxlarge' }}>
+        <Box css={{ font: 'heading' }}>Price Overrides</Box>
+      </Box>
+
+      <Accordion>
+        {prices.map((p) => (
+          <PriceAccordianItem
+            key={p.id}
+            id={p.id}
+            context={context}
+            productState={productState}
+          ></PriceAccordianItem>
+        ))}
+      </Accordion>
+      <FeaturesForm
+        context={context}
+        shown={isShowingFeaturesForm}
+        setShown={setIsShowingFeaturesForm}
+      />
     </ContextView>
   )
 }
