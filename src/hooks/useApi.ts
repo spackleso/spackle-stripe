@@ -11,7 +11,7 @@ const useApi = ({ userContext }: ExtensionContextValue) => {
         account_id: userContext.account.id,
       })
 
-      return fetch(`http://localhost:3000/${endpoint}`, {
+      return fetch(`http://localhost:3001/${endpoint}`, {
         method: 'POST',
         headers: {
           'Stripe-Signature': await fetchStripeSignature(requestData),
