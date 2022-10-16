@@ -7,6 +7,10 @@
     {
       "permission": "plan_read",
       "purpose": "Required to read pricing data"
+    },
+    {
+      "permission": "event_read",
+      "purpose": "Required to keep subscription statuses up-to-date"
     }
   ],
   "app_backend": {

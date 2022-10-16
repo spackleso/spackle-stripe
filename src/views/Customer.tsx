@@ -49,7 +49,7 @@ const Customer = (context: ExtensionContextValue) => {
 
   return (
     <ContextView
-      title="Features"
+      title="Customer Features"
       brandColor="#F6F8FA"
       brandIcon={BrandIcon}
       actions={
