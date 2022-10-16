@@ -74,7 +74,7 @@ const Product = (context: ExtensionContextValue) => {
 
   return (
     <ContextView
-      title="Features"
+      title="Product Features"
       brandColor="#F6F8FA"
       brandIcon={BrandIcon}
       actions={
@@ -97,7 +97,7 @@ const Product = (context: ExtensionContextValue) => {
       />
 
       <Box css={{ marginTop: 'xxlarge' }}>
-        <Box css={{ font: 'heading' }}>Price Overrides</Box>
+        <Box css={{ font: 'heading' }}>Price Features</Box>
       </Box>
 
       <Accordion>
@@ -113,7 +113,10 @@ const Product = (context: ExtensionContextValue) => {
       <FeaturesForm
         context={context}
         shown={isShowingFeaturesForm}
-        setShown={setIsShowingFeaturesForm}
+        setShown={(val: boolean) => {
+          setIsShowingFeaturesForm(val)
+          fetch()
+        }}
       />
     </ContextView>
   )

@@ -1,28 +1,51 @@
 import { ContextView, Box, Link, Icon } from '@stripe/ui-extension-sdk/ui'
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import BrandIcon from './brand_icon.svg'
 import useApi from '../hooks/useApi'
 import { CustomerFeature, Feature } from '../types'
 import FeatureList from '../components/FeatureList'
+import FeaturesForm from '../components/FeaturesForm'
 
 const Customer = (context: ExtensionContextValue) => {
   const customerId = context.environment.objectContext?.id
   const { post } = useApi(context)
-  const [accountFeatures, setAccountFeatures] = useState<Feature[]>([])
+  const [subscriptionsState, setSubscriptionsState] = useState<Feature[]>([])
   const [customerFeatures, setCustomerFeatures] = useState<CustomerFeature[]>(
     [],
   )
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
+  const fetch = useCallback(async () => {
+    let data = await (
+      await post(`api/stripe/get_subscriptions_state`, {
+        customer_id: customerId,
+      })
+    ).json()
+    setSubscriptionsState(data.data)
+
+    data = await (
+      await post(`api/stripe/get_customer_features`, {
+        customer_id: customerId,
+      })
+    ).json()
+    setCustomerFeatures(data.data)
+  }, [customerId, post])
+
   useEffect(() => {
-    post(`api/stripe/get_account_features`, {}).then((res) =>
-      res.json().then((data) => setAccountFeatures(data.data)),
-    )
-    post(`api/stripe/get_customer_features`, {
-      customer_id: customerId,
-    }).then((res) => res.json().then((data) => setCustomerFeatures(data.data)))
-  }, [post, customerId])
+    fetch()
+  }, [fetch])
+
+  const saveOverrides = useCallback(
+    async (overrides) => {
+      await post(`api/stripe/update_customer_features`, {
+        customer_id: customerId,
+        customer_features: overrides,
+      })
+      await fetch()
+    },
+    [post, fetch, customerId],
+  )
 
   return (
     <ContextView
@@ -42,7 +65,20 @@ const Customer = (context: ExtensionContextValue) => {
         </>
       }
     >
-      <FeatureList features={accountFeatures} overrides={customerFeatures} />
+      <FeatureList
+        features={subscriptionsState}
+        overrides={customerFeatures}
+        saveOverrides={(overrides) => saveOverrides(overrides)}
+      />
+
+      <FeaturesForm
+        context={context}
+        shown={isShowingFeaturesForm}
+        setShown={(val: boolean) => {
+          setIsShowingFeaturesForm(val)
+          fetch()
+        }}
+      />
     </ContextView>
   )
 }

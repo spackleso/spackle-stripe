@@ -52,6 +52,16 @@ const FeaturesForm = ({
     [post, fetch],
   )
 
+  const destroy = useCallback(
+    async (feature) => {
+      await post(`api/stripe/delete_account_feature`, {
+        feature_id: feature.id,
+      })
+      await fetch()
+    },
+    [post, fetch],
+  )
+
   return (
     <FocusView title={'Features'} shown={shown} setShown={setShown}>
       {isShowingNewForm ? (
@@ -64,7 +74,9 @@ const FeaturesForm = ({
               value_flag: false,
               value_limit: null,
             }}
+            isNew={true}
             save={create}
+            cancel={() => setIsShowingNewForm(false)}
           />
         </Box>
       ) : (
@@ -101,7 +113,12 @@ const FeaturesForm = ({
                     </>
                   }
                 >
-                  <FeatureForm feature={f} save={update} />
+                  <FeatureForm
+                    feature={f}
+                    isNew={false}
+                    save={update}
+                    destroy={destroy}
+                  />
                 </AccordionItem>
               ))}
             </Accordion>

@@ -33,7 +33,6 @@ const PriceAccordianItem = ({
   const [price, setPrice] = useState<Stripe.Price | null>(null)
   const [priceFeatures, setPriceFeatures] = useState<PriceFeature[]>([])
   const { post } = useApi(context)
-  console.log(priceFeatures)
 
   const fetch = useCallback(async () => {
     const data = await (
