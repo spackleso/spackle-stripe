@@ -33,7 +33,9 @@
     ],
     "actions": [],
     "content_security_policy": {
-      "connect-src": null,
+      "connect-src": [
+        "https://spackle.netlify.app/api/"
+      ],
       "image-src": null,
       "purpose": ""
     }
