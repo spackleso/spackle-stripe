@@ -16,13 +16,6 @@ import FeatureList from '../components/FeatureList'
 import PriceAccordianItem from '../components/PriceAccordianItem'
 import stripe from '../stripe'
 
-interface State {
-  prices: Stripe.Price[]
-  accountState: Feature[]
-  productFeatures: ProductFeature[]
-  productState: Feature[]
-}
-
 const Product = (context: ExtensionContextValue) => {
   const productId = context.environment.objectContext?.id
   const { post } = useApi(context)
@@ -39,6 +32,7 @@ const Product = (context: ExtensionContextValue) => {
     data = await (
       await post(`api/stripe/get_product_features`, {
         product_id: productId,
+        mode: context.environment.mode,
       })
     ).json()
     setProductFeatures(data.data)
@@ -46,6 +40,7 @@ const Product = (context: ExtensionContextValue) => {
     data = await (
       await post(`api/stripe/get_product_state`, {
         product_id: productId,
+        mode: context.environment.mode,
       })
     ).json()
     setProductState(data.data)
@@ -55,17 +50,18 @@ const Product = (context: ExtensionContextValue) => {
         setPrices(p.data)
       })
     }
-  }, [post, productId])
+  }, [post, productId, context.environment.mode])
 
   const saveOverrides = useCallback(
     async (overrides) => {
       await post(`api/stripe/update_product_features`, {
         product_id: productId,
         product_features: overrides,
+        mode: context.environment.mode,
       })
       await fetch()
     },
-    [post, fetch, productId],
+    [post, fetch, productId, context.environment.mode],
   )
 
   useEffect(() => {

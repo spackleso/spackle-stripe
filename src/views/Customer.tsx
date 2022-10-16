@@ -20,6 +20,7 @@ const Customer = (context: ExtensionContextValue) => {
     let data = await (
       await post(`api/stripe/get_subscriptions_state`, {
         customer_id: customerId,
+        mode: context.environment.mode,
       })
     ).json()
     setSubscriptionsState(data.data)
@@ -27,10 +28,11 @@ const Customer = (context: ExtensionContextValue) => {
     data = await (
       await post(`api/stripe/get_customer_features`, {
         customer_id: customerId,
+        mode: context.environment.mode,
       })
     ).json()
     setCustomerFeatures(data.data)
-  }, [customerId, post])
+  }, [customerId, post, context.environment.mode])
 
   useEffect(() => {
     fetch()
@@ -41,10 +43,11 @@ const Customer = (context: ExtensionContextValue) => {
       await post(`api/stripe/update_customer_features`, {
         customer_id: customerId,
         customer_features: overrides,
+        mode: context.environment.mode,
       })
       await fetch()
     },
-    [post, fetch, customerId],
+    [post, fetch, customerId, context.environment.mode],
   )
 
   return (

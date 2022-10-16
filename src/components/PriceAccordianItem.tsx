@@ -38,20 +38,22 @@ const PriceAccordianItem = ({
     const data = await (
       await post(`api/stripe/get_price_features`, {
         price_id: id,
+        mode: context.environment.mode,
       })
     ).json()
     setPriceFeatures(data.data)
-  }, [setPriceFeatures, id, post])
+  }, [setPriceFeatures, id, post, context.environment.mode])
 
   const saveOverrides = useCallback(
     async (overrides) => {
       await post(`api/stripe/update_price_features`, {
         price_id: id,
         price_features: overrides,
+        mode: context.environment.mode,
       })
       await fetch()
     },
-    [post, fetch, id],
+    [post, fetch, id, context.environment.mode],
   )
 
   useEffect(() => {
