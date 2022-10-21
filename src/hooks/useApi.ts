@@ -11,7 +11,7 @@ const useApi = ({ userContext }: ExtensionContextValue) => {
         account_id: userContext.account.id,
       })
 
-      return fetch(`https://spackle.netlify.app/${endpoint}`, {
+      return fetch(`https://www.spackle.so/${endpoint}`, {
         method: 'POST',
         headers: {
           'Stripe-Signature': await fetchStripeSignature(requestData),
