@@ -24,10 +24,6 @@ const FeatureList = ({
 
   const isModified =
     JSON.stringify(overrides) !== JSON.stringify(Object.values(overrideMap))
-  console.log(
-    JSON.stringify(overrides),
-    JSON.stringify(Object.values(overrideMap)),
-  )
 
   return (
     <>

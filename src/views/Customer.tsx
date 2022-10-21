@@ -1,12 +1,17 @@
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import { QueryClientProvider } from '@tanstack/react-query'
+import AccountWrapper from '../components/AccountWrapper'
 import CustomerView from '../components/CustomerView'
 import { queryClient } from '../query'
 
 const View = (context: ExtensionContextValue) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <CustomerView context={context} />
+      {context.userContext && (
+        <AccountWrapper context={context}>
+          <CustomerView context={context} />
+        </AccountWrapper>
+      )}
     </QueryClientProvider>
   )
 }
