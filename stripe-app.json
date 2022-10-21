@@ -38,8 +38,7 @@
     "actions": [],
     "content_security_policy": {
       "connect-src": [
-        "https://spackle.netlify.app/api/stripe/",
-        "https://taypcjktwqfscxfylmdl.supabase.co/rest/"
+        "https://www.spackle.so/api/stripe/"
       ],
       "image-src": null,
       "purpose": ""
