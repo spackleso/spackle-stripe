@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  Divider,
-  List,
-  ListItem,
-} from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Divider } from '@stripe/ui-extension-sdk/ui'
 import { Feature, NewOverride, Override } from '../types'
 import FeatureValue from './FeatureValue'
 import { useState, useEffect } from 'react'
@@ -30,6 +24,10 @@ const FeatureList = ({
 
   const isModified =
     JSON.stringify(overrides) !== JSON.stringify(Object.values(overrideMap))
+  console.log(
+    JSON.stringify(overrides),
+    JSON.stringify(Object.values(overrideMap)),
+  )
 
   return (
     <>

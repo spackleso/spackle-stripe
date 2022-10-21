@@ -1,4 +1,4 @@
-import { AccordionItem } from '@stripe/ui-extension-sdk/ui'
+import { AccordionItem, Box, Spinner } from '@stripe/ui-extension-sdk/ui'
 import FeatureList from './FeatureList'
 import { useEffect, useState, useCallback } from 'react'
 import { Feature, PriceFeature } from '../types'
@@ -6,6 +6,8 @@ import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import Stripe from 'stripe'
 import useApi from '../hooks/useApi'
 import stripe from '../stripe'
+import usePriceFeatures from '../hooks/usePriceFeatures'
+import { queryClient } from '../query'
 
 const priceDisplay = (price: Stripe.Price): string => {
   if (price.nickname) {
@@ -30,19 +32,9 @@ const PriceAccordianItem = ({
   productState: Feature[]
   context: ExtensionContextValue
 }) => {
-  const [price, setPrice] = useState<Stripe.Price | null>(null)
-  const [priceFeatures, setPriceFeatures] = useState<PriceFeature[]>([])
   const { post } = useApi(context)
-
-  const fetch = useCallback(async () => {
-    const data = await (
-      await post(`api/stripe/get_price_features`, {
-        price_id: id,
-        mode: context.environment.mode,
-      })
-    ).json()
-    setPriceFeatures(data.data)
-  }, [setPriceFeatures, id, post, context.environment.mode])
+  const [price, setPrice] = useState<Stripe.Price | null>(null)
+  const { data: priceFeatures } = usePriceFeatures(context, id)
 
   const saveOverrides = useCallback(
     async (overrides) => {
@@ -51,9 +43,9 @@ const PriceAccordianItem = ({
         price_features: overrides,
         mode: context.environment.mode,
       })
-      await fetch()
+      queryClient.invalidateQueries(['priceFeatures', id])
     },
-    [post, fetch, id, context.environment.mode],
+    [post, id, context.environment.mode],
   )
 
   useEffect(() => {
@@ -64,17 +56,27 @@ const PriceAccordianItem = ({
     }
   }, [id])
 
-  useEffect(() => {
-    fetch()
-  }, [fetch])
-
   return (
     <AccordionItem title={price ? priceDisplay(price) : id}>
-      <FeatureList
-        features={productState}
-        overrides={priceFeatures}
-        saveOverrides={(overrides) => saveOverrides(overrides)}
-      />
+      {priceFeatures ? (
+        <FeatureList
+          features={productState}
+          overrides={priceFeatures as any}
+          saveOverrides={(overrides) => saveOverrides(overrides)}
+        />
+      ) : (
+        <Box
+          css={{
+            stack: 'x',
+            alignX: 'center',
+            alignY: 'center',
+            width: 'fill',
+            height: 'fill',
+          }}
+        >
+          <Spinner />
+        </Box>
+      )}
     </AccordionItem>
   )
 }

@@ -11,6 +11,10 @@
     {
       "permission": "event_read",
       "purpose": "Required to keep subscription statuses up-to-date"
+    },
+    {
+      "permission": "secret_write",
+      "purpose": "Required to keep subscription statuses up-to-date"
     }
   ],
   "app_backend": {
@@ -34,7 +38,8 @@
     "actions": [],
     "content_security_policy": {
       "connect-src": [
-        "https://spackle.netlify.app/api/stripe/"
+        "https://spackle.netlify.app/api/stripe/",
+        "https://taypcjktwqfscxfylmdl.supabase.co/rest/"
       ],
       "image-src": null,
       "purpose": ""
