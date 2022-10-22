@@ -22,7 +22,6 @@ const AccountWrapper = ({
   )
 
   const startSync = useCallback(async () => {
-    console.log('Starting sync')
     await post('api/stripe/sync_account', {})
   }, [post])
 

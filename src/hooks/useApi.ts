@@ -12,6 +12,7 @@ const useApi = ({ userContext }: ExtensionContextValue) => {
       })
 
       return fetch(`https://www.spackle.so/${endpoint}`, {
+        // return fetch(`http://localhost:3001/${endpoint}`, {
         method: 'POST',
         headers: {
           'Stripe-Signature': await fetchStripeSignature(requestData),
