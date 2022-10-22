@@ -5,7 +5,7 @@ import {
   Icon,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import BrandIcon from '../views/brand_icon.svg'
 import useApi from '../hooks/useApi'
 import FeatureList from '../components/FeatureList'
@@ -14,6 +14,8 @@ import { queryClient } from '../query'
 import useSubscriptionsState from '../hooks/useSubscriptionsState'
 import useCustomerFeatures from '../hooks/useCustomerFeatures'
 import useStripeContext from '../hooks/useStripeContext'
+import { NewOverride, Override } from '../types'
+import { useMutation } from '@tanstack/react-query'
 
 const CustomerView = () => {
   const { environment } = useStripeContext()
@@ -27,20 +29,19 @@ const CustomerView = () => {
     customerId,
     environment.mode,
   )
-  const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
-
-  const saveOverrides = useCallback(
-    async (overrides) => {
-      await post(`api/stripe/update_customer_features`, {
+  const saveOverrides = useMutation(
+    async (overrides: Override[] | NewOverride[]) => {
+      const response = await post(`api/stripe/update_customer_features`, {
         customer_id: customerId,
         customer_features: overrides,
         mode: environment.mode,
       })
       queryClient.invalidateQueries(['subscriptionsState', customerId])
       queryClient.invalidateQueries(['customerFeatures', customerId])
+      return response
     },
-    [post, customerId, environment.mode],
   )
+  const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
   return (
     <ContextView
@@ -65,7 +66,7 @@ const CustomerView = () => {
           <FeatureList
             features={subscriptionsState}
             overrides={customerFeatures}
-            saveOverrides={(overrides) => saveOverrides(overrides)}
+            saveOverrides={saveOverrides}
           />
 
           <FeaturesForm

@@ -19,6 +19,8 @@ import FeatureList from '../components/FeatureList'
 import PriceAccordianItem from '../components/PriceAccordianItem'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
+import { NewOverride, Override } from '../types'
+import { useMutation } from '@tanstack/react-query'
 
 const ProductView = () => {
   const { post } = useApi()
@@ -41,17 +43,17 @@ const ProductView = () => {
     })
   }, [productId])
 
-  const saveOverrides = useCallback(
-    async (overrides) => {
-      await post(`api/stripe/update_product_features`, {
+  const saveOverrides = useMutation(
+    async (overrides: Override[] | NewOverride[]) => {
+      const response = await post(`api/stripe/update_product_features`, {
         product_id: productId,
         product_features: overrides,
         mode: environment.mode,
       })
       queryClient.invalidateQueries(['productFeatures', productId])
       queryClient.invalidateQueries(['productState', productId])
+      return response
     },
-    [post, productId, environment.mode],
   )
 
   useEffect(() => {
@@ -81,7 +83,7 @@ const ProductView = () => {
           <FeatureList
             features={accountState}
             overrides={productFeatures}
-            saveOverrides={(overrides) => saveOverrides(overrides)}
+            saveOverrides={saveOverrides}
           />
 
           <Box css={{ marginTop: 'xxlarge' }}>

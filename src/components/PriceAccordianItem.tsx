@@ -1,13 +1,14 @@
 import { AccordionItem, Box, Spinner } from '@stripe/ui-extension-sdk/ui'
 import FeatureList from './FeatureList'
-import { useEffect, useState, useCallback } from 'react'
-import { Feature } from '../types'
+import { useEffect, useState } from 'react'
+import { Feature, NewOverride, Override } from '../types'
 import Stripe from 'stripe'
 import useApi from '../hooks/useApi'
 import stripe from '../stripe'
 import usePriceFeatures from '../hooks/usePriceFeatures'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
+import { useMutation } from '@tanstack/react-query'
 
 const priceDisplay = (price: Stripe.Price): string => {
   if (price.nickname) {
@@ -34,9 +35,8 @@ const PriceAccordianItem = ({
   const { environment } = useStripeContext()
   const [price, setPrice] = useState<Stripe.Price | null>(null)
   const { data: priceFeatures } = usePriceFeatures(id, environment.mode)
-
-  const saveOverrides = useCallback(
-    async (overrides) => {
+  const saveOverrides = useMutation(
+    async (overrides: Override[] | NewOverride[]) => {
       await post(`api/stripe/update_price_features`, {
         price_id: id,
         price_features: overrides,
@@ -44,7 +44,6 @@ const PriceAccordianItem = ({
       })
       queryClient.invalidateQueries(['priceFeatures', id])
     },
-    [post, id, environment.mode],
   )
 
   useEffect(() => {
@@ -61,7 +60,7 @@ const PriceAccordianItem = ({
         <FeatureList
           features={productState}
           overrides={priceFeatures as any}
-          saveOverrides={(overrides) => saveOverrides(overrides)}
+          saveOverrides={saveOverrides}
         />
       ) : (
         <Box

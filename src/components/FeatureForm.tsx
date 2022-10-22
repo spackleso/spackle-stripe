@@ -5,9 +5,11 @@ import {
   TextField,
   Radio,
   Switch,
+  Spinner,
 } from '@stripe/ui-extension-sdk/ui'
 import { Feature, FeatureType, NewFeature } from '../types'
 import { useState } from 'react'
+import { UseMutationResult } from '@tanstack/react-query'
 
 const FeatureForm = ({
   feature,
@@ -18,9 +20,9 @@ const FeatureForm = ({
 }: {
   feature: Feature | NewFeature
   isNew: boolean
-  save: (feature: Feature | NewFeature) => Promise<void>
+  save: UseMutationResult<any, unknown, Feature | NewFeature, unknown>
   cancel?: () => void
-  destroy?: (feature: Feature) => Promise<void>
+  destroy?: UseMutationResult<any, unknown, Feature, unknown>
 }) => {
   const [name, setName] = useState<string>(feature.name)
   const [key, setKey] = useState<string>(feature.key)
@@ -41,7 +43,7 @@ const FeatureForm = ({
     <Box css={{ padding: 'small', gap: 'small', stack: 'y' }}>
       <TextField
         label="Name"
-        required={true}
+        required
         description="Name of the feature"
         value={name}
         placeholder="Priority Support"
@@ -49,7 +51,7 @@ const FeatureForm = ({
       />
       <TextField
         label="Key"
-        required={true}
+        required
         disabled={!isNew}
         description="Feature key for use by the API"
         value={key}
@@ -126,35 +128,38 @@ const FeatureForm = ({
           {!isNew && (
             <Button
               type="destructive"
-              onPress={() => destroy && destroy(feature as Feature)}
+              disabled={save.isLoading || destroy?.isLoading}
+              onPress={() => destroy && destroy.mutate(feature as Feature)}
             >
-              Delete
+              {destroy?.isLoading ? <Spinner /> : <>Destroy</>}
             </Button>
           )}
         </Box>
 
         <Box css={{ stack: 'x', alignX: 'end', gapX: 'small' }}>
-          <Button
-            type="secondary"
-            disabled={!isEdited && !isNew}
-            onPress={() => {
-              setName(feature.name)
-              setKey(feature.key)
-              setType(feature.type)
-              setValueFlag(feature.value_flag)
-              setValueLimit(feature.value_limit)
-              if (cancel) {
-                cancel()
-              }
-            }}
-          >
-            Cancel
-          </Button>
+          {!(save.isLoading || destroy?.isLoading) && (
+            <Button
+              type="secondary"
+              disabled={!isEdited && !isNew}
+              onPress={() => {
+                setName(feature.name)
+                setKey(feature.key)
+                setType(feature.type)
+                setValueFlag(feature.value_flag)
+                setValueLimit(feature.value_limit)
+                if (cancel) {
+                  cancel()
+                }
+              }}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             type="primary"
-            disabled={!isEdited}
+            disabled={!isEdited || destroy?.isLoading || save.isLoading}
             onPress={() =>
-              save({
+              save.mutate({
                 ...feature,
                 name,
                 key,
@@ -164,7 +169,7 @@ const FeatureForm = ({
               })
             }
           >
-            Save
+            {save.isLoading ? <Spinner /> : <>Save</>}
           </Button>
         </Box>
       </Box>

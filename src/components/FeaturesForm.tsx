@@ -7,12 +7,13 @@ import {
   Switch,
 } from '@stripe/ui-extension-sdk/ui'
 import useApi from '../hooks/useApi'
-import { FeatureType } from '../types'
-import { useState, useCallback } from 'react'
+import { Feature, FeatureType, NewFeature } from '../types'
+import { useState } from 'react'
 import FeatureForm from './FeatureForm'
 import useAccountFeatures from '../hooks/useAccountFeatures'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
+import { useMutation } from '@tanstack/react-query'
 
 const FeaturesForm = ({
   shown,
@@ -26,44 +27,38 @@ const FeaturesForm = ({
   const { data: features } = useAccountFeatures(userContext.account.id)
   const { post } = useApi()
 
-  const update = useCallback(
-    async (feature) => {
-      await post(`api/stripe/update_account_feature`, feature)
-      queryClient.invalidateQueries(['accountFeatures'])
-      queryClient.invalidateQueries(['accountState'])
-      queryClient.invalidateQueries(['customerFeatures'])
-      queryClient.invalidateQueries(['productState'])
-      queryClient.invalidateQueries(['subscriptionsState'])
-    },
-    [post],
-  )
+  const update = useMutation(async (feature: Feature | NewFeature) => {
+    const response = await post(`api/stripe/update_account_feature`, feature)
+    queryClient.invalidateQueries(['accountFeatures'])
+    queryClient.invalidateQueries(['accountState'])
+    queryClient.invalidateQueries(['customerFeatures'])
+    queryClient.invalidateQueries(['productState'])
+    queryClient.invalidateQueries(['subscriptionsState'])
+    return response
+  })
 
-  const create = useCallback(
-    async (feature) => {
-      await post(`api/stripe/create_account_feature`, feature)
-      queryClient.invalidateQueries(['accountFeatures'])
-      queryClient.invalidateQueries(['accountState'])
-      queryClient.invalidateQueries(['customerFeatures'])
-      queryClient.invalidateQueries(['productState'])
-      queryClient.invalidateQueries(['subscriptionsState'])
-      setIsShowingNewForm(false)
-    },
-    [post],
-  )
+  const create = useMutation(async (feature: NewFeature | Feature) => {
+    const response = await post(`api/stripe/create_account_feature`, feature)
+    queryClient.invalidateQueries(['accountFeatures'])
+    queryClient.invalidateQueries(['accountState'])
+    queryClient.invalidateQueries(['customerFeatures'])
+    queryClient.invalidateQueries(['productState'])
+    queryClient.invalidateQueries(['subscriptionsState'])
+    setIsShowingNewForm(false)
+    return response
+  })
 
-  const destroy = useCallback(
-    async (feature) => {
-      await post(`api/stripe/delete_account_feature`, {
-        feature_id: feature.id,
-      })
-      queryClient.invalidateQueries(['accountFeatures'])
-      queryClient.invalidateQueries(['accountState'])
-      queryClient.invalidateQueries(['customerFeatures'])
-      queryClient.invalidateQueries(['productState'])
-      queryClient.invalidateQueries(['subscriptionsState'])
-    },
-    [post],
-  )
+  const destroy = useMutation(async (feature: Feature) => {
+    const response = await post(`api/stripe/delete_account_feature`, {
+      feature_id: feature.id,
+    })
+    queryClient.invalidateQueries(['accountFeatures'])
+    queryClient.invalidateQueries(['accountState'])
+    queryClient.invalidateQueries(['customerFeatures'])
+    queryClient.invalidateQueries(['productState'])
+    queryClient.invalidateQueries(['subscriptionsState'])
+    return response
+  })
 
   return (
     <FocusView title={'Features'} shown={shown} setShown={setShown}>

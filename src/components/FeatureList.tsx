@@ -1,7 +1,8 @@
-import { Box, Button, Divider } from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Divider, Spinner } from '@stripe/ui-extension-sdk/ui'
 import { Feature, NewOverride, Override } from '../types'
 import FeatureValue from './FeatureValue'
 import { useState, useEffect } from 'react'
+import { UseMutationResult } from '@tanstack/react-query'
 
 const FeatureList = ({
   features,
@@ -10,7 +11,7 @@ const FeatureList = ({
 }: {
   features: Feature[]
   overrides: Override[] | NewOverride[]
-  saveOverrides: (overrides: Override[] | NewOverride[]) => Promise<void>
+  saveOverrides: UseMutationResult<any, unknown, Override[] | NewOverride[]>
 }) => {
   const [overrideMap, setOverrideMap] = useState<{
     [key: number]: Override | NewOverride
@@ -42,26 +43,28 @@ const FeatureList = ({
       </Box>
 
       <Box css={{ stack: 'x', marginY: 'large', gap: 'small', alignX: 'end' }}>
-        <Button
-          type="secondary"
-          disabled={!isModified}
-          onPress={() => {
-            setOverrideMap(
-              Object.assign(
-                {},
-                ...overrides.map((o) => ({ [o.feature_id]: o })),
-              ),
-            )
-          }}
-        >
-          Cancel
-        </Button>
+        {!saveOverrides.isLoading && (
+          <Button
+            type="secondary"
+            disabled={!isModified || saveOverrides.isLoading}
+            onPress={() => {
+              setOverrideMap(
+                Object.assign(
+                  {},
+                  ...overrides.map((o) => ({ [o.feature_id]: o })),
+                ),
+              )
+            }}
+          >
+            Cancel
+          </Button>
+        )}
         <Button
           type="primary"
-          disabled={!isModified}
-          onPress={() => saveOverrides(Object.values(overrideMap))}
+          disabled={!isModified || saveOverrides.isLoading}
+          onPress={() => saveOverrides.mutate(Object.values(overrideMap))}
         >
-          Save
+          {saveOverrides.isLoading ? <Spinner /> : <>Save</>}
         </Button>
       </Box>
     </>
