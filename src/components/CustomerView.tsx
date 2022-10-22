@@ -17,7 +17,7 @@ import useCustomerFeatures from '../hooks/useCustomerFeatures'
 
 const CustomerView = ({ context }: { context: ExtensionContextValue }) => {
   const customerId = context.environment.objectContext?.id
-  const { post } = useApi(context)
+  const { post } = useApi()
   const { data: subscriptionsState } = useSubscriptionsState(
     context,
     customerId,

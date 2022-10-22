@@ -28,7 +28,7 @@ const FeaturesForm = ({
     context,
     context.userContext.account.id,
   )
-  const { post } = useApi(context)
+  const { post } = useApi()
 
   const update = useCallback(
     async (feature) => {

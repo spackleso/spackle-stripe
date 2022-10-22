@@ -24,7 +24,7 @@ const ProductView = ({ context }: { context: ExtensionContextValue }) => {
   const { environment, userContext } = context
   const productId = environment.objectContext?.id
   const [prices, setPrices] = useState<Stripe.Price[]>([])
-  const { post } = useApi(context)
+  const { post } = useApi()
   const { data: accountState } = useAccountState(
     context,
     userContext.account.id,

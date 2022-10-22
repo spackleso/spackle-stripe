@@ -3,14 +3,17 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import AccountWrapper from '../components/AccountWrapper'
 import ProductView from '../components/ProductView'
 import { queryClient } from '../query'
+import { ApiContext, createApi } from '../hooks/useApi'
 
 const View = (context: ExtensionContextValue) => {
   return (
     <QueryClientProvider client={queryClient}>
       {context.userContext && (
-        <AccountWrapper context={context}>
-          <ProductView context={context} />
-        </AccountWrapper>
+        <ApiContext.Provider value={createApi(context)}>
+          <AccountWrapper context={context}>
+            <ProductView context={context} />
+          </AccountWrapper>
+        </ApiContext.Provider>
       )}
     </QueryClientProvider>
   )

@@ -15,7 +15,7 @@ const AccountWrapper = ({
   context: ExtensionContextValue
   children: ReactNode
 }) => {
-  const { post } = useApi(context)
+  const { post } = useApi()
   const { data: account, refetch } = useAccount(
     context,
     context.userContext.account.id,

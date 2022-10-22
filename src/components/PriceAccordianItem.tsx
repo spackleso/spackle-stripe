@@ -32,7 +32,7 @@ const PriceAccordianItem = ({
   productState: Feature[]
   context: ExtensionContextValue
 }) => {
-  const { post } = useApi(context)
+  const { post } = useApi()
   const [price, setPrice] = useState<Stripe.Price | null>(null)
   const { data: priceFeatures } = usePriceFeatures(context, id)
 

@@ -1,29 +1,38 @@
 import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import fetchStripeSignature from '@stripe/ui-extension-sdk/signature'
-import { useCallback } from 'react'
+import { useContext, createContext } from 'react'
 
-const useApi = ({ userContext }: ExtensionContextValue) => {
-  const post = useCallback(
-    async (endpoint, requestData) => {
-      const body = JSON.stringify({
-        ...requestData,
-        user_id: userContext.id,
-        account_id: userContext.account.id,
-      })
+interface Api {
+  post: (endpoint: string, requestData: any) => Promise<any>
+}
 
-      return fetch(`https://www.spackle.so/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Stripe-Signature': await fetchStripeSignature(requestData),
-          'Content-Type': 'application/json',
-        },
-        body: body,
-      })
-    },
-    [userContext],
-  )
+export const ApiContext = createContext<Api | undefined>(undefined)
 
-  return { post }
+export const createApi = ({ userContext }: ExtensionContextValue) => ({
+  post: async (endpoint: string, requestData: any) => {
+    const body = JSON.stringify({
+      ...requestData,
+      user_id: userContext.id,
+      account_id: userContext.account.id,
+    })
+
+    return fetch(`https://www.spackle.so/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Stripe-Signature': await fetchStripeSignature(requestData),
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    })
+  },
+})
+
+export const useApi = () => {
+  const context = useContext(ApiContext)
+  if (context === undefined) {
+    throw new Error('useApi must be used within a ')
+  }
+  return context
 }
 
 export default useApi
