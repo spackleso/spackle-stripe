@@ -5,7 +5,6 @@ import {
   Icon,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
-import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import { useState, useCallback } from 'react'
 import BrandIcon from '../views/brand_icon.svg'
 import useApi from '../hooks/useApi'
@@ -14,15 +13,20 @@ import FeaturesForm from '../components/FeaturesForm'
 import { queryClient } from '../query'
 import useSubscriptionsState from '../hooks/useSubscriptionsState'
 import useCustomerFeatures from '../hooks/useCustomerFeatures'
+import useStripeContext from '../hooks/useStripeContext'
 
-const CustomerView = ({ context }: { context: ExtensionContextValue }) => {
-  const customerId = context.environment.objectContext?.id
+const CustomerView = () => {
+  const { environment } = useStripeContext()
+  const customerId = environment.objectContext?.id
   const { post } = useApi()
   const { data: subscriptionsState } = useSubscriptionsState(
-    context,
     customerId,
+    environment.mode,
   )
-  const { data: customerFeatures } = useCustomerFeatures(context, customerId)
+  const { data: customerFeatures } = useCustomerFeatures(
+    customerId,
+    environment.mode,
+  )
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
   const saveOverrides = useCallback(
@@ -30,12 +34,12 @@ const CustomerView = ({ context }: { context: ExtensionContextValue }) => {
       await post(`api/stripe/update_customer_features`, {
         customer_id: customerId,
         customer_features: overrides,
-        mode: context.environment.mode,
+        mode: environment.mode,
       })
       queryClient.invalidateQueries(['subscriptionsState', customerId])
       queryClient.invalidateQueries(['customerFeatures', customerId])
     },
-    [post, customerId, context.environment.mode],
+    [post, customerId, environment.mode],
   )
 
   return (
@@ -65,7 +69,6 @@ const CustomerView = ({ context }: { context: ExtensionContextValue }) => {
           />
 
           <FeaturesForm
-            context={context}
             shown={isShowingFeaturesForm}
             setShown={setIsShowingFeaturesForm}
           />

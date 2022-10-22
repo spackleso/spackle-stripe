@@ -2,24 +2,16 @@ import { Box, Spinner } from '@stripe/ui-extension-sdk/ui'
 import useAccount from '../hooks/useAccount'
 import { ReactNode, useEffect, useCallback } from 'react'
 import useApi from '../hooks/useApi'
-import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
+import useStripeContext from '../hooks/useStripeContext'
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-const AccountWrapper = ({
-  context,
-  children,
-}: {
-  context: ExtensionContextValue
-  children: ReactNode
-}) => {
+const AccountWrapper = ({ children }: { children: ReactNode }) => {
   const { post } = useApi()
-  const { data: account, refetch } = useAccount(
-    context,
-    context.userContext.account.id,
-  )
+  const { userContext } = useStripeContext()
+  const { data: account, refetch } = useAccount(userContext.account.id)
 
   const startSync = useCallback(async () => {
     await post('api/stripe/sync_account', {})

@@ -17,20 +17,22 @@ import BrandIcon from '../views/brand_icon.svg'
 import FeaturesForm from '../components/FeaturesForm'
 import FeatureList from '../components/FeatureList'
 import PriceAccordianItem from '../components/PriceAccordianItem'
-import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import { queryClient } from '../query'
+import useStripeContext from '../hooks/useStripeContext'
 
-const ProductView = ({ context }: { context: ExtensionContextValue }) => {
-  const { environment, userContext } = context
-  const productId = environment.objectContext?.id
-  const [prices, setPrices] = useState<Stripe.Price[]>([])
+const ProductView = () => {
   const { post } = useApi()
-  const { data: accountState } = useAccountState(
-    context,
-    userContext.account.id,
+  const { environment, userContext } = useStripeContext()
+  const { data: accountState } = useAccountState(userContext.account.id)
+
+  const productId = environment.objectContext?.id
+  const { data: productFeatures } = useProductFeatures(
+    productId,
+    environment.mode,
   )
-  const { data: productFeatures } = useProductFeatures(context, productId)
-  const { data: productState } = useProductState(context, productId)
+  const { data: productState } = useProductState(productId, environment.mode)
+
+  const [prices, setPrices] = useState<Stripe.Price[]>([])
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
   const fetch = useCallback(async () => {
@@ -44,12 +46,12 @@ const ProductView = ({ context }: { context: ExtensionContextValue }) => {
       await post(`api/stripe/update_product_features`, {
         product_id: productId,
         product_features: overrides,
-        mode: context.environment.mode,
+        mode: environment.mode,
       })
       queryClient.invalidateQueries(['productFeatures', productId])
       queryClient.invalidateQueries(['productState', productId])
     },
-    [post, productId, context.environment.mode],
+    [post, productId, environment.mode],
   )
 
   useEffect(() => {
@@ -91,13 +93,11 @@ const ProductView = ({ context }: { context: ExtensionContextValue }) => {
               <PriceAccordianItem
                 key={p.id}
                 id={p.id}
-                context={context}
                 productState={productState}
               ></PriceAccordianItem>
             ))}
           </Accordion>
           <FeaturesForm
-            context={context}
             shown={isShowingFeaturesForm}
             setShown={setIsShowingFeaturesForm}
           />

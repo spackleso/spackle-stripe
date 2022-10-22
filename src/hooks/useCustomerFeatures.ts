@@ -1,12 +1,11 @@
-import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import { useQuery } from '@tanstack/react-query'
 import useApi from './useApi'
 
 const useCustomerFeatures = (
-  context: ExtensionContextValue,
   customerId: string | undefined,
+  mode: 'live' | 'test',
 ) => {
-  const { post } = useApi(context)
+  const { post } = useApi()
   return useQuery(
     ['customerFeatures', customerId],
     async () => {
@@ -14,7 +13,7 @@ const useCustomerFeatures = (
         const response = await (
           await post(`api/stripe/get_customer_features`, {
             customer_id: customerId,
-            mode: context.environment.mode,
+            mode,
           })
         ).json()
         return response.data

@@ -30,7 +30,7 @@ export const createApi = ({ userContext }: ExtensionContextValue) => ({
 export const useApi = () => {
   const context = useContext(ApiContext)
   if (context === undefined) {
-    throw new Error('useApi must be used within a ')
+    throw new Error('useApi must be used within a ApiContext.Provider')
   }
   return context
 }

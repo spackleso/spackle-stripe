@@ -1,4 +1,3 @@
-import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import {
   Button,
   Box,
@@ -13,21 +12,18 @@ import { useState, useCallback } from 'react'
 import FeatureForm from './FeatureForm'
 import useAccountFeatures from '../hooks/useAccountFeatures'
 import { queryClient } from '../query'
+import useStripeContext from '../hooks/useStripeContext'
 
 const FeaturesForm = ({
-  context,
   shown,
   setShown,
 }: {
-  context: ExtensionContextValue
   shown: boolean
   setShown: (val: boolean) => void
 }) => {
+  const { userContext } = useStripeContext()
   const [isShowingNewForm, setIsShowingNewForm] = useState<boolean>(false)
-  const { data: features } = useAccountFeatures(
-    context,
-    context.userContext.account.id,
-  )
+  const { data: features } = useAccountFeatures(userContext.account.id)
   const { post } = useApi()
 
   const update = useCallback(

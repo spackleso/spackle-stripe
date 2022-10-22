@@ -1,13 +1,13 @@
 import { AccordionItem, Box, Spinner } from '@stripe/ui-extension-sdk/ui'
 import FeatureList from './FeatureList'
 import { useEffect, useState, useCallback } from 'react'
-import { Feature, PriceFeature } from '../types'
-import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
+import { Feature } from '../types'
 import Stripe from 'stripe'
 import useApi from '../hooks/useApi'
 import stripe from '../stripe'
 import usePriceFeatures from '../hooks/usePriceFeatures'
 import { queryClient } from '../query'
+import useStripeContext from '../hooks/useStripeContext'
 
 const priceDisplay = (price: Stripe.Price): string => {
   if (price.nickname) {
@@ -26,26 +26,25 @@ const priceDisplay = (price: Stripe.Price): string => {
 const PriceAccordianItem = ({
   id,
   productState,
-  context,
 }: {
   id: string
   productState: Feature[]
-  context: ExtensionContextValue
 }) => {
   const { post } = useApi()
+  const { environment } = useStripeContext()
   const [price, setPrice] = useState<Stripe.Price | null>(null)
-  const { data: priceFeatures } = usePriceFeatures(context, id)
+  const { data: priceFeatures } = usePriceFeatures(id, environment.mode)
 
   const saveOverrides = useCallback(
     async (overrides) => {
       await post(`api/stripe/update_price_features`, {
         price_id: id,
         price_features: overrides,
-        mode: context.environment.mode,
+        mode: environment.mode,
       })
       queryClient.invalidateQueries(['priceFeatures', id])
     },
-    [post, id, context.environment.mode],
+    [post, id, environment.mode],
   )
 
   useEffect(() => {
