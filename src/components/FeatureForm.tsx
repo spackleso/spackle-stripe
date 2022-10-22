@@ -140,7 +140,7 @@ const FeatureForm = ({
               disabled={save.isLoading || destroy?.isLoading}
               onPress={() => destroy && destroy.mutate(feature as Feature)}
             >
-              {destroy?.isLoading ? <Spinner /> : <>Destroy</>}
+              {destroy?.isLoading ? <Spinner /> : <>Delete</>}
             </Button>
           )}
         </Box>
