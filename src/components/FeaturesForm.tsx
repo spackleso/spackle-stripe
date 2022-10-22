@@ -39,6 +39,11 @@ const FeaturesForm = ({
 
   const create = useMutation(async (feature: NewFeature | Feature) => {
     const response = await post(`api/stripe/create_account_feature`, feature)
+    if (response.status !== 201) {
+      const error = (await response.json()).error
+      throw new Error(error)
+    }
+
     queryClient.invalidateQueries(['accountFeatures'])
     queryClient.invalidateQueries(['accountState'])
     queryClient.invalidateQueries(['customerFeatures'])

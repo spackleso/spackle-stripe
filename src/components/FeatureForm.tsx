@@ -43,7 +43,7 @@ const FeatureForm = ({
     <Box css={{ padding: 'small', gap: 'small', stack: 'y' }}>
       <TextField
         label="Name"
-        required
+        required={true}
         description="Name of the feature"
         value={name}
         placeholder="Priority Support"
@@ -51,7 +51,7 @@ const FeatureForm = ({
       />
       <TextField
         label="Key"
-        required
+        required={true}
         disabled={!isNew}
         description="Feature key for use by the API"
         value={key}
@@ -123,7 +123,16 @@ const FeatureForm = ({
           <></>
         )}
       </Box>
-      <Box css={{ stack: 'x', paddingY: 'small', distribute: 'space-between' }}>
+      {save.error && (
+        <Box
+          css={{ color: 'critical', textAlign: 'center', paddingTop: 'medium' }}
+        >
+          Something went wrong
+        </Box>
+      )}
+      <Box
+        css={{ stack: 'x', paddingY: 'medium', distribute: 'space-between' }}
+      >
         <Box css={{ stack: 'x', alignX: 'end', gapX: 'small' }}>
           {!isNew && (
             <Button
@@ -157,7 +166,13 @@ const FeatureForm = ({
           )}
           <Button
             type="primary"
-            disabled={!isEdited || destroy?.isLoading || save.isLoading}
+            disabled={
+              !isEdited ||
+              destroy?.isLoading ||
+              save.isLoading ||
+              key.length === 0 ||
+              name.length === 0
+            }
             onPress={() =>
               save.mutate({
                 ...feature,
