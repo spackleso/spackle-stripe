@@ -5,16 +5,24 @@
   "icon": "",
   "permissions": [
     {
-      "permission": "plan_read",
-      "purpose": "Required to read pricing data"
+      "permission": "customer_read",
+      "purpose": "Required to read customer subscription data"
     },
     {
       "permission": "event_read",
       "purpose": "Required to keep subscription statuses up-to-date"
     },
     {
-      "permission": "secret_write",
-      "purpose": "Required to keep subscription statuses up-to-date"
+      "permission": "plan_read",
+      "purpose": "Required to read pricing data"
+    },
+    {
+      "permission": "product_read",
+      "purpose": "Required to read pricing data"
+    },
+    {
+      "permission": "subscription_read",
+      "purpose": "Required to read customer subscription data"
     }
   ],
   "app_backend": {
@@ -44,5 +52,7 @@
       "purpose": ""
     }
   },
-  "post_install_action": null
+  "post_install_action": {
+    "type": "settings"
+  }
 }

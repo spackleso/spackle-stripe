@@ -1,10 +1,21 @@
-import { Box, SettingsView } from '@stripe/ui-extension-sdk/ui'
+import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { ApiContext, createApi } from '../hooks/useApi'
+import { StripeContext } from '../hooks/useStripeContext'
+import { queryClient } from '../query'
+import SettingsView from '../components/SettingsView'
 
-const AppSettings = () => {
+const AppSettings = (context: ExtensionContextValue) => {
   return (
-    <SettingsView>
-      <Box>Settings</Box>
-    </SettingsView>
+    <QueryClientProvider client={queryClient}>
+      {context.userContext && (
+        <StripeContext.Provider value={context}>
+          <ApiContext.Provider value={createApi(context)}>
+            <SettingsView />
+          </ApiContext.Provider>
+        </StripeContext.Provider>
+      )}
+    </QueryClientProvider>
   )
 }
 
