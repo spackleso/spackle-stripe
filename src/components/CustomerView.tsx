@@ -46,7 +46,7 @@ const CustomerView = () => {
   return (
     <ContextView
       title="Customer Features"
-      brandColor="#F6F8FA"
+      brandColor="#5D56E6"
       brandIcon={BrandIcon}
       actions={
         <>

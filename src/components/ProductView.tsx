@@ -63,7 +63,7 @@ const ProductView = () => {
   return (
     <ContextView
       title="Product Features"
-      brandColor="#F6F8FA"
+      brandColor="#5D56E6"
       brandIcon={BrandIcon}
       actions={
         <>
