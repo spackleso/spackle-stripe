@@ -66,10 +66,15 @@ const ProductView = () => {
       title="Product Features"
       brandColor="#FFFFFF"
       brandIcon={BrandIcon}
-      actions={
+      externalLink={{
+        label: 'Documentation',
+        href: 'https://www.spackle.so/docs',
+      }}
+      footerContent={
         <>
           <Box>
             <Link
+              type="secondary"
               onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
             >
               <Icon name="settings" />
@@ -119,7 +124,7 @@ const ProductView = () => {
               <Inline css={{ fontWeight: 'bold' }}>
                 &quot;Manage Features&quot;
               </Inline>{' '}
-              above
+              below
             </Box>
           )}
           <FeaturesForm
