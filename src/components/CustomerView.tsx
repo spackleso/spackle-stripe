@@ -6,7 +6,7 @@ import {
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
 import { useState } from 'react'
-import BrandIcon from '../views/brand_icon.svg'
+import BrandIcon from '../views/icon.svg'
 import useApi from '../hooks/useApi'
 import FeatureList from '../components/FeatureList'
 import FeaturesForm from '../components/FeaturesForm'
