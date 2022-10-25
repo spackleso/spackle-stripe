@@ -1,8 +1,8 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "Spackle",
-  "icon": "",
+  "icon": "./icon.png",
   "permissions": [
     {
       "permission": "customer_read",
@@ -53,6 +53,7 @@
     }
   },
   "post_install_action": {
-    "type": "settings"
+    "type": "settings",
+    "url": ""
   }
 }

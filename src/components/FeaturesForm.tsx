@@ -5,6 +5,7 @@ import {
   Accordion,
   AccordionItem,
   Switch,
+  Inline,
 } from '@stripe/ui-extension-sdk/ui'
 import useApi from '../hooks/useApi'
 import { Feature, FeatureType, NewFeature } from '../types'
@@ -99,38 +100,58 @@ const FeaturesForm = ({
           </Box>
 
           <Box>
-            <Accordion>
-              {features &&
-                features.map((f: any) => (
-                  <AccordionItem
-                    key={f.key}
-                    title={f.name}
-                    subtitle={f.key}
-                    actions={
-                      <>
-                        {f.type === FeatureType.Flag ? (
-                          <Switch
-                            disabled={true}
-                            checked={!!f.value_flag}
-                            defaultChecked={!!f.value_flag}
-                          ></Switch>
-                        ) : f.type === FeatureType.Limit ? (
-                          <Box css={{ font: 'heading' }}>{f.value_limit}</Box>
-                        ) : (
-                          <></>
-                        )}
-                      </>
-                    }
-                  >
-                    <FeatureForm
-                      feature={f}
-                      isNew={false}
-                      save={update}
-                      destroy={destroy}
-                    />
-                  </AccordionItem>
-                ))}
-            </Accordion>
+            {features?.length ? (
+              <Accordion>
+                {features &&
+                  features.map((f: any) => (
+                    <AccordionItem
+                      key={f.key}
+                      title={f.name}
+                      subtitle={f.key}
+                      actions={
+                        <>
+                          {f.type === FeatureType.Flag ? (
+                            <Switch
+                              disabled={true}
+                              checked={!!f.value_flag}
+                              defaultChecked={!!f.value_flag}
+                            ></Switch>
+                          ) : f.type === FeatureType.Limit ? (
+                            <Box css={{ font: 'heading' }}>{f.value_limit}</Box>
+                          ) : (
+                            <></>
+                          )}
+                        </>
+                      }
+                    >
+                      <FeatureForm
+                        feature={f}
+                        isNew={false}
+                        save={update}
+                        destroy={destroy}
+                      />
+                    </AccordionItem>
+                  ))}
+              </Accordion>
+            ) : (
+              <Box
+                css={{
+                  keyline: 'neutral',
+                  padding: 'medium',
+                  font: 'caption',
+                  borderRadius: 'small',
+                  margin: 'xxlarge',
+                  textAlign: 'center',
+                }}
+              >
+                You don&apos;t have any features yet. Create a new feature by
+                clicking{' '}
+                <Inline css={{ fontWeight: 'bold' }}>
+                  &quot;Create New&quot;
+                </Inline>{' '}
+                above
+              </Box>
+            )}
           </Box>
         </Box>
       )}

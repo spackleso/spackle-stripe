@@ -4,6 +4,7 @@ import {
   Link,
   Icon,
   Spinner,
+  Inline,
 } from '@stripe/ui-extension-sdk/ui'
 import { useState } from 'react'
 import BrandIcon from '../views/icon.svg'
@@ -46,7 +47,7 @@ const CustomerView = () => {
   return (
     <ContextView
       title="Customer Features"
-      brandColor="#5D56E6"
+      brandColor="#FFFFFF"
       brandIcon={BrandIcon}
       actions={
         <>
@@ -63,11 +64,31 @@ const CustomerView = () => {
     >
       {subscriptionsState ? (
         <Box>
-          <FeatureList
-            features={subscriptionsState}
-            overrides={customerFeatures}
-            saveOverrides={saveOverrides}
-          />
+          {subscriptionsState.length ? (
+            <FeatureList
+              features={subscriptionsState}
+              overrides={customerFeatures}
+              saveOverrides={saveOverrides}
+            />
+          ) : (
+            <Box
+              css={{
+                keyline: 'neutral',
+                padding: 'medium',
+                font: 'caption',
+                borderRadius: 'small',
+                margin: 'medium',
+                textAlign: 'center',
+              }}
+            >
+              You don&apos;t have any features yet. Create a new feature by
+              clicking{' '}
+              <Inline css={{ fontWeight: 'bold' }}>
+                &quot;Manage Features&quot;
+              </Inline>{' '}
+              above
+            </Box>
+          )}
 
           <FeaturesForm
             shown={isShowingFeaturesForm}

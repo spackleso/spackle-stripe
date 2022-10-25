@@ -5,6 +5,7 @@ import {
   Spinner,
   Link,
   Icon,
+  Inline,
 } from '@stripe/ui-extension-sdk/ui'
 import useAccountState from '../hooks/useAccountState'
 import useProductFeatures from '../hooks/useProductFeatures'
@@ -63,7 +64,7 @@ const ProductView = () => {
   return (
     <ContextView
       title="Product Features"
-      brandColor="#5D56E6"
+      brandColor="#FFFFFF"
       brandIcon={BrandIcon}
       actions={
         <>
@@ -80,25 +81,47 @@ const ProductView = () => {
     >
       {accountState && productFeatures && productState ? (
         <Box>
-          <FeatureList
-            features={accountState}
-            overrides={productFeatures}
-            saveOverrides={saveOverrides}
-          />
+          {accountState.length ? (
+            <>
+              <FeatureList
+                features={accountState}
+                overrides={productFeatures}
+                saveOverrides={saveOverrides}
+              />
 
-          <Box css={{ marginTop: 'xxlarge' }}>
-            <Box css={{ font: 'heading' }}>Price Features</Box>
-          </Box>
+              <Box css={{ marginTop: 'xxlarge' }}>
+                <Box css={{ font: 'heading' }}>Price Features</Box>
+              </Box>
 
-          <Accordion>
-            {prices.map((p) => (
-              <PriceAccordianItem
-                key={p.id}
-                id={p.id}
-                productState={productState}
-              ></PriceAccordianItem>
-            ))}
-          </Accordion>
+              <Accordion>
+                {prices.map((p) => (
+                  <PriceAccordianItem
+                    key={p.id}
+                    id={p.id}
+                    productState={productState}
+                  ></PriceAccordianItem>
+                ))}
+              </Accordion>
+            </>
+          ) : (
+            <Box
+              css={{
+                keyline: 'neutral',
+                padding: 'medium',
+                font: 'caption',
+                borderRadius: 'small',
+                margin: 'medium',
+                textAlign: 'center',
+              }}
+            >
+              You don&apos;t have any features yet. Create a new feature by
+              clicking{' '}
+              <Inline css={{ fontWeight: 'bold' }}>
+                &quot;Manage Features&quot;
+              </Inline>{' '}
+              above
+            </Box>
+          )}
           <FeaturesForm
             shown={isShowingFeaturesForm}
             setShown={setIsShowingFeaturesForm}
