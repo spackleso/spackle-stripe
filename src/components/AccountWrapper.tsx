@@ -11,7 +11,11 @@ function delay(ms: number) {
 const AccountWrapper = ({ children }: { children: ReactNode }) => {
   const { post } = useApi()
   const { userContext } = useStripeContext()
-  const { data: account, refetch } = useAccount(userContext.account.id)
+  const {
+    data: account,
+    refetch,
+    isLoading,
+  } = useAccount(userContext.account.id)
 
   const startSync = useCallback(async () => {
     await post('api/stripe/sync_account', {})
@@ -50,9 +54,22 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
     }
   }, [account, pollAccount, startSync])
 
-  if (account && account.initial_sync_complete) {
-    return <>{children}</>
-  } else {
+  if (isLoading) {
+    return (
+      <Box
+        css={{
+          stack: 'y',
+          alignX: 'center',
+          alignY: 'center',
+          width: 'fill',
+          height: 'fill',
+          gap: 'small',
+        }}
+      >
+        <Spinner />
+      </Box>
+    )
+  } else if (!account.initial_sync_complete) {
     return (
       <Box
         css={{
@@ -68,6 +85,8 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
         <Spinner />
       </Box>
     )
+  } else {
+    return <>{children}</>
   }
 }
 
