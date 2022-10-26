@@ -92,7 +92,6 @@ const FeatureItem = ({
   overrideMap: { [key: number]: Override | NewOverride }
   setOverrideMap: (map: { [key: number]: Override | NewOverride }) => void
 }) => {
-  console.log(feature, overrideMap)
   return (
     <Box
       css={{
