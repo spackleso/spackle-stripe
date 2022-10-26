@@ -26,14 +26,11 @@ import { useMutation } from '@tanstack/react-query'
 const ProductView = () => {
   const { post } = useApi()
   const { environment, userContext } = useStripeContext()
-  const { data: accountState } = useAccountState(userContext.account.id)
+  const accountState = useAccountState(userContext.account.id)
 
   const productId = environment.objectContext?.id
-  const { data: productFeatures } = useProductFeatures(
-    productId,
-    environment.mode,
-  )
-  const { data: productState } = useProductState(productId, environment.mode)
+  const productFeatures = useProductFeatures(productId, environment.mode)
+  const productState = useProductState(productId, environment.mode)
 
   const [prices, setPrices] = useState<Stripe.Price[]>([])
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
@@ -61,6 +58,10 @@ const ProductView = () => {
     fetch()
   }, [fetch])
 
+  const isLoading =
+    accountState.isLoading ||
+    productFeatures.isLoading ||
+    productState.isLoading
   return (
     <ContextView
       title="Product Features"
@@ -84,9 +85,21 @@ const ProductView = () => {
         </>
       }
     >
-      {accountState && productFeatures && productState ? (
+      {isLoading ? (
+        <Box
+          css={{
+            stack: 'x',
+            alignX: 'center',
+            alignY: 'center',
+            width: 'fill',
+            height: 'fill',
+          }}
+        >
+          <Spinner />
+        </Box>
+      ) : (
         <Box>
-          {accountState.length ? (
+          {accountState.data.length ? (
             <>
               <FeatureList
                 features={accountState}
@@ -131,18 +144,6 @@ const ProductView = () => {
             shown={isShowingFeaturesForm}
             setShown={setIsShowingFeaturesForm}
           />
-        </Box>
-      ) : (
-        <Box
-          css={{
-            stack: 'x',
-            alignX: 'center',
-            alignY: 'center',
-            width: 'fill',
-            height: 'fill',
-          }}
-        >
-          <Spinner />
         </Box>
       )}
     </ContextView>

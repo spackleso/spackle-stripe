@@ -8,7 +8,7 @@ import stripe from '../stripe'
 import usePriceFeatures from '../hooks/usePriceFeatures'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
-import { useMutation } from '@tanstack/react-query'
+import { QueryObserverResult, useMutation } from '@tanstack/react-query'
 
 const priceDisplay = (price: Stripe.Price): string => {
   if (price.nickname) {
@@ -29,12 +29,12 @@ const PriceAccordianItem = ({
   productState,
 }: {
   id: string
-  productState: Feature[]
+  productState: QueryObserverResult<Feature[]>
 }) => {
   const { post } = useApi()
   const { environment } = useStripeContext()
   const [price, setPrice] = useState<Stripe.Price | null>(null)
-  const { data: priceFeatures } = usePriceFeatures(id, environment.mode)
+  const priceFeatures = usePriceFeatures(id, environment.mode)
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
       await post(`api/stripe/update_price_features`, {
@@ -59,7 +59,7 @@ const PriceAccordianItem = ({
       {priceFeatures ? (
         <FeatureList
           features={productState}
-          overrides={priceFeatures as any}
+          overrides={priceFeatures}
           saveOverrides={saveOverrides}
         />
       ) : (

@@ -2,34 +2,46 @@ import { Box, Button, Divider, Spinner } from '@stripe/ui-extension-sdk/ui'
 import { Feature, NewOverride, Override } from '../types'
 import FeatureValue from './FeatureValue'
 import { useState, useEffect } from 'react'
-import { UseMutationResult } from '@tanstack/react-query'
+import { QueryObserverResult, UseMutationResult } from '@tanstack/react-query'
 
 const FeatureList = ({
   features,
   overrides,
   saveOverrides,
 }: {
-  features: Feature[]
-  overrides: Override[] | NewOverride[]
+  features: QueryObserverResult<Feature[]>
+  overrides: QueryObserverResult<Override[] | NewOverride[]>
   saveOverrides: UseMutationResult<any, unknown, Override[] | NewOverride[]>
 }) => {
   const [overrideMap, setOverrideMap] = useState<{
     [key: number]: Override | NewOverride
   }>({})
 
-  useEffect(() => {
-    setOverrideMap(
-      Object.assign({}, ...overrides.map((o) => ({ [o.feature_id]: o }))),
-    )
-  }, [overrides])
-
   const isModified =
-    JSON.stringify(overrides) !== JSON.stringify(Object.values(overrideMap))
+    JSON.stringify(overrides.data) !==
+    JSON.stringify(Object.values(overrideMap))
+  const isLoading =
+    features.isRefetching || overrides.isRefetching || saveOverrides.isLoading
+
+  useEffect(() => {
+    if (overrides.data) {
+      setOverrideMap(
+        Object.assign(
+          {},
+          ...overrides.data.map((o) => ({ [o.feature_id]: o })),
+        ),
+      )
+    }
+  }, [overrides.data])
+
+  if (!features.data || !overrides.data) {
+    return <></>
+  }
 
   return (
     <>
       <Box css={{ stack: 'y' }}>
-        {features.map((f) => (
+        {features.data.map((f) => (
           <>
             <FeatureItem
               key={f.key}
@@ -46,12 +58,12 @@ const FeatureList = ({
         {!saveOverrides.isLoading && (
           <Button
             type="secondary"
-            disabled={!isModified || saveOverrides.isLoading}
+            disabled={!isModified || isLoading}
             onPress={() => {
               setOverrideMap(
                 Object.assign(
                   {},
-                  ...overrides.map((o) => ({ [o.feature_id]: o })),
+                  ...overrides.data.map((o) => ({ [o.feature_id]: o })),
                 ),
               )
             }}
@@ -61,7 +73,7 @@ const FeatureList = ({
         )}
         <Button
           type="primary"
-          disabled={!isModified || saveOverrides.isLoading}
+          disabled={!isModified || isLoading}
           onPress={() => saveOverrides.mutate(Object.values(overrideMap))}
         >
           {saveOverrides.isLoading ? <Spinner /> : <>Save</>}
@@ -80,6 +92,7 @@ const FeatureItem = ({
   overrideMap: { [key: number]: Override | NewOverride }
   setOverrideMap: (map: { [key: number]: Override | NewOverride }) => void
 }) => {
+  console.log(feature, overrideMap)
   return (
     <Box
       css={{

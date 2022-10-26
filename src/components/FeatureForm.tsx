@@ -17,12 +17,14 @@ const FeatureForm = ({
   save,
   cancel,
   destroy,
+  isLoading,
 }: {
   feature: Feature | NewFeature
   isNew: boolean
   save: UseMutationResult<any, unknown, Feature | NewFeature, unknown>
   cancel?: () => void
   destroy?: UseMutationResult<any, unknown, Feature, unknown>
+  isLoading?: boolean
 }) => {
   const [name, setName] = useState<string>(feature.name)
   const [key, setKey] = useState<string>(feature.key)
@@ -137,7 +139,7 @@ const FeatureForm = ({
           {!isNew && (
             <Button
               type="destructive"
-              disabled={save.isLoading || destroy?.isLoading}
+              disabled={save.isLoading || destroy?.isLoading || isLoading}
               onPress={() => destroy && destroy.mutate(feature as Feature)}
             >
               {destroy?.isLoading ? <Spinner /> : <>Delete</>}
@@ -149,7 +151,7 @@ const FeatureForm = ({
           {!(save.isLoading || destroy?.isLoading) && (
             <Button
               type="secondary"
-              disabled={!isEdited && !isNew}
+              disabled={(!isEdited && !isNew) || !isLoading}
               onPress={() => {
                 setName(feature.name)
                 setKey(feature.key)
@@ -171,7 +173,8 @@ const FeatureForm = ({
               destroy?.isLoading ||
               save.isLoading ||
               key.length === 0 ||
-              name.length === 0
+              name.length === 0 ||
+              isLoading
             }
             onPress={() =>
               save.mutate({

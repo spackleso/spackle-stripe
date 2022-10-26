@@ -25,7 +25,11 @@ const FeaturesForm = ({
 }) => {
   const { userContext } = useStripeContext()
   const [isShowingNewForm, setIsShowingNewForm] = useState<boolean>(false)
-  const { data: features } = useAccountFeatures(userContext.account.id)
+  const {
+    data: features,
+    isLoading,
+    isRefetching,
+  } = useAccountFeatures(userContext.account.id)
   const { post } = useApi()
 
   const update = useMutation(async (feature: Feature | NewFeature) => {
@@ -129,6 +133,7 @@ const FeaturesForm = ({
                         isNew={false}
                         save={update}
                         destroy={destroy}
+                        isLoading={isLoading || isRefetching}
                       />
                     </AccordionItem>
                   ))}

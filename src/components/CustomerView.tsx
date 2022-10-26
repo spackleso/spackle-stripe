@@ -22,14 +22,8 @@ const CustomerView = () => {
   const { environment } = useStripeContext()
   const customerId = environment.objectContext?.id
   const { post } = useApi()
-  const { data: subscriptionsState } = useSubscriptionsState(
-    customerId,
-    environment.mode,
-  )
-  const { data: customerFeatures } = useCustomerFeatures(
-    customerId,
-    environment.mode,
-  )
+  const subscriptionsState = useSubscriptionsState(customerId, environment.mode)
+  const customerFeatures = useCustomerFeatures(customerId, environment.mode)
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
       const response = await post(`api/stripe/update_customer_features`, {
@@ -43,6 +37,8 @@ const CustomerView = () => {
     },
   )
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
+
+  const isLoading = subscriptionsState.isLoading || customerFeatures.isLoading
 
   return (
     <ContextView
@@ -67,9 +63,21 @@ const CustomerView = () => {
         </>
       }
     >
-      {subscriptionsState ? (
+      {isLoading ? (
+        <Box
+          css={{
+            stack: 'x',
+            alignX: 'center',
+            alignY: 'center',
+            width: 'fill',
+            height: 'fill',
+          }}
+        >
+          <Spinner />
+        </Box>
+      ) : (
         <Box>
-          {subscriptionsState.length ? (
+          {subscriptionsState.data.length ? (
             <FeatureList
               features={subscriptionsState}
               overrides={customerFeatures}
@@ -99,18 +107,6 @@ const CustomerView = () => {
             shown={isShowingFeaturesForm}
             setShown={setIsShowingFeaturesForm}
           />
-        </Box>
-      ) : (
-        <Box
-          css={{
-            stack: 'x',
-            alignX: 'center',
-            alignY: 'center',
-            width: 'fill',
-            height: 'fill',
-          }}
-        >
-          <Spinner />
         </Box>
       )}
     </ContextView>
