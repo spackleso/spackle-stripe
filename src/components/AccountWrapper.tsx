@@ -1,11 +1,124 @@
-import { Box, Spinner } from '@stripe/ui-extension-sdk/ui'
+import {
+  Box,
+  Button,
+  Divider,
+  Icon,
+  Spinner,
+  TextField,
+} from '@stripe/ui-extension-sdk/ui'
 import useAccount from '../hooks/useAccount'
-import { ReactNode, useEffect, useCallback } from 'react'
+import { ReactNode, useEffect, useCallback, useState } from 'react'
 import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
+import { useMutation } from '@tanstack/react-query'
+import { queryClient } from '../query'
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+const LoadingSpinner = ({ children }: { children?: ReactNode }) => {
+  return (
+    <Box
+      css={{
+        stack: 'y',
+        alignX: 'center',
+        alignY: 'center',
+        width: 'fill',
+        height: 'fill',
+        gap: 'small',
+      }}
+    >
+      {children}
+      <Spinner />
+    </Box>
+  )
+}
+
+const InviteInterstitial = ({ account }: { account: any }) => {
+  const { post } = useApi()
+  const [email, setEmail] = useState('')
+  const [inviteToken, setInviteToken] = useState('')
+
+  const requestAccess = useMutation(
+    async ({ user_email }: { user_email: string }) => {
+      const response = await post('api/stripe/add_to_waitlist', {
+        user_email,
+      })
+      queryClient.invalidateQueries(['account', account.stripe_id])
+      return response
+    },
+  )
+
+  return (
+    <Box
+      css={{
+        stack: 'y',
+        width: 'fill',
+        height: 'fill',
+        gap: 'small',
+        paddingY: 'xxlarge',
+        paddingX: 'medium',
+      }}
+    >
+      <Box css={{ width: 'fill' }}>
+        <Box css={{ paddingY: 'medium', marginY: 'medium' }}>
+          <Box css={{ font: 'heading' }}>Spackle is in private beta </Box>
+          <Box css={{ marginY: 'small' }}>
+            If you have an invite token, enter it below:
+          </Box>
+          <Box css={{ stack: 'x', gapX: 'small' }}>
+            <TextField
+              placeholder="Invite Token"
+              onChange={(e) => setInviteToken(e.target.value)}
+            />
+            <Button disabled={!inviteToken}>Submit</Button>
+          </Box>
+        </Box>
+        <Divider />
+        <Box
+          css={{
+            stack: 'y',
+            paddingY: 'medium',
+            gapY: 'small',
+            marginY: 'medium',
+          }}
+        >
+          <Box css={{ fontWeight: 'bold' }}>Request Access</Box>
+          {account.wait_list_entries.length ? (
+            <Box
+              css={{
+                stack: 'x',
+                gapX: 'small',
+                alignX: 'center',
+                marginY: 'large',
+              }}
+            >
+              <Icon name="check" css={{ fill: 'success' }} />
+              <Box>You&apos;re on the list</Box>
+            </Box>
+          ) : (
+            <Box css={{ stack: 'x', gapX: 'small' }}>
+              <TextField
+                placeholder="jane@example.com"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button
+                disabled={!email || requestAccess.isLoading}
+                onPress={() =>
+                  requestAccess.mutate({
+                    user_email: email,
+                  })
+                }
+              >
+                Submit
+              </Button>
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </Box>
+  )
 }
 
 const AccountWrapper = ({ children }: { children: ReactNode }) => {
@@ -42,7 +155,7 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
   }, [refetch, startSync])
 
   useEffect(() => {
-    if (!account) {
+    if (!account || !account.invite_id) {
       return
     }
 
@@ -55,36 +168,11 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
   }, [account, pollAccount, startSync])
 
   if (isLoading) {
-    return (
-      <Box
-        css={{
-          stack: 'y',
-          alignX: 'center',
-          alignY: 'center',
-          width: 'fill',
-          height: 'fill',
-          gap: 'small',
-        }}
-      >
-        <Spinner />
-      </Box>
-    )
+    return <LoadingSpinner />
+  } else if (!account.invite_id) {
+    return <InviteInterstitial account={account} />
   } else if (!account.initial_sync_complete) {
-    return (
-      <Box
-        css={{
-          stack: 'y',
-          alignX: 'center',
-          alignY: 'center',
-          width: 'fill',
-          height: 'fill',
-          gap: 'small',
-        }}
-      >
-        Running initial setup...
-        <Spinner />
-      </Box>
-    )
+    return <LoadingSpinner>Running initial setup...</LoadingSpinner>
   } else {
     return <>{children}</>
   }
