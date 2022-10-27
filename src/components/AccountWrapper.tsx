@@ -45,10 +45,30 @@ const InviteInterstitial = ({ account }: { account: any }) => {
       const response = await post('api/stripe/add_to_waitlist', {
         user_email,
       })
+
+      if (response.status !== 200) {
+        const error = (await response.json()).error
+        throw new Error(error)
+      }
+
       queryClient.invalidateQueries(['account', account.stripe_id])
       return response
     },
   )
+
+  const acceptInvite = useMutation(async ({ token }: { token: string }) => {
+    const response = await post('api/stripe/accept_invite', {
+      token,
+    })
+
+    if (response.status !== 200) {
+      const error = (await response.json()).error
+      throw new Error(error)
+    }
+
+    queryClient.invalidateQueries(['account', account.stripe_id])
+    return response
+  })
 
   return (
     <Box
@@ -72,8 +92,18 @@ const InviteInterstitial = ({ account }: { account: any }) => {
               placeholder="Invite Token"
               onChange={(e) => setInviteToken(e.target.value)}
             />
-            <Button disabled={!inviteToken}>Submit</Button>
+            <Button
+              disabled={!inviteToken || acceptInvite.isLoading}
+              onPress={() => acceptInvite.mutate({ token: inviteToken })}
+            >
+              Submit
+            </Button>
           </Box>
+          {acceptInvite.error && (
+            <Box css={{ font: 'caption', color: 'critical', marginY: 'small' }}>
+              {(acceptInvite.error as any).message}
+            </Box>
+          )}
         </Box>
         <Divider />
         <Box
@@ -98,21 +128,30 @@ const InviteInterstitial = ({ account }: { account: any }) => {
               <Box>You&apos;re on the list</Box>
             </Box>
           ) : (
-            <Box css={{ stack: 'x', gapX: 'small' }}>
-              <TextField
-                placeholder="jane@example.com"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Button
-                disabled={!email || requestAccess.isLoading}
-                onPress={() =>
-                  requestAccess.mutate({
-                    user_email: email,
-                  })
-                }
-              >
-                Submit
-              </Button>
+            <Box>
+              <Box css={{ stack: 'x', gapX: 'small' }}>
+                <TextField
+                  placeholder="jane@example.com"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Button
+                  disabled={!email || requestAccess.isLoading}
+                  onPress={() =>
+                    requestAccess.mutate({
+                      user_email: email,
+                    })
+                  }
+                >
+                  Submit
+                </Button>
+              </Box>
+              {requestAccess.error && (
+                <Box
+                  css={{ font: 'caption', color: 'critical', marginY: 'small' }}
+                >
+                  {(requestAccess.error as any).message}
+                </Box>
+              )}
             </Box>
           )}
         </Box>
