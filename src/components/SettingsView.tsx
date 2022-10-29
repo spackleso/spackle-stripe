@@ -21,9 +21,13 @@ const SettingsView = () => {
       </Box>
       <Box>For more information:</Box>
       <Box css={{ stack: 'x', alignX: 'center', marginY: 'medium' }}>
-        <Link href="https://www.spackle.so/docs" type="primary">
+        <Link
+          href="https://www.spackle.so/docs"
+          type="primary"
+          target="_blank"
+          external
+        >
           Read the Docs
-          <Icon name="arrowUpRight" size="xsmall" />
         </Link>
       </Box>
       <Box
