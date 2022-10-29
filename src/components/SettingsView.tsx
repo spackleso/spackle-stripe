@@ -12,6 +12,7 @@ const SettingsView = () => {
       css={{
         height: 'fill',
         width: 'fill',
+        padding: 'small',
       }}
     >
       <Box>
