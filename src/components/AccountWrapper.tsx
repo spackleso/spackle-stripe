@@ -160,6 +160,49 @@ const InviteInterstitial = ({ account }: { account: any }) => {
   )
 }
 
+const SetupInterstitial = ({ account }: { account: any }) => {
+  const { post } = useApi()
+
+  const acknowledgeSetup = useMutation(async () => {
+    const response = await post('api/stripe/acknowledge_setup', {})
+
+    if (response.status !== 200) {
+      const error = (await response.json()).error
+      throw new Error(error)
+    }
+
+    queryClient.invalidateQueries(['account', account.stripe_id])
+    return response
+  })
+
+  return (
+    <Box
+      css={{
+        width: 'fill',
+        height: 'fill',
+        gap: 'small',
+      }}
+    >
+      <Box css={{ paddingX: 'large', font: 'heading', marginTop: 'xxlarge' }}>
+        Setup
+      </Box>
+      <Box css={{ paddingX: 'large', marginY: 'small' }}>
+        Before we begin, Spackle will need to sync all of your current products,
+        subscriptions, and customers. This can take a few minutes.
+      </Box>
+      <Box css={{ stack: 'x', alignX: 'center', marginY: 'medium' }}>
+        <Button
+          type="primary"
+          onPress={() => acknowledgeSetup.mutate()}
+          disabled={acknowledgeSetup.isLoading}
+        >
+          Continue
+        </Button>
+      </Box>
+    </Box>
+  )
+}
+
 const AccountWrapper = ({ children }: { children: ReactNode }) => {
   const { post } = useApi()
   const { userContext } = useStripeContext()
@@ -194,7 +237,7 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
   }, [refetch, startSync])
 
   useEffect(() => {
-    if (!account || !account.invite_id) {
+    if (!account || !account.invite_id || !account.has_acknowledged_setup) {
       return
     }
 
@@ -210,6 +253,8 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
     return <LoadingSpinner />
   } else if (!account.invite_id) {
     return <InviteInterstitial account={account} />
+  } else if (!account.has_acknowledged_setup) {
+    return <SetupInterstitial account={account} />
   } else if (!account.initial_sync_complete) {
     return <LoadingSpinner>Running initial setup...</LoadingSpinner>
   } else {
