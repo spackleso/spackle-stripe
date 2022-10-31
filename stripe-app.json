@@ -53,7 +53,6 @@
     }
   },
   "post_install_action": {
-    "type": "settings",
-    "url": ""
+    "type": "settings"
   }
 }
