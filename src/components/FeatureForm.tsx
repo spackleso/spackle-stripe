@@ -76,7 +76,7 @@ const FeatureForm = ({
                 setValueLimit(null)
                 setValueFlag(feature.value_flag)
               } else if (value === FeatureType.Limit) {
-                setValueLimit(feature.value_limit)
+                setValueLimit(feature.value_limit || 0)
                 setValueFlag(null)
               }
               setType(value)
@@ -96,7 +96,7 @@ const FeatureForm = ({
                 setValueLimit(null)
                 setValueFlag(feature.value_flag)
               } else if (value === FeatureType.Limit) {
-                setValueLimit(feature.value_limit)
+                setValueLimit(feature.value_limit || 0)
                 setValueFlag(null)
               }
               setType(value)
@@ -119,7 +119,7 @@ const FeatureForm = ({
             label="Default Limit"
             description="This will be the value unless overridden by products, prices, or customers"
             value={valueLimit || 0}
-            onChange={(e) => setValueLimit(parseInt(e.target.value))}
+            onChange={(e) => setValueLimit(parseInt(e.target.value) || 0)}
           ></TextField>
         ) : (
           <></>
@@ -157,7 +157,7 @@ const FeatureForm = ({
                 setKey(feature.key)
                 setType(feature.type)
                 setValueFlag(feature.value_flag)
-                setValueLimit(feature.value_limit)
+                setValueLimit(feature.value_limit || 0)
                 if (cancel) {
                   cancel()
                 }
