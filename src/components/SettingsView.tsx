@@ -1,4 +1,11 @@
-import { Box, Button, Icon, Link, TextField } from '@stripe/ui-extension-sdk/ui'
+import {
+  Box,
+  Button,
+  Icon,
+  Link,
+  Spinner,
+  TextField,
+} from '@stripe/ui-extension-sdk/ui'
 import { clipboardWriteText, showToast } from '@stripe/ui-extension-sdk/utils'
 import useStripeContext from '../hooks/useStripeContext'
 import useToken from '../hooks/useToken'
@@ -19,8 +26,8 @@ const SettingsView = () => {
         Use the access token below to request feature access flags via the
         Spackle API.
       </Box>
-      <Box>For more information:</Box>
-      <Box css={{ stack: 'x', alignX: 'center', marginY: 'medium' }}>
+      <Box css={{ stack: 'x', gapX: 'small', marginBottom: 'medium' }}>
+        For more information:
         <Link
           href="https://www.spackle.so/docs"
           type="primary"
@@ -38,17 +45,27 @@ const SettingsView = () => {
           marginTop: 'large',
         }}
       >
-        <TextField disabled value={data?.token || ''} label="Access Token" />
-        <Button
-          onPress={async () => {
-            if (data?.token) {
-              await clipboardWriteText(data.token)
-              showToast('Copied!', { type: 'success' })
-            }
-          }}
-        >
-          <Icon name="clipboard" />
-        </Button>
+        {data?.token ? (
+          <>
+            <TextField
+              disabled
+              value={data?.token || ''}
+              label="Access Token"
+            />
+            <Button
+              onPress={async () => {
+                if (data?.token) {
+                  await clipboardWriteText(data.token)
+                  showToast('Copied!', { type: 'success' })
+                }
+              }}
+            >
+              <Icon name="clipboard" />
+            </Button>
+          </>
+        ) : (
+          <Spinner />
+        )}
       </Box>
     </Box>
   )
