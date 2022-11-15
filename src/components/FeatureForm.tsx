@@ -151,7 +151,7 @@ const FeatureForm = ({
           {!(save.isLoading || destroy?.isLoading) && (
             <Button
               type="secondary"
-              disabled={(!isEdited && !isNew) || !isLoading}
+              disabled={(!isEdited && !isNew) || isLoading}
               onPress={() => {
                 setName(feature.name)
                 setKey(feature.key)

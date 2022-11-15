@@ -76,7 +76,16 @@ const FeaturesForm = ({
   })
 
   return (
-    <FocusView title={'Features'} shown={shown} setShown={setShown}>
+    <FocusView
+      title={'Features'}
+      shown={shown}
+      setShown={(val) => {
+        if (!val) {
+          setIsShowingNewForm(false)
+        }
+        setShown(val)
+      }}
+    >
       {isShowingNewForm ? (
         <Box>
           <FeatureForm
