@@ -102,7 +102,7 @@ const FeatureItem = ({
         gap: 'medium',
       }}
     >
-      <Box css={{ width: '3/5' }}>
+      <Box css={{ width: '3/5', stack: 'y', gapY: 'small' }}>
         <Box css={{ fontWeight: 'semibold' }}>{feature.name}</Box>
         <Box css={{ font: 'caption', color: 'secondary' }}>{feature.key}</Box>
       </Box>

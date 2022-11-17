@@ -1,4 +1,4 @@
-import { Box, Icon, Link, Switch, TextField } from '@stripe/ui-extension-sdk/ui'
+import { Box, Link, Switch, TextField } from '@stripe/ui-extension-sdk/ui'
 import { Feature, FeatureType, NewOverride, Override } from '../types'
 
 const FeatureValue = ({
@@ -12,7 +12,15 @@ const FeatureValue = ({
 }) => {
   if (override) {
     return (
-      <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+      <Box
+        css={{
+          stack: 'y',
+          gapX: 'small',
+          alignY: 'center',
+          alignX: 'end',
+          gapY: 'small',
+        }}
+      >
         {feature.type === FeatureType.Flag ? (
           <Switch
             checked={!!override.value_flag}
@@ -38,14 +46,24 @@ const FeatureValue = ({
           <></>
         )}
 
-        <Link type="secondary" onPress={() => setOverride(undefined)}>
-          <Icon name="cancel" size="xsmall" />
-        </Link>
+        <Box css={{ font: 'caption' }}>
+          <Link type="secondary" onPress={() => setOverride(undefined)}>
+            Reset to Default
+          </Link>
+        </Box>
       </Box>
     )
   } else {
     return (
-      <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+      <Box
+        css={{
+          stack: 'y',
+          gapX: 'small',
+          alignY: 'center',
+          alignX: 'end',
+          gapY: 'small',
+        }}
+      >
         {feature.type === FeatureType.Flag ? (
           <>{feature.value_flag ? <Box>Enabled</Box> : <Box>Disabled</Box>}</>
         ) : feature.type === FeatureType.Limit ? (
@@ -53,20 +71,24 @@ const FeatureValue = ({
         ) : (
           <></>
         )}
-        <Link
-          type="secondary"
-          onPress={() =>
-            setOverride({
-              feature_id: feature.id,
-              value_flag:
-                feature.type === FeatureType.Flag ? feature.value_flag : null,
-              value_limit:
-                feature.type === FeatureType.Limit ? feature.value_limit : null,
-            })
-          }
-        >
-          <Icon name="edit" size="xsmall" />
-        </Link>
+        <Box css={{ font: 'caption' }}>
+          <Link
+            type="primary"
+            onPress={() =>
+              setOverride({
+                feature_id: feature.id,
+                value_flag:
+                  feature.type === FeatureType.Flag ? feature.value_flag : null,
+                value_limit:
+                  feature.type === FeatureType.Limit
+                    ? feature.value_limit
+                    : null,
+              })
+            }
+          >
+            Override
+          </Link>
+        </Box>
       </Box>
     )
   }
