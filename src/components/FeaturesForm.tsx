@@ -6,6 +6,8 @@ import {
   AccordionItem,
   Switch,
   Inline,
+  Link,
+  Icon,
 } from '@stripe/ui-extension-sdk/ui'
 import useApi from '../hooks/useApi'
 import { Feature, FeatureType, NewFeature } from '../types'
@@ -88,6 +90,9 @@ const FeaturesForm = ({
     >
       {isShowingNewForm ? (
         <Box>
+          <Link onPress={() => setIsShowingNewForm(false)}>
+            <Icon name="arrowLeft" size="xsmall"></Icon> Back to features list
+          </Link>
           <FeatureForm
             feature={{
               name: '',
