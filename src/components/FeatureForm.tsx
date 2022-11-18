@@ -33,6 +33,8 @@ const FeatureForm = ({
   const [valueLimit, setValueLimit] = useState<number | null>(
     feature.value_limit,
   )
+  const [isShowingDestroyConfirmation, setIsShowingDestroyConfirmation] =
+    useState(false)
 
   const isEdited =
     name !== feature.name ||
@@ -40,6 +42,31 @@ const FeatureForm = ({
     type !== feature.type ||
     valueFlag !== feature.value_flag ||
     valueLimit !== feature.value_limit
+
+  if (isShowingDestroyConfirmation) {
+    return (
+      <Box
+        css={{ stack: 'y', gap: 'small', alignX: 'center', paddingY: 'large' }}
+      >
+        Are you sure you want to delete this feature?
+        <Box css={{ stack: 'x', gap: 'small' }}>
+          <Button
+            disabled={save.isLoading || destroy?.isLoading || isLoading}
+            onPress={() => setIsShowingDestroyConfirmation(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="destructive"
+            disabled={save.isLoading || destroy?.isLoading || isLoading}
+            onPress={() => destroy && destroy.mutate(feature as Feature)}
+          >
+            {destroy?.isLoading ? <Spinner /> : <>Delete</>}
+          </Button>
+        </Box>
+      </Box>
+    )
+  }
 
   return (
     <Box css={{ padding: 'small', gap: 'small', stack: 'y' }}>
@@ -140,7 +167,7 @@ const FeatureForm = ({
             <Button
               type="destructive"
               disabled={save.isLoading || destroy?.isLoading || isLoading}
-              onPress={() => destroy && destroy.mutate(feature as Feature)}
+              onPress={() => setIsShowingDestroyConfirmation(true)}
             >
               {destroy?.isLoading ? <Spinner /> : <>Delete</>}
             </Button>
