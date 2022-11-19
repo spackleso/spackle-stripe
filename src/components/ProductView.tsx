@@ -78,8 +78,10 @@ const ProductView = () => {
               type="secondary"
               onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
             >
-              <Icon name="settings" />
-              Manage Features
+              <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+                <Icon name="settings" />
+                Manage Features
+              </Box>
             </Link>
           </Box>
         </>
