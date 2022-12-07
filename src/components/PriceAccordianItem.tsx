@@ -9,16 +9,21 @@ import usePriceFeatures from '../hooks/usePriceFeatures'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
 import { QueryObserverResult, useMutation } from '@tanstack/react-query'
+import getSymbolFromCurrency from 'currency-symbol-map'
 
 const priceDisplay = (price: Stripe.Price): string => {
   if (price.nickname) {
     return price.nickname
-  } else if (price.currency !== 'usd') {
-    return price.id
-  } else if (price.unit_amount && price.recurring) {
-    return `$${price.unit_amount / 100} / ${price.recurring.interval}`
+  }
+
+  const currency = price.currency.toUpperCase()
+  const symbol = getSymbolFromCurrency(currency) || ''
+  if (price.unit_amount && price.recurring) {
+    return `${symbol}${price.unit_amount / 100} ${currency} / ${
+      price.recurring.interval
+    }`
   } else if (price.unit_amount) {
-    return `$${price.unit_amount / 100}`
+    return `${symbol}${price.unit_amount / 100} ${currency}`
   } else {
     return price.id
   }
