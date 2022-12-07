@@ -1,4 +1,5 @@
 import { Box, Link, Switch, TextField } from '@stripe/ui-extension-sdk/ui'
+import { useEffect } from 'react'
 import { Feature, FeatureType, NewOverride, Override } from '../types'
 
 const FeatureValue = ({
@@ -34,7 +35,7 @@ const FeatureValue = ({
         ) : feature.type === FeatureType.Limit ? (
           <TextField
             type="number"
-            defaultValue={override.value_limit || 0}
+            value={override.value_limit || 0}
             onChange={(e) =>
               setOverride({
                 ...override,
