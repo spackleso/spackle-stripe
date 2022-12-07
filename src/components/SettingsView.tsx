@@ -54,10 +54,8 @@ const SettingsView = () => {
             />
             <Button
               onPress={async () => {
-                if (data?.token) {
-                  await clipboardWriteText(data.token)
-                  showToast('Copied!', { type: 'success' })
-                }
+                await clipboardWriteText(data.token)
+                showToast('Copied!', { type: 'success' })
               }}
             >
               <Icon name="clipboard" />
