@@ -35,7 +35,7 @@ const FeaturesForm = ({
   const { post } = useApi()
 
   const update = useMutation(async (feature: Feature | NewFeature) => {
-    const response = await post(`api/stripe/update_account_feature`, feature)
+    const response = await post(`/stripe/update_account_feature`, feature)
     if (response.status !== 200) {
       const error = (await response.json()).error
       throw new Error(error)
@@ -50,7 +50,7 @@ const FeaturesForm = ({
   })
 
   const create = useMutation(async (feature: NewFeature | Feature) => {
-    const response = await post(`api/stripe/create_account_feature`, feature)
+    const response = await post(`/stripe/create_account_feature`, feature)
     if (response.status !== 201) {
       const error = (await response.json()).error
       throw new Error(error)
@@ -66,7 +66,7 @@ const FeaturesForm = ({
   })
 
   const destroy = useMutation(async (feature: Feature) => {
-    const response = await post(`api/stripe/delete_account_feature`, {
+    const response = await post(`/stripe/delete_account_feature`, {
       feature_id: feature.id,
     })
     queryClient.invalidateQueries(['accountFeatures'])

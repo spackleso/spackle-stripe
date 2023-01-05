@@ -4,7 +4,7 @@ import { useContext, createContext } from 'react'
 
 const isDev = false
 
-let HOST = 'https://www.spackle.so'
+let HOST = 'https://api.spackle.so'
 if (isDev) {
   HOST = 'http://localhost:3001'
 }
@@ -23,7 +23,7 @@ export const createApi = ({ userContext }: ExtensionContextValue) => ({
       account_id: userContext.account.id,
     })
 
-    return fetch(`${HOST}/${endpoint}`, {
+    return fetch(`${HOST}${endpoint}`, {
       method: 'POST',
       headers: {
         'Stripe-Signature': await fetchStripeSignature(requestData),

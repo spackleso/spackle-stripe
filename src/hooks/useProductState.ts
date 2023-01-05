@@ -10,7 +10,7 @@ const useProductState = (
     ['productState', productId],
     async () => {
       const response = await (
-        await post(`api/stripe/get_product_state`, {
+        await post(`/stripe/get_product_state`, {
           product_id: productId,
           mode,
         })

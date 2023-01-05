@@ -29,7 +29,7 @@ const SettingsView = () => {
       <Box css={{ stack: 'x', gapX: 'small', marginBottom: 'medium' }}>
         For more information:
         <Link
-          href="https://www.spackle.so/docs"
+          href="https://docs.spackle.so"
           type="primary"
           target="_blank"
           external
