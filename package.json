@@ -1,6 +1,6 @@
 {
   "name": "com.bolderresearch.spackle",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Spackle",
   "private": true,
   "license": "~~proprietary~~",
@@ -24,7 +24,8 @@
   "scripts": {
     "dev": "stripe apps start",
     "lint": "eslint --ext ts,tsx src",
-    "test": "jest"
+    "test": "jest",
+    "upload": "stripe apps upload"
   },
   "resolutions": {
     "@types/react": "^17.0.2"
