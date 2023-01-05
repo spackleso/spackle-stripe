@@ -11,7 +11,7 @@ const useCustomerFeatures = (
     async () => {
       if (customerId) {
         const response = await (
-          await post(`api/stripe/get_customer_features`, {
+          await post(`/stripe/get_customer_features`, {
             customer_id: customerId,
             mode,
           })

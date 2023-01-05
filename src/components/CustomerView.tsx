@@ -26,7 +26,7 @@ const CustomerView = () => {
   const customerFeatures = useCustomerFeatures(customerId, environment.mode)
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
-      const response = await post(`api/stripe/update_customer_features`, {
+      const response = await post(`/stripe/update_customer_features`, {
         customer_id: customerId,
         customer_features: overrides,
         mode: environment.mode,
@@ -47,7 +47,7 @@ const CustomerView = () => {
       brandIcon={BrandIcon}
       externalLink={{
         label: 'Documentation',
-        href: 'https://www.spackle.so/docs',
+        href: 'https://docs.spackle.so',
       }}
       footerContent={
         <>

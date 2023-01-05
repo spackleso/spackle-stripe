@@ -10,7 +10,7 @@ const useSubscriptionsState = (
     ['subscriptionsState', customerId],
     async () => {
       const response = await (
-        await post(`api/stripe/get_subscriptions_state`, {
+        await post(`/stripe/get_subscriptions_state`, {
           customer_id: customerId,
           mode,
         })

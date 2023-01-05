@@ -43,7 +43,7 @@ const ProductView = () => {
 
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
-      const response = await post(`api/stripe/update_product_features`, {
+      const response = await post(`/stripe/update_product_features`, {
         product_id: productId,
         product_features: overrides,
         mode: environment.mode,
@@ -69,7 +69,7 @@ const ProductView = () => {
       brandIcon={BrandIcon}
       externalLink={{
         label: 'Documentation',
-        href: 'https://www.spackle.so/docs',
+        href: 'https://docs.spackle.so',
       }}
       footerContent={
         <>

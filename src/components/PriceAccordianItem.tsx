@@ -42,7 +42,7 @@ const PriceAccordianItem = ({
   const priceFeatures = usePriceFeatures(id, environment.mode)
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
-      await post(`api/stripe/update_price_features`, {
+      await post(`/stripe/update_price_features`, {
         price_id: id,
         price_features: overrides,
         mode: environment.mode,

@@ -11,7 +11,7 @@ const useProductFeatures = (
     async () => {
       if (productId) {
         const response = await (
-          await post(`api/stripe/get_product_features`, {
+          await post(`/stripe/get_product_features`, {
             product_id: productId,
             mode,
           })

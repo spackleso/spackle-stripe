@@ -42,7 +42,7 @@ const InviteInterstitial = ({ account }: { account: any }) => {
 
   const requestAccess = useMutation(
     async ({ user_email }: { user_email: string }) => {
-      const response = await post('api/stripe/add_to_waitlist', {
+      const response = await post('/stripe/add_to_waitlist', {
         user_email,
       })
 
@@ -57,7 +57,7 @@ const InviteInterstitial = ({ account }: { account: any }) => {
   )
 
   const acceptInvite = useMutation(async ({ token }: { token: string }) => {
-    const response = await post('api/stripe/accept_invite', {
+    const response = await post('/stripe/accept_invite', {
       token,
     })
 
@@ -164,7 +164,7 @@ const SetupInterstitial = ({ account }: { account: any }) => {
   const { post } = useApi()
 
   const acknowledgeSetup = useMutation(async () => {
-    const response = await post('api/stripe/acknowledge_setup', {})
+    const response = await post('/stripe/acknowledge_setup', {})
 
     if (response.status !== 200) {
       const error = (await response.json()).error
@@ -213,7 +213,7 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
   } = useAccount(userContext.account.id)
 
   const startSync = useCallback(async () => {
-    await post('api/stripe/sync_account', {})
+    await post('/stripe/sync_account', {})
   }, [post])
 
   const pollAccount = useCallback(async (): Promise<boolean> => {

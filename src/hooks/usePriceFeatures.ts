@@ -11,7 +11,7 @@ const usePriceFeatures = (
     async () => {
       if (priceId) {
         const response = await (
-          await post(`api/stripe/get_price_features`, {
+          await post(`/stripe/get_price_features`, {
             price_id: priceId,
             mode,
           })
