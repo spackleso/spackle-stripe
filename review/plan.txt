@@ -1,7 +1,14 @@
-Invite code: edec1dc0
+Invite code:
 
+Setup
 1. Install the Spackle plugin
 2. Visit a customer or product page
-3. Enter the invite code and begin the initial sync
-4. Follow the quickstart instructions here: https://docs.spackle.so/#quick-start
-5. Integrate with one of the SDKs listed here: https://docs.spackle.so/#integrate-with-your-product
+3. Enter the invite code: edec1dc0
+4. Run the initial sync
+5. Follow the quickstart instructions here: https://docs.spackle.so/#quick-start
+
+Test Python integration
+1. Open a terminal and run `pip3 install -U spackle-python`
+2. Download the python script hosted here: https://docs.spackle.so/spackle_demo.py
+3. In the terminal, navigate to the directory where you downloaded the `spackle_demo.py` file and run `python3 spackle_demo.py`
+4. Follow the instructions in the terminal to test Spackle's functionality
