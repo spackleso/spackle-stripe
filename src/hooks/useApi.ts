@@ -6,7 +6,7 @@ const isDev = false
 
 let HOST = 'https://api.spackle.so'
 if (isDev) {
-  HOST = 'http://localhost:3001'
+  HOST = 'http://localhost:3000'
 }
 
 interface Api {
