@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Spinner } from '@stripe/ui-extension-sdk/ui'
 import { Feature, NewOverride, Override } from '../types'
-import FeatureValue from './FeatureValue'
+import FeatureItem from './FeatureItem'
 import { useState, useEffect } from 'react'
 import { QueryObserverResult, UseMutationResult } from '@tanstack/react-query'
 
@@ -49,7 +49,6 @@ const FeatureList = ({
               overrideMap={overrideMap}
               setOverrideMap={setOverrideMap}
             />
-            <Divider />
           </>
         ))}
       </Box>
@@ -83,46 +82,5 @@ const FeatureList = ({
   )
 }
 
-const FeatureItem = ({
-  feature,
-  overrideMap,
-  setOverrideMap,
-}: {
-  feature: Feature
-  overrideMap: { [key: number]: Override | NewOverride }
-  setOverrideMap: (map: { [key: number]: Override | NewOverride }) => void
-}) => {
-  return (
-    <Box
-      css={{
-        stack: 'x',
-        distribute: 'space-between',
-        padding: 'small',
-        alignY: 'center',
-        gap: 'medium',
-      }}
-    >
-      <Box css={{ width: '3/5', stack: 'y', gapY: 'small' }}>
-        <Box css={{ fontWeight: 'semibold' }}>{feature.name}</Box>
-        <Box css={{ font: 'caption', color: 'secondary' }}>{feature.key}</Box>
-      </Box>
-      <Box css={{ width: '2/5' }}>
-        <FeatureValue
-          feature={feature}
-          override={overrideMap[feature.id]}
-          setOverride={(o) => {
-            if (o) {
-              setOverrideMap({ ...overrideMap, [feature.id]: o })
-            } else {
-              const oMap = { ...overrideMap }
-              delete oMap[feature.id]
-              setOverrideMap(oMap)
-            }
-          }}
-        />
-      </Box>
-    </Box>
-  )
-}
 
 export default FeatureList

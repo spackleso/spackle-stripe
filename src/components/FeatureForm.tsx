@@ -6,6 +6,8 @@ import {
   Radio,
   Switch,
   Spinner,
+  Tooltip,
+  Checkbox,
 } from '@stripe/ui-extension-sdk/ui'
 import { Feature, FeatureType, NewFeature } from '../types'
 import { useState } from 'react'
@@ -141,13 +143,35 @@ const FeatureForm = ({
             onChange={(e) => setValueFlag(e.target.checked)}
           ></Switch>
         ) : type === FeatureType.Limit ? (
-          <TextField
-            type="number"
-            label="Default Limit"
-            description="This will be the value unless overridden by products, prices, or customers"
-            value={valueLimit || 0}
-            onChange={(e) => setValueLimit(parseInt(e.target.value) || 0)}
-          ></TextField>
+          <Box>
+            <Box css={{ marginBottom: 'small' }}>
+              <Box css={{ fontWeight: 'semibold' }}>Default Limit</Box>
+              <Box css={{ font: 'caption', color: 'secondary' }}>This will be the value unless overridden by products, prices, or customers</Box>
+            </Box>
+            <Box css={{ stack: 'x', gapX: 'small', alignY: 'bottom' }}>
+              <TextField
+                type={valueLimit === null ? "text" : "number"}
+                value={valueLimit === null ? '∞' : valueLimit}
+                disabled={valueLimit === null}
+                onChange={(e) => setValueLimit(parseInt(e.target.value) || 0)}
+              ></TextField>
+              <Tooltip
+                type="label"
+                placement="top"
+                trigger={
+                  <Checkbox
+                    label="∞"
+                    onChange={(e) => {
+                      const val = e.target.checked ? null : 0
+                      setValueLimit(val)
+                    }}
+                  ></Checkbox>
+                }
+              >
+                Unlimited
+              </Tooltip>
+            </Box>
+          </Box>
         ) : (
           <></>
         )}

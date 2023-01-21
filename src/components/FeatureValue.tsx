@@ -1,4 +1,4 @@
-import { Box, Link, Switch, TextField } from '@stripe/ui-extension-sdk/ui'
+import { Box, Checkbox, Link, Switch, TextField, Tooltip } from '@stripe/ui-extension-sdk/ui'
 import { useEffect } from 'react'
 import { Feature, FeatureType, NewOverride, Override } from '../types'
 
@@ -15,39 +15,61 @@ const FeatureValue = ({
     return (
       <Box
         css={{
-          stack: 'y',
-          gapX: 'small',
+          stack: 'x',
           alignY: 'center',
-          alignX: 'end',
-          gapY: 'small',
+          alignX: 'stretch',
         }}
       >
-        {feature.type === FeatureType.Flag ? (
-          <Switch
-            checked={!!override.value_flag}
-            onChange={(e) =>
-              setOverride({
-                ...override,
-                value_flag: e.target.checked,
-              })
-            }
-          ></Switch>
-        ) : feature.type === FeatureType.Limit ? (
-          <TextField
-            type="number"
-            value={override.value_limit || 0}
-            onChange={(e) =>
-              setOverride({
-                ...override,
-                value_limit: parseInt(e.target.value),
-              })
-            }
-          ></TextField>
-        ) : (
-          <></>
-        )}
+        <Box css={{ width: '1/2' }}>
+          {feature.type === FeatureType.Flag ? (
+            <Switch
+              checked={!!override.value_flag}
+              onChange={(e) =>
+                setOverride({
+                  ...override,
+                  value_flag: e.target.checked,
+                })
+              }
+            ></Switch>
+          ) : feature.type === FeatureType.Limit ? (
+            <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+              <TextField
+                type={override.value_limit === null ? "text" : "number"}
+                size="small"
+                value={override.value_limit === null ? '∞' : override.value_limit}
+                disabled={override.value_limit === null}
+                onChange={(e) =>
+                  setOverride({
+                    ...override,
+                    value_limit: parseInt(e.target.value),
+                  })
+                }
+              ></TextField>
+              <Tooltip
+                type="label"
+                placement="top"
+                trigger={
+                  <Checkbox
+                    label="∞"
+                    onChange={(e) => {
+                      const val = e.target.checked ? null : feature.value_limit
+                      setOverride({
+                        ...override,
+                        value_limit: val,
+                      })
+                    }}
+                  ></Checkbox>
+                }
+              >
+                Unlimited
+              </Tooltip>
+            </Box>
+          ) : (
+            <></>
+          )}
+        </Box>
 
-        <Box css={{ font: 'caption' }}>
+        <Box css={{ font: 'caption', stack: 'x', alignX: 'end' }}>
           <Link type="secondary" onPress={() => setOverride(undefined)}>
             Reset to Default
           </Link>
@@ -58,21 +80,29 @@ const FeatureValue = ({
     return (
       <Box
         css={{
-          stack: 'y',
-          gapX: 'small',
+          stack: 'x',
           alignY: 'center',
-          alignX: 'end',
-          gapY: 'small',
+          alignX: 'stretch',
         }}
       >
-        {feature.type === FeatureType.Flag ? (
-          <>{feature.value_flag ? <Box>Enabled</Box> : <Box>Disabled</Box>}</>
-        ) : feature.type === FeatureType.Limit ? (
-          <Box>{feature.value_limit}</Box>
-        ) : (
-          <></>
-        )}
-        <Box css={{ font: 'caption' }}>
+        <Box css={{ width: '1/4' }}>
+          {feature.type === FeatureType.Flag ? (
+            <Switch
+              checked={!!feature.value_flag}
+              disabled={true}
+            ></Switch>
+          ) : feature.type === FeatureType.Limit ? (
+            <TextField
+              type="number"
+              size="small"
+              value={feature.value_limit || 0}
+              disabled={true}
+            ></TextField>
+          ) : (
+            <></>
+          )}
+        </Box>
+        <Box css={{ font: 'caption', stack: 'x', alignX: 'end' }}>
           <Link
             type="primary"
             onPress={() =>
