@@ -17,6 +17,7 @@ import useAccountFeatures from '../hooks/useAccountFeatures'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
 import { useMutation } from '@tanstack/react-query'
+import { sortFeatures } from '../utils'
 
 const FeaturesForm = ({
   shown,
@@ -121,7 +122,7 @@ const FeaturesForm = ({
             {features?.length ? (
               <Accordion>
                 {features &&
-                  features.map((f: any) => (
+                  features.sort(sortFeatures).map((f: any) => (
                     <AccordionItem
                       key={f.key}
                       title={f.name}

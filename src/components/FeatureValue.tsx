@@ -51,8 +51,9 @@ const FeatureValue = ({
                 trigger={
                   <Checkbox
                     label="∞"
+                    defaultChecked={feature.value_limit === null}
                     onChange={(e) => {
-                      const val = e.target.checked ? null : feature.value_limit
+                      const val = e.target.checked ? null : feature.value_limit || 0
                       setOverride({
                         ...override,
                         value_limit: val,
@@ -93,9 +94,9 @@ const FeatureValue = ({
             ></Switch>
           ) : feature.type === FeatureType.Limit ? (
             <TextField
-              type="number"
+              type={feature.value_limit === null ? "text" : "number"}
               size="small"
-              value={feature.value_limit || 0}
+              value={feature.value_limit === null ? '∞' : feature.value_limit}
               disabled={true}
             ></TextField>
           ) : (
