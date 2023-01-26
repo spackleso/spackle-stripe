@@ -3,6 +3,7 @@ import { Feature, NewOverride, Override } from '../types'
 import FeatureItem from './FeatureItem'
 import { useState, useEffect } from 'react'
 import { QueryObserverResult, UseMutationResult } from '@tanstack/react-query'
+import { sortFeatures } from '../utils'
 
 const FeatureList = ({
   features,
@@ -41,7 +42,7 @@ const FeatureList = ({
   return (
     <>
       <Box css={{ stack: 'y' }}>
-        {features.data.map((f) => (
+        {features.data.sort(sortFeatures).map((f) => (
           <>
             <FeatureItem
               key={f.key}
