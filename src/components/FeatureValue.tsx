@@ -1,5 +1,4 @@
 import { Box, Checkbox, Link, Switch, TextField, Tooltip } from '@stripe/ui-extension-sdk/ui'
-import { useEffect } from 'react'
 import { Feature, FeatureType, NewOverride, Override } from '../types'
 
 const FeatureValue = ({
@@ -51,7 +50,7 @@ const FeatureValue = ({
                 trigger={
                   <Checkbox
                     label="∞"
-                    defaultChecked={feature.value_limit === null}
+                    defaultChecked={override.value_limit === null}
                     onChange={(e) => {
                       const val = e.target.checked ? null : feature.value_limit || 0
                       setOverride({
