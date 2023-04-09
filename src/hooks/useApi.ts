@@ -3,7 +3,7 @@ import fetchStripeSignature from '@stripe/ui-extension-sdk/signature'
 import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
 import { useContext, createContext } from 'react'
 
-const isDev = true
+const isDev = false
 
 let HOST = 'https://api.spackle.so'
 if (isDev) {
