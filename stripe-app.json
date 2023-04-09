@@ -1,6 +1,6 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "name": "Spackle",
   "icon": "./icon.png",
   "permissions": [
@@ -23,6 +23,10 @@
     {
       "permission": "subscription_read",
       "purpose": "Required to read customer subscription data"
+    },
+    {
+      "permission": "user_email_read",
+      "purpose": "Required to provide support and send updates"
     }
   ],
   "app_backend": {
