@@ -22,7 +22,7 @@ export const createApi = ({ userContext }: ExtensionContextValue) => ({
     try {
       const response = await getDashboardUserEmail();
       email = response.email;
-    } catch (error) {}
+    } catch (error) { }
 
     const data = {
       ...requestData,
