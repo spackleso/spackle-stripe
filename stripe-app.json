@@ -29,9 +29,6 @@
       "purpose": "Required to provide support and send updates"
     }
   ],
-  "app_backend": {
-    "webhooks": []
-  },
   "ui_extension": {
     "views": [
       {
@@ -57,5 +54,8 @@
     }
   },
   "post_install_action": null,
-  "constants": null
+  "constants": {
+    "ENV": "production",
+    "API_HOST": "https://api.spackle.so"
+  }
 }

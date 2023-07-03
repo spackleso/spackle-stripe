@@ -1,0 +1,7 @@
+{
+  "extends": "stripe-app.json",
+  "constants": {
+    "ENV": "development",
+    "API_HOST": "http://localhost:3000"
+  }
+}

@@ -3,20 +3,13 @@ import fetchStripeSignature from '@stripe/ui-extension-sdk/signature'
 import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
 import { useContext, createContext } from 'react'
 
-const isDev = false
-
-let HOST = 'https://api.spackle.so'
-if (isDev) {
-  HOST = 'http://localhost:3000'
-}
-
 interface Api {
   post: (endpoint: string, requestData: any) => Promise<any>
 }
 
 export const ApiContext = createContext<Api | undefined>(undefined)
 
-export const createApi = ({ userContext }: ExtensionContextValue) => ({
+export const createApi = ({ userContext, environment }: ExtensionContextValue) => ({
   post: async (endpoint: string, requestData: any) => {
     let email: string | undefined;
     try {
@@ -37,7 +30,8 @@ export const createApi = ({ userContext }: ExtensionContextValue) => ({
       account_id: userContext.account.id,
     });
 
-    return fetch(`${HOST}${endpoint}`, {
+    const host = environment.constants?.API_HOST ?? '';
+    return fetch(`${host}${endpoint}`, {
       method: 'POST',
       headers: {
         'Stripe-Signature': await fetchStripeSignature(data),
