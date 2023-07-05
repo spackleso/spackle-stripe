@@ -22,10 +22,13 @@ import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
 import { NewOverride, Override } from '../types'
 import { useMutation } from '@tanstack/react-query'
+import { useEntitlements } from '../hooks/useEntitlements'
+import EntitlementsPaywall from './EntitlementsPaywall'
 
 const ProductView = () => {
   const { post } = useApi()
   const { environment, userContext } = useStripeContext()
+  const entitlements = useEntitlements(userContext.account.id)
   const accountState = useAccountState(userContext.account.id)
 
   const productId = environment.objectContext?.id
@@ -60,8 +63,13 @@ const ProductView = () => {
 
   const isLoading =
     accountState.isLoading ||
+    entitlements.isLoading ||
     productFeatures.isLoading ||
     productState.isLoading
+
+  const entitled =
+    entitlements.data?.flag('entitlements') || environment.mode === 'test'
+
   return (
     <ContextView
       title="Product Features"
@@ -72,19 +80,21 @@ const ProductView = () => {
         href: 'https://docs.spackle.so',
       }}
       footerContent={
-        <>
-          <Box>
-            <Link
-              type="secondary"
-              onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
-            >
-              <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-                <Icon name="settings" />
-                Manage Features
-              </Box>
-            </Link>
-          </Box>
-        </>
+        entitled && (
+          <>
+            <Box>
+              <Link
+                type="secondary"
+                onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
+              >
+                <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+                  <Icon name="settings" />
+                  Manage Features
+                </Box>
+              </Link>
+            </Box>
+          </>
+        )
       }
     >
       {isLoading ? (
@@ -99,7 +109,7 @@ const ProductView = () => {
         >
           <Spinner />
         </Box>
-      ) : (
+      ) : entitled ? (
         <Box>
           {accountState.data.length ? (
             <>
@@ -147,6 +157,8 @@ const ProductView = () => {
             setShown={setIsShowingFeaturesForm}
           />
         </Box>
+      ) : (
+        <EntitlementsPaywall />
       )}
     </ContextView>
   )

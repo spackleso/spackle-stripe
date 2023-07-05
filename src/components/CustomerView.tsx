@@ -17,11 +17,14 @@ import useCustomerFeatures from '../hooks/useCustomerFeatures'
 import useStripeContext from '../hooks/useStripeContext'
 import { NewOverride, Override } from '../types'
 import { useMutation } from '@tanstack/react-query'
+import { useEntitlements } from '../hooks/useEntitlements'
+import EntitlementsPaywall from './EntitlementsPaywall'
 
 const CustomerView = () => {
-  const { environment } = useStripeContext()
+  const { environment, userContext } = useStripeContext()
   const customerId = environment.objectContext?.id
   const { post } = useApi()
+  const entitlements = useEntitlements(userContext.account.id)
   const subscriptionsState = useSubscriptionsState(customerId, environment.mode)
   const customerFeatures = useCustomerFeatures(customerId, environment.mode)
   const saveOverrides = useMutation(
@@ -38,7 +41,13 @@ const CustomerView = () => {
   )
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
-  const isLoading = subscriptionsState.isLoading || customerFeatures.isLoading
+  const isLoading =
+    entitlements.isLoading ||
+    subscriptionsState.isLoading ||
+    customerFeatures.isLoading
+
+  const entitled =
+    entitlements.data?.flag('entitlements') || environment.mode === 'test'
 
   return (
     <ContextView
@@ -50,19 +59,21 @@ const CustomerView = () => {
         href: 'https://docs.spackle.so',
       }}
       footerContent={
-        <>
-          <Box>
-            <Link
-              type="secondary"
-              onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
-            >
-              <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-                <Icon name="settings" />
-                Manage Features
-              </Box>
-            </Link>
-          </Box>
-        </>
+        entitled && (
+          <>
+            <Box>
+              <Link
+                type="secondary"
+                onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
+              >
+                <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+                  <Icon name="settings" />
+                  Manage Features
+                </Box>
+              </Link>
+            </Box>
+          </>
+        )
       }
     >
       {isLoading ? (
@@ -77,7 +88,7 @@ const CustomerView = () => {
         >
           <Spinner />
         </Box>
-      ) : (
+      ) : entitled ? (
         <Box>
           {subscriptionsState.data.length ? (
             <FeatureList
@@ -110,6 +121,8 @@ const CustomerView = () => {
             setShown={setIsShowingFeaturesForm}
           />
         </Box>
+      ) : (
+        <EntitlementsPaywall />
       )}
     </ContextView>
   )
