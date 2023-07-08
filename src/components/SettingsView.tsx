@@ -145,7 +145,7 @@ const NewPlan = () => {
             Add Payment Method
           </Button>
           <Link external href="https://spackle.so">
-            More info
+            View Pricing
           </Link>
         </Box>
       </Box>
