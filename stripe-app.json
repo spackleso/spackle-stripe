@@ -1,6 +1,6 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "name": "Spackle",
   "icon": "./icon.png",
   "permissions": [
@@ -44,7 +44,6 @@
         "component": "Product"
       }
     ],
-    "actions": [],
     "content_security_policy": {
       "connect-src": [
         "https://api.spackle.so/stripe/"
@@ -53,9 +52,8 @@
       "purpose": ""
     }
   },
-  "post_install_action": null,
   "constants": {
-    "ENV": "production",
-    "API_HOST": "https://api.spackle.so"
+    "API_HOST": "https://api.spackle.so",
+    "ENV": "production"
   }
 }
