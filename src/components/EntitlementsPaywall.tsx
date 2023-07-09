@@ -1,11 +1,5 @@
 import fetchStripeSignature from '@stripe/ui-extension-sdk/signature'
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Icon,
-  Inline,
-} from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Icon, Inline } from '@stripe/ui-extension-sdk/ui'
 import useStripeContext from '../hooks/useStripeContext'
 import { useEffect, useState } from 'react'
 import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'

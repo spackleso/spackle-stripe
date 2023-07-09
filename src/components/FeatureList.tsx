@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Spinner } from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Spinner } from '@stripe/ui-extension-sdk/ui'
 import { Feature, NewOverride, Override } from '../types'
 import FeatureItem from './FeatureItem'
 import { useState, useEffect } from 'react'
@@ -82,6 +82,5 @@ const FeatureList = ({
     </>
   )
 }
-
 
 export default FeatureList

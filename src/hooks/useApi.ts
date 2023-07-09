@@ -9,13 +9,18 @@ interface Api {
 
 export const ApiContext = createContext<Api | undefined>(undefined)
 
-export const createApi = ({ userContext, environment }: ExtensionContextValue) => ({
+export const createApi = ({
+  userContext,
+  environment,
+}: ExtensionContextValue) => ({
   post: async (endpoint: string, requestData: any) => {
-    let email: string | undefined;
+    let email: string | undefined
     try {
-      const response = await getDashboardUserEmail();
-      email = response.email;
-    } catch (error) { }
+      const response = await getDashboardUserEmail()
+      email = response.email
+    } catch (error) {
+      console.error(error)
+    }
 
     const data = {
       ...requestData,
@@ -28,9 +33,9 @@ export const createApi = ({ userContext, environment }: ExtensionContextValue) =
       ...data,
       user_id: userContext.id,
       account_id: userContext.account.id,
-    });
+    })
 
-    const host = environment.constants?.API_HOST ?? '';
+    const host = environment.constants?.API_HOST ?? ''
     return fetch(`${host}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -38,7 +43,7 @@ export const createApi = ({ userContext, environment }: ExtensionContextValue) =
         'Content-Type': 'application/json',
       },
       body: body,
-    });
+    })
   },
 })
 

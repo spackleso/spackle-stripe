@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Divider,
   Icon,
   Inline,
   Link,
