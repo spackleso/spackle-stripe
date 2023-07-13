@@ -35,131 +35,6 @@ const LoadingSpinner = ({ children }: { children?: ReactNode }) => {
   )
 }
 
-const InviteInterstitial = ({ account }: { account: any }) => {
-  const { post } = useApi()
-  const [email, setEmail] = useState('')
-  const [inviteToken, setInviteToken] = useState('')
-
-  const requestAccess = useMutation(
-    async ({ user_email }: { user_email: string }) => {
-      const response = await post('/stripe/add_to_waitlist', {
-        user_email,
-      })
-
-      if (response.status !== 200) {
-        const error = (await response.json()).error
-        throw new Error(error)
-      }
-
-      queryClient.invalidateQueries(['account', account.stripe_id])
-      return response
-    },
-  )
-
-  const acceptInvite = useMutation(async ({ token }: { token: string }) => {
-    const response = await post('/stripe/accept_invite', {
-      token,
-    })
-
-    if (response.status !== 200) {
-      const error = (await response.json()).error
-      throw new Error(error)
-    }
-
-    queryClient.invalidateQueries(['account', account.stripe_id])
-    return response
-  })
-
-  return (
-    <Box
-      css={{
-        stack: 'y',
-        width: 'fill',
-        height: 'fill',
-        gap: 'small',
-        paddingY: 'xxlarge',
-        paddingX: 'medium',
-      }}
-    >
-      <Box css={{ width: 'fill' }}>
-        <Box css={{ paddingY: 'medium', marginY: 'medium' }}>
-          <Box css={{ font: 'heading' }}>Spackle is in private beta </Box>
-          <Box css={{ marginY: 'small' }}>
-            If you have an invite token, enter it below:
-          </Box>
-          <Box css={{ stack: 'x', gapX: 'small' }}>
-            <TextField
-              placeholder="Invite Token"
-              onChange={(e) => setInviteToken(e.target.value)}
-            />
-            <Button
-              disabled={!inviteToken || acceptInvite.isLoading}
-              onPress={() => acceptInvite.mutate({ token: inviteToken })}
-            >
-              Submit
-            </Button>
-          </Box>
-          {acceptInvite.error && (
-            <Box css={{ font: 'caption', color: 'critical', marginY: 'small' }}>
-              {(acceptInvite.error as any).message}
-            </Box>
-          )}
-        </Box>
-        <Divider />
-        <Box
-          css={{
-            stack: 'y',
-            paddingY: 'medium',
-            gapY: 'small',
-            marginY: 'medium',
-          }}
-        >
-          <Box css={{ fontWeight: 'bold' }}>Request Access</Box>
-          {account.wait_list_entries.length ? (
-            <Box
-              css={{
-                stack: 'x',
-                gapX: 'small',
-                alignX: 'center',
-                marginY: 'large',
-              }}
-            >
-              <Icon name="check" css={{ fill: 'success' }} />
-              <Box>You&apos;re on the list</Box>
-            </Box>
-          ) : (
-            <Box>
-              <Box css={{ stack: 'x', gapX: 'small' }}>
-                <TextField
-                  placeholder="jane@example.com"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <Button
-                  disabled={!email || requestAccess.isLoading}
-                  onPress={() =>
-                    requestAccess.mutate({
-                      user_email: email,
-                    })
-                  }
-                >
-                  Submit
-                </Button>
-              </Box>
-              {requestAccess.error && (
-                <Box
-                  css={{ font: 'caption', color: 'critical', marginY: 'small' }}
-                >
-                  {(requestAccess.error as any).message}
-                </Box>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Box>
-    </Box>
-  )
-}
-
 const SetupInterstitial = ({ account }: { account: any }) => {
   const { post } = useApi()
 
@@ -237,7 +112,7 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
   }, [refetch, startSync])
 
   useEffect(() => {
-    if (!account || !account.invite_id || !account.has_acknowledged_setup) {
+    if (!account || !account.has_acknowledged_setup) {
       return
     }
 
@@ -251,8 +126,6 @@ const AccountWrapper = ({ children }: { children: ReactNode }) => {
 
   if (isLoading) {
     return <LoadingSpinner />
-  } else if (!account.invite_id) {
-    return <InviteInterstitial account={account} />
   } else if (!account.has_acknowledged_setup) {
     return <SetupInterstitial account={account} />
   } else if (!account.initial_sync_complete) {
