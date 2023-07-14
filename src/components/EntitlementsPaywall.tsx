@@ -3,9 +3,11 @@ import { Box, Button, Icon, Inline } from '@stripe/ui-extension-sdk/ui'
 import useStripeContext from '../hooks/useStripeContext'
 import { useEffect, useState } from 'react'
 import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
+import useApi from '../hooks/useApi'
 
 const EntitlementsPaywall = () => {
   const { environment, userContext } = useStripeContext()
+  const { post } = useApi()
   const [sig, setSig] = useState('')
   const [email, setEmail] = useState('')
   const host = environment.constants?.API_HOST ?? ''
@@ -17,6 +19,15 @@ const EntitlementsPaywall = () => {
     }
 
     fetchParams()
+  }, [])
+
+  useEffect(() => {
+    const track = async () => {
+      await post('/stripe/track', {
+        event: 'Viewed paywall',
+      })
+    }
+    track()
   }, [])
 
   return (

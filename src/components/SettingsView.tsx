@@ -18,6 +18,7 @@ import useToken from '../hooks/useToken'
 import { SettingsView as StripeSettingsView } from '@stripe/ui-extension-sdk/ui'
 import { Entitlements, useEntitlements } from '../hooks/useEntitlements'
 import { useState, useEffect } from 'react'
+import useApi from '../hooks/useApi'
 
 const ConfigurationSettings = () => {
   const { userContext } = useStripeContext()
@@ -184,6 +185,23 @@ const BillingSettings = () => {
 }
 
 const SettingsView = () => {
+  const { post } = useApi()
+
+  useEffect(() => {
+    const track = async () => {
+      await post('/stripe/identify', {
+        path: `/settings`,
+      })
+      await post('/stripe/track', {
+        event: '$pageview',
+        properties: {
+          $current_url: `https://stripe.spackle.so/settings`,
+        },
+      })
+    }
+    track()
+  }, [])
+
   return (
     <StripeSettingsView>
       <Box css={{ stack: 'y', gapY: 'xxlarge' }}>

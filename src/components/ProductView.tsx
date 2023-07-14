@@ -70,6 +70,21 @@ const ProductView = () => {
   const entitled =
     entitlements.data?.flag('entitlements') || environment.mode === 'test'
 
+  useEffect(() => {
+    const track = async () => {
+      await post('/stripe/identify', {
+        path: `/products/${productId}`,
+      })
+      await post('/stripe/track', {
+        event: '$pageview',
+        properties: {
+          $current_url: `https://stripe.spackle.so/products/${productId}`,
+        },
+      })
+    }
+    track()
+  }, [])
+
   return (
     <ContextView
       title="Product Features"

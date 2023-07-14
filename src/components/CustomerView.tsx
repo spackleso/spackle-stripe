@@ -6,7 +6,7 @@ import {
   Spinner,
   Inline,
 } from '@stripe/ui-extension-sdk/ui'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import BrandIcon from '../views/icon.svg'
 import useApi from '../hooks/useApi'
 import FeatureList from '../components/FeatureList'
@@ -19,6 +19,7 @@ import { NewOverride, Override } from '../types'
 import { useMutation } from '@tanstack/react-query'
 import { useEntitlements } from '../hooks/useEntitlements'
 import EntitlementsPaywall from './EntitlementsPaywall'
+import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
 
 const CustomerView = () => {
   const { environment, userContext } = useStripeContext()
@@ -48,6 +49,21 @@ const CustomerView = () => {
 
   const entitled =
     entitlements.data?.flag('entitlements') || environment.mode === 'test'
+
+  useEffect(() => {
+    const track = async () => {
+      await post('/stripe/identify', {
+        path: `/customers/${customerId}`,
+      })
+      await post('/stripe/track', {
+        event: '$pageview',
+        properties: {
+          $current_url: `https://stripe.spackle.so/customers/${customerId}`,
+        },
+      })
+    }
+    track()
+  }, [])
 
   return (
     <ContextView

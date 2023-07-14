@@ -1,13 +1,6 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Icon,
-  Spinner,
-  TextField,
-} from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Spinner } from '@stripe/ui-extension-sdk/ui'
 import useAccount from '../hooks/useAccount'
-import { ReactNode, useEffect, useCallback, useState } from 'react'
+import { ReactNode, useEffect, useCallback } from 'react'
 import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
 import { useMutation } from '@tanstack/react-query'
