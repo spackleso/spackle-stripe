@@ -19,9 +19,11 @@ const priceDisplay = (price: Stripe.Price): string => {
   const currency = price.currency.toUpperCase()
   const symbol = getSymbolFromCurrency(currency) || ''
   if (price.unit_amount && price.recurring) {
-    return `${symbol}${price.unit_amount / 100} ${currency} / ${
-      price.recurring.interval
-    }`
+    const interval =
+      price.recurring.interval_count > 1
+        ? `${price.recurring.interval_count} ${price.recurring.interval}s`
+        : `${price.recurring.interval_count} ${price.recurring.interval}`
+    return `${symbol}${price.unit_amount / 100} ${currency} / ${interval}`
   } else if (price.unit_amount) {
     return `${symbol}${price.unit_amount / 100} ${currency}`
   } else {
