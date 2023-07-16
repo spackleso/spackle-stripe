@@ -1,6 +1,6 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "name": "Spackle",
   "icon": "./icon.png",
   "permissions": [
@@ -51,6 +51,10 @@
       "image-src": null,
       "purpose": ""
     }
+  },
+  "post_install_action": {
+    "type": "external",
+    "url": "https://docs.spackle.so"
   },
   "constants": {
     "API_HOST": "https://api.spackle.so",
