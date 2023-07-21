@@ -19,7 +19,6 @@ import { NewOverride, Override } from '../types'
 import { useMutation } from '@tanstack/react-query'
 import { useEntitlements } from '../hooks/useEntitlements'
 import EntitlementsPaywall from './EntitlementsPaywall'
-import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
 
 const CustomerView = () => {
   const { environment, userContext } = useStripeContext()

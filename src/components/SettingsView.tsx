@@ -139,7 +139,7 @@ const NewPlan = () => {
         <Box css={{ stack: 'x', alignY: 'center', gapX: 'small' }}>
           <Button
             type="primary"
-            href={`${host}/stripe/billing_checkout?product=entitlements&user_id=${userContext.id}&account_id=${userContext.account.id}&email=${email}&sig=${sig}`}
+            href={`${host}/stripe/checkout_redirect?user_id=${userContext.id}&account_id=${userContext.account.id}&email=${email}&sig=${sig}`}
             disabled={!sig || !email}
           >
             Add Payment Method

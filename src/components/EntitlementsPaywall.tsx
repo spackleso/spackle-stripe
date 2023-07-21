@@ -58,7 +58,7 @@ const EntitlementsPaywall = () => {
         {sig && email ? (
           <Button
             type="primary"
-            href={`${host}/stripe/billing_checkout?product=entitlements&user_id=${userContext.id}&account_id=${userContext.account.id}&email=${email}&sig=${sig}`}
+            href={`${host}/stripe/checkout_redirect?user_id=${userContext.id}&account_id=${userContext.account.id}&email=${email}&sig=${sig}`}
           >
             Enable
           </Button>
