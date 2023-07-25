@@ -143,6 +143,7 @@ const NewPlan = () => {
             disabled={!sig || !email}
           >
             Add Payment Method
+            <Icon name="external" />
           </Button>
           <Link external href="https://spackle.so">
             View Pricing

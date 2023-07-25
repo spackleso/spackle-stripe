@@ -61,10 +61,12 @@ const EntitlementsPaywall = () => {
             href={`${host}/stripe/checkout_redirect?user_id=${userContext.id}&account_id=${userContext.account.id}&email=${email}&sig=${sig}`}
           >
             Enable
+            <Icon name="external" />
           </Button>
         ) : (
           <Button type="primary" disabled={true}>
             Enable
+            <Icon name="external" />
           </Button>
         )}
         <Button href="https://spackle.so/" target="_blank">
