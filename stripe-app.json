@@ -42,6 +42,10 @@
       {
         "viewport": "stripe.dashboard.product.detail",
         "component": "Product"
+      },
+      {
+        "viewport": "stripe.dashboard.drawer.default",
+        "component": "App"
       }
     ],
     "content_security_policy": {

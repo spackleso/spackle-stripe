@@ -72,7 +72,7 @@ const ProductView = () => {
 
   return (
     <ContextView
-      title="Product Features"
+      title="Entitlements"
       brandColor="#FFFFFF"
       brandIcon={BrandIcon}
       externalLink={{

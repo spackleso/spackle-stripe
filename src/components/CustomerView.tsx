@@ -66,7 +66,7 @@ const CustomerView = () => {
 
   return (
     <ContextView
-      title="Customer Features"
+      title="Entitlements"
       brandColor="#FFFFFF"
       brandIcon={BrandIcon}
       externalLink={{
