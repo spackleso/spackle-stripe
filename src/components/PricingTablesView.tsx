@@ -144,7 +144,7 @@ const PricingTablesView = () => {
         </Button>
       </Box>
 
-      <Box css={{ stack: 'y', gapY: 'large' }}>
+      <Box css={{ stack: 'y', gapY: 'small' }}>
         {priceTable.products.map((product) => (
           <Box
             key={product.id}
