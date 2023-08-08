@@ -1,7 +1,6 @@
 import {
   ContextView,
   Box,
-  Accordion,
   Spinner,
   Link,
   Icon,
@@ -11,13 +10,10 @@ import useAccountState from '../hooks/useAccountState'
 import useProductFeatures from '../hooks/useProductFeatures'
 import useProductState from '../hooks/useProductState'
 import useApi from '../hooks/useApi'
-import { useState, useEffect, useCallback } from 'react'
-import Stripe from 'stripe'
-import stripe from '../stripe'
+import { useState, useEffect } from 'react'
 import BrandIcon from '../views/icon.svg'
 import FeaturesForm from '../components/FeaturesForm'
 import FeatureList from '../components/FeatureList'
-import PriceAccordianItem from '../components/PriceAccordianItem'
 import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
 import { NewOverride, Override } from '../types'
@@ -35,14 +31,7 @@ const ProductView = () => {
   const productFeatures = useProductFeatures(productId, environment.mode)
   const productState = useProductState(productId, environment.mode)
 
-  const [prices, setPrices] = useState<Stripe.Price[]>([])
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
-
-  const fetch = useCallback(async () => {
-    return stripe.prices.list({ product: productId }).then((p) => {
-      setPrices(p.data)
-    })
-  }, [productId])
 
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
@@ -56,10 +45,6 @@ const ProductView = () => {
       return response
     },
   )
-
-  useEffect(() => {
-    fetch()
-  }, [fetch])
 
   const isLoading =
     accountState.isLoading ||
@@ -127,27 +112,11 @@ const ProductView = () => {
       ) : entitled ? (
         <Box>
           {accountState.data.length ? (
-            <>
-              <FeatureList
-                features={accountState}
-                overrides={productFeatures}
-                saveOverrides={saveOverrides}
-              />
-
-              <Box css={{ marginTop: 'xxlarge' }}>
-                <Box css={{ font: 'heading' }}>Price Features</Box>
-              </Box>
-
-              <Accordion>
-                {prices.map((p) => (
-                  <PriceAccordianItem
-                    key={p.id}
-                    id={p.id}
-                    productState={productState}
-                  ></PriceAccordianItem>
-                ))}
-              </Accordion>
-            </>
+            <FeatureList
+              features={accountState}
+              overrides={productFeatures}
+              saveOverrides={saveOverrides}
+            />
           ) : (
             <Box
               css={{
