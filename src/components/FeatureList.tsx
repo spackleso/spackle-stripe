@@ -18,11 +18,21 @@ const FeatureList = ({
     [key: number]: Override | NewOverride
   }>({})
 
-  const isModified =
-    JSON.stringify(overrides.data) !==
-    JSON.stringify(Object.values(overrideMap))
   const isLoading =
     features.isRefetching || overrides.isRefetching || saveOverrides.isLoading
+
+  // compares the value_limit and value_flag values of overrides.data and overrideMap
+  const isModified = !(
+    overrides.data &&
+    Object.values(overrideMap).length === overrides.data.length &&
+    overrides.data.every((o) => {
+      const override = overrideMap[o.feature_id]
+      return (
+        override.value_limit === o.value_limit &&
+        override.value_flag === o.value_flag
+      )
+    })
+  )
 
   useEffect(() => {
     if (overrides.data) {

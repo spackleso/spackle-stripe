@@ -136,7 +136,9 @@ const FeaturesForm = ({
                               defaultChecked={!!f.value_flag}
                             ></Switch>
                           ) : f.type === FeatureType.Limit ? (
-                            <Box css={{ font: 'heading' }}>{f.value_limit}</Box>
+                            <Box css={{ font: 'heading' }}>
+                              {f.value_limit === null ? '∞' : f.value_limit}
+                            </Box>
                           ) : (
                             <></>
                           )}

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import useApi from './useApi'
 
-const useProductFeatures = (accountId: string) => {
+const useAccountFeatures = (accountId: string) => {
   const { post } = useApi()
   return useQuery(['accountFeatures', accountId], async () => {
     const response = await (
@@ -11,4 +11,4 @@ const useProductFeatures = (accountId: string) => {
   })
 }
 
-export default useProductFeatures
+export default useAccountFeatures
