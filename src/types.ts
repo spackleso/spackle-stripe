@@ -1,3 +1,5 @@
+import Stripe from 'stripe'
+
 export enum FeatureType {
   Flag = 0,
   Limit = 1,
@@ -51,3 +53,18 @@ export type NewOverride =
   | NewCustomerFeature
 
 export type Override = ProductFeature | PriceFeature | CustomerFeature
+
+export type PricingTable = {
+  id: number
+  name: string
+  monthly_enabled: boolean
+  annual_enabled: boolean
+}
+
+export type PricingTableProduct = {
+  id: number
+  name: string
+  features: Feature[]
+  monthly_stripe_price?: Stripe.Price
+  annual_stripe_price?: Stripe.Price
+}
