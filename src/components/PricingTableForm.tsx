@@ -36,6 +36,11 @@ const PricingTableForm = ({
     useState<PricingTableProduct[]>(pricingTableProducts)
   const [confirmClose, setConfirmClose] = useState<boolean>(true)
 
+  const resetForm = useCallback(() => {
+    setUpdatedPricingTable(pricingTable)
+    setUpdatedPricingTableProducts(pricingTableProducts)
+  }, [pricingTable, pricingTableProducts])
+
   const closeWithConfirm = useCallback(() => {
     setShown(false)
   }, [setShown])
@@ -43,16 +48,46 @@ const PricingTableForm = ({
   const closeWithoutConfirm = useCallback(() => {
     setConfirmClose(false)
     setShown(false)
-  }, [setShown, setConfirmClose])
+    resetForm()
+  }, [setShown, setConfirmClose, resetForm])
+
+  const isModified = !(
+    updatedPricingTable.monthly_enabled === pricingTable.monthly_enabled &&
+    updatedPricingTable.annual_enabled === pricingTable.annual_enabled &&
+    updatedPricingTableProducts.length === pricingTableProducts.length &&
+    updatedPricingTableProducts.every((p) => {
+      const pricingTableProduct = pricingTableProducts.find(
+        (ptp) => ptp.id === p.id,
+      )
+      return (
+        pricingTableProduct &&
+        p.annual_stripe_price?.id ===
+          pricingTableProduct.annual_stripe_price?.id &&
+        p.monthly_stripe_price?.id ===
+          pricingTableProduct.monthly_stripe_price?.id
+      )
+    })
+  )
 
   return (
     <FocusView
-      confirmCloseMessages={confirmClose ? confirmCloseMessages : undefined}
+      confirmCloseMessages={
+        confirmClose && isModified ? confirmCloseMessages : undefined
+      }
       shown={shown}
-      setShown={setShown}
+      setShown={(val) => {
+        if (!val) {
+          resetForm()
+        }
+        setShown(val)
+      }}
       title={'Pricing Table'}
       primaryAction={
-        <Button type="primary" onPress={closeWithoutConfirm}>
+        <Button
+          type="primary"
+          onPress={closeWithoutConfirm}
+          disabled={!isModified}
+        >
           Save
         </Button>
       }
