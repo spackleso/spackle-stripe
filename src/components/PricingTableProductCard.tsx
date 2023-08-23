@@ -1,6 +1,7 @@
 import { Box, Divider, Inline } from '@stripe/ui-extension-sdk/ui'
 import { PricingTable, PricingTableProduct } from '../types'
 import PricingTableProductCardFeatures from './PricingTableProductCardFeatures'
+import { stripePriceDisplay } from '../utils'
 
 const PricingTableProductCard = ({
   pricingTable,
@@ -27,16 +28,10 @@ const PricingTableProductCard = ({
         <Box css={{ fontWeight: 'bold' }}>{product.name}</Box>
         <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>
           {pricingTable.monthly_enabled && product.monthly_stripe_price && (
-            <Inline>
-              {(product.monthly_stripe_price.unit_amount || 0) / 100}{' '}
-              {product.monthly_stripe_price.currency} / mo
-            </Inline>
+            <Inline>{stripePriceDisplay(product.monthly_stripe_price)}</Inline>
           )}
           {pricingTable.annual_enabled && product.annual_stripe_price && (
-            <Inline>
-              {(product.annual_stripe_price.unit_amount || 0) / 100}{' '}
-              {product.annual_stripe_price.currency} / yr
-            </Inline>
+            <Inline>{stripePriceDisplay(product.annual_stripe_price)}</Inline>
           )}
         </Box>
       </Box>

@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Stripe from 'stripe'
 import stripe from '../stripe'
 import PricingTablesProductList from './PricingTablesProductList'
+import { stripePriceDisplay } from '../utils'
 
 const confirmCloseMessages = {
   title: 'Your pricing table will not be saved',
@@ -283,9 +284,7 @@ const AddProductForm = ({
                   )
                   .map((price) => (
                     <option value={price.id} key={price.id}>
-                      {price.unit_amount
-                        ? `${price.unit_amount / 100} ${price.currency} / month`
-                        : price.id}
+                      {stripePriceDisplay(price)}
                     </option>
                   ))}
               </Select>
@@ -305,9 +304,7 @@ const AddProductForm = ({
                   )
                   .map((price) => (
                     <option value={price.id} key={price.id}>
-                      {price.unit_amount
-                        ? `${price.unit_amount / 100} ${price.currency} / year`
-                        : price.id}
+                      {stripePriceDisplay(price)}
                     </option>
                   ))}
               </Select>

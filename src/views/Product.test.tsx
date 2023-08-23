@@ -6,7 +6,6 @@ import Product from './Product'
 describe('Product', () => {
   it('renders ContextView', () => {
     const { wrapper } = render(<Product {...getMockContextProps()} />)
-
     expect(wrapper.find(ContextView)).toContainText('save to reload this view')
   })
 })
