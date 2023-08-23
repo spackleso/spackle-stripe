@@ -11,6 +11,7 @@ import { PricingTable, PricingTableProduct } from '../types'
 import { useCallback, useEffect, useState } from 'react'
 import Stripe from 'stripe'
 import stripe from '../stripe'
+import PricingTablesProductList from './PricingTablesProductList'
 
 const confirmCloseMessages = {
   title: 'Your pricing table will not be saved',
@@ -103,6 +104,7 @@ const PricingTableForm = ({
           >
             <Switch
               label="Monthly"
+              defaultChecked={updatedPricingTable.monthly_enabled}
               onChange={(e) => {
                 setUpdatedPricingTable({
                   ...updatedPricingTable,
@@ -112,6 +114,7 @@ const PricingTableForm = ({
             />
             <Switch
               label="Annual"
+              defaultChecked={updatedPricingTable.annual_enabled}
               onChange={(e) => {
                 setUpdatedPricingTable({
                   ...updatedPricingTable,
@@ -134,10 +137,12 @@ const PricingTableForm = ({
             These are the products that will be displayed in your pricing table
             with their associated features.
           </Box>
-          {updatedPricingTableProducts?.map((product) => (
-            <Box key={product.id}>{product.name}</Box>
-          ))}
+          <PricingTablesProductList
+            pricingTable={updatedPricingTable}
+            pricingTableProducts={updatedPricingTableProducts}
+          />
           <AddProductForm
+            pricingTable={updatedPricingTable}
             pricingTableProducts={updatedPricingTableProducts}
             setPricingTableProducts={setUpdatedPricingTableProducts}
           />
@@ -148,15 +153,21 @@ const PricingTableForm = ({
 }
 
 const AddProductForm = ({
+  pricingTable,
   pricingTableProducts,
   setPricingTableProducts,
 }: {
+  pricingTable: PricingTable
   pricingTableProducts: PricingTableProduct[]
   setPricingTableProducts: (val: PricingTableProduct[]) => void
 }) => {
-  const [selectedProductId, setSelectedProductId] = useState<string>('')
   const [showForm, setShowForm] = useState(false)
   const [products, setProducts] = useState<Stripe.Product[]>([])
+  const [prices, setPrices] = useState<Stripe.Price[]>([])
+  const [selectedProductId, setSelectedProductId] = useState<string>('')
+  const [selectedMonthlyPriceId, setSelectedMonthlyPriceId] =
+    useState<string>('')
+  const [selectedAnnualPriceId, setSelectedAnnualPriceId] = useState<string>('')
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -166,61 +177,159 @@ const AddProductForm = ({
     fetchProducts()
   }, [])
 
-  const addProduct = useCallback(async () => {
-    const product = products.find((p) => p.id === selectedProductId)
-    if (!product) {
-      return
+  useEffect(() => {
+    const fetchPrices = async () => {
+      if (!selectedProductId) {
+        setPrices([])
+        return
+      }
+
+      const result = await stripe.prices.list({
+        limit: 100,
+        active: true,
+        product: selectedProductId,
+      })
+      setPrices(result.data)
     }
-    const result = await stripe.prices.list({
-      limit: 100,
-      active: true,
-      product: product.id,
-    })
-    const price = result.data.find((p) => p.active && p.type === 'recurring')
-    if (!price) {
-      return
-    }
-    const newProduct: PricingTableProduct = {
-      id: pricingTableProducts.length * -1,
-      name: product.name,
-      monthly_stripe_price: price,
-      annual_stripe_price: price,
-      features: [],
-    }
-    setPricingTableProducts([...pricingTableProducts, newProduct])
-    setShowForm(false)
+
+    fetchPrices()
+  }, [selectedProductId])
+
+  const resetForm = useCallback(() => {
     setSelectedProductId('')
-  }, [
-    products,
-    selectedProductId,
-    pricingTableProducts,
-    setPricingTableProducts,
-  ])
+    setSelectedMonthlyPriceId('')
+    setSelectedAnnualPriceId('')
+    setShowForm(false)
+  }, [])
+
+  const addProduct = useCallback(
+    async (selectedProductId) => {
+      const product = products.find((p) => p.id === selectedProductId)
+      if (!product) {
+        return
+      }
+      const newProduct: PricingTableProduct = {
+        id: pricingTableProducts.length * -1,
+        name: product.name,
+        product_id: product.id,
+        monthly_stripe_price: selectedMonthlyPriceId
+          ? prices.find((p) => p.id === selectedMonthlyPriceId)
+          : undefined,
+        annual_stripe_price: selectedAnnualPriceId
+          ? prices.find((p) => p.id === selectedAnnualPriceId)
+          : undefined,
+      }
+      setPricingTableProducts([...pricingTableProducts, newProduct])
+      resetForm()
+    },
+    [
+      products,
+      pricingTableProducts,
+      selectedMonthlyPriceId,
+      prices,
+      selectedAnnualPriceId,
+      setPricingTableProducts,
+      resetForm,
+    ],
+  )
 
   return (
     <Box css={{ stack: 'x', alignX: 'center' }}>
       {showForm ? (
-        <Box css={{ stack: 'x', gapX: 'large' }}>
-          <Select onChange={(e) => setSelectedProductId(e.target.value)}>
-            <option value="">Choose an option</option>
-            {products.map((product) => (
-              <option value={product.id} key={product.id}>
-                {product.name}{' '}
-              </option>
-            ))}
-          </Select>
-          <Box css={{ stack: 'x', gapX: 'small', alignX: 'end' }}>
-            <Button
-              type="secondary"
-              onPress={() => {
-                setSelectedProductId('')
-                setShowForm(false)
+        <Box
+          css={{
+            stack: 'y',
+            gapY: 'medium',
+            width: 'fill',
+            backgroundColor: 'container',
+            padding: 'large',
+            borderRadius: 'medium',
+          }}
+        >
+          <Box css={{ stack: 'x', gapX: 'large' }}>
+            <Select
+              label="Product"
+              css={{ width: '1/3' }}
+              onChange={(e) => {
+                setSelectedProductId(e.target.value)
               }}
             >
-              Cancel
-            </Button>
-            <Button type="primary" onPress={addProduct}>
+              <option value="">Choose an option</option>
+              {products
+                .filter(
+                  (p) =>
+                    !pricingTableProducts.find(
+                      (ptp) => p.id === ptp.product_id,
+                    ),
+                )
+                .map((product) => (
+                  <option value={product.id} key={product.id}>
+                    {product.name}{' '}
+                  </option>
+                ))}
+            </Select>
+            {pricingTable.monthly_enabled && selectedProductId && (
+              <Select
+                label="Monthly Price"
+                css={{ width: '1/3' }}
+                onChange={(e) => setSelectedMonthlyPriceId(e.target.value)}
+              >
+                <option value="">Choose an option</option>
+                {prices
+                  .filter(
+                    (p) =>
+                      p.recurring?.interval === 'month' &&
+                      p.recurring?.interval_count === 1,
+                  )
+                  .map((price) => (
+                    <option value={price.id} key={price.id}>
+                      {price.unit_amount
+                        ? `${price.unit_amount / 100} ${price.currency} / month`
+                        : price.id}
+                    </option>
+                  ))}
+              </Select>
+            )}
+            {pricingTable.annual_enabled && selectedProductId && (
+              <Select
+                label="Yearly Price"
+                css={{ width: '1/3' }}
+                onChange={(e) => setSelectedAnnualPriceId(e.target.value)}
+              >
+                <option value="">Choose an option</option>
+                {prices
+                  .filter(
+                    (p) =>
+                      p.recurring?.interval === 'year' &&
+                      p.recurring?.interval_count === 1,
+                  )
+                  .map((price) => (
+                    <option value={price.id} key={price.id}>
+                      {price.unit_amount
+                        ? `${price.unit_amount / 100} ${price.currency} / year`
+                        : price.id}
+                    </option>
+                  ))}
+              </Select>
+            )}
+          </Box>
+          <Box css={{ stack: 'x', gapX: 'small', alignX: 'end' }}>
+            <Button
+              type="primary"
+              onPress={() => {
+                if (
+                  selectedProductId &&
+                  (!pricingTable.monthly_enabled || selectedMonthlyPriceId) &&
+                  (!pricingTable.annual_enabled || selectedAnnualPriceId)
+                ) {
+                  addProduct(selectedProductId)
+                }
+              }}
+            >
               Add
+            </Button>
+            <Button type="secondary" onPress={() => resetForm()}>
+              Cancel
             </Button>
           </Box>
         </Box>

@@ -64,7 +64,7 @@ export type PricingTable = {
 export type PricingTableProduct = {
   id: number
   name: string
-  features: Feature[]
+  product_id: string
   monthly_stripe_price?: Stripe.Price
   annual_stripe_price?: Stripe.Price
 }
