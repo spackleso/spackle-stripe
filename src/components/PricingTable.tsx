@@ -1,4 +1,4 @@
-import { Box, Button, Icon, Spinner } from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Icon, Inline, Spinner } from '@stripe/ui-extension-sdk/ui'
 import { PricingTable } from '../types'
 import PricingTablesProductList from './PricingTablesProductList'
 import { useState } from 'react'
@@ -58,10 +58,28 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
       </Box>
 
       <Box css={{ stack: 'y', gapY: 'small' }}>
-        <PricingTablesProductList
-          pricingTable={pricingTable}
-          pricingTableProducts={pricingTableProducts}
-        />
+        {pricingTableProducts.length ? (
+          <PricingTablesProductList
+            pricingTable={pricingTable}
+            pricingTableProducts={pricingTableProducts}
+          />
+        ) : (
+          <Box
+            css={{
+              keyline: 'neutral',
+              padding: 'medium',
+              font: 'caption',
+              borderRadius: 'small',
+              margin: 'medium',
+              textAlign: 'center',
+            }}
+          >
+            Add products to your pricing table by clicking the{' '}
+            <Inline css={{ fontWeight: 'bold' }}>&quot;Edit&quot;</Inline>{' '}
+            button above
+            {/* TODO: add a link to documentation/getting started */}
+          </Box>
+        )}
       </Box>
       <PricingTableForm
         pricingTable={pricingTable}

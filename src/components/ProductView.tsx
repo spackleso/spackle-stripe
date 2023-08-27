@@ -134,6 +134,7 @@ const ProductView = () => {
                 &quot;Manage Features&quot;
               </Inline>{' '}
               below
+              {/* TODO: add a link to documentation/getting started */}
             </Box>
           )}
           <FeaturesForm
