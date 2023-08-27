@@ -1,12 +1,12 @@
 import { Box, Icon, Spinner } from '@stripe/ui-extension-sdk/ui'
-import { Feature, PricingTableProduct } from '../types'
+import { Feature, NewPricingTableProduct, PricingTableProduct } from '../types'
 import useStripeContext from '../hooks/useStripeContext'
 import useProductState from '../hooks/useProductState'
 
 const PricingTableProductCardFeatures = ({
   product,
 }: {
-  product: PricingTableProduct
+  product: PricingTableProduct | NewPricingTableProduct
 }) => {
   const { environment } = useStripeContext()
   const { data: features } = useProductState(

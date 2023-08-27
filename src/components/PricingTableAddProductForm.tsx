@@ -1,7 +1,11 @@
 import { Box, Button, Icon, Select } from '@stripe/ui-extension-sdk/ui'
 import { stripePriceDisplay } from '../utils'
 import { useCallback, useEffect, useState } from 'react'
-import { PricingTable, PricingTableProduct } from '../types'
+import {
+  NewPricingTableProduct,
+  PricingTable,
+  PricingTableProduct,
+} from '../types'
 import Stripe from 'stripe'
 import stripe from '../stripe'
 
@@ -11,8 +15,10 @@ const PricingTableAddProductForm = ({
   setPricingTableProducts,
 }: {
   pricingTable: PricingTable
-  pricingTableProducts: PricingTableProduct[]
-  setPricingTableProducts: (val: PricingTableProduct[]) => void
+  pricingTableProducts: (PricingTableProduct | NewPricingTableProduct)[]
+  setPricingTableProducts: (
+    val: (PricingTableProduct | NewPricingTableProduct)[],
+  ) => void
 }) => {
   const [showForm, setShowForm] = useState(false)
   const [products, setProducts] = useState<Stripe.Product[]>([])
@@ -61,8 +67,7 @@ const PricingTableAddProductForm = ({
       if (!product) {
         return
       }
-      const newProduct: PricingTableProduct = {
-        id: pricingTableProducts.length * -1,
+      const newProduct: NewPricingTableProduct = {
         name: product.name,
         product_id: product.id,
         monthly_stripe_price: selectedMonthlyPriceId
@@ -116,7 +121,7 @@ const PricingTableAddProductForm = ({
                     ),
                 )
                 .map((product) => (
-                  <option value={product.id} key={product.id}>
+                  <option value={product.id} key={product.id || Math.random()}>
                     {product.name}{' '}
                   </option>
                 ))}

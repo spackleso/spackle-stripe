@@ -1,5 +1,9 @@
 import { Box, Divider, Inline } from '@stripe/ui-extension-sdk/ui'
-import { PricingTable, PricingTableProduct } from '../types'
+import {
+  NewPricingTableProduct,
+  PricingTable,
+  PricingTableProduct,
+} from '../types'
 import PricingTableProductCardFeatures from './PricingTableProductCardFeatures'
 import { stripePriceDisplay } from '../utils'
 
@@ -8,12 +12,16 @@ const PricingTableProductCard = ({
   product,
 }: {
   pricingTable: PricingTable
-  product: PricingTableProduct
+  product: PricingTableProduct | NewPricingTableProduct
   isEditable?: boolean
 }) => {
   return (
     <Box
-      key={product.id}
+      key={
+        Object.hasOwn(product, 'id')
+          ? (product as PricingTableProduct).id
+          : Math.random()
+      }
       css={{
         stack: 'y',
         distribute: 'space-between',

@@ -1,5 +1,9 @@
 import { Box } from '@stripe/ui-extension-sdk/ui'
-import { PricingTable, PricingTableProduct } from '../types'
+import {
+  NewPricingTableProduct,
+  PricingTable,
+  PricingTableProduct,
+} from '../types'
 import PricingTableProductCard from './PricingTableProductCard'
 
 const PricingTablesProductList = ({
@@ -7,7 +11,7 @@ const PricingTablesProductList = ({
   pricingTableProducts,
 }: {
   pricingTable: PricingTable
-  pricingTableProducts: PricingTableProduct[]
+  pricingTableProducts: (PricingTableProduct | NewPricingTableProduct)[]
 }) => {
   if (pricingTable.monthly_enabled) {
     pricingTableProducts = pricingTableProducts.sort((a, b) => {
@@ -34,7 +38,11 @@ const PricingTablesProductList = ({
     <Box>
       {pricingTableProducts.map((product) => (
         <PricingTableProductCard
-          key={product.id}
+          key={
+            Object.hasOwn(product, 'id')
+              ? (product as PricingTableProduct).id
+              : Math.random()
+          }
           pricingTable={pricingTable}
           product={product}
         />

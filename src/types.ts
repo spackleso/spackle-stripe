@@ -62,10 +62,13 @@ export type PricingTable = {
   annual_enabled: boolean
 }
 
-export type PricingTableProduct = {
-  id: number
+export type NewPricingTableProduct = {
   name: string
   product_id: string
   monthly_stripe_price?: Stripe.Price
   annual_stripe_price?: Stripe.Price
+}
+
+export type PricingTableProduct = NewPricingTableProduct & {
+  id: number
 }
