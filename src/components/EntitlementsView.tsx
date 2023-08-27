@@ -21,7 +21,7 @@ const EntitlementsView = () => {
     }
 
     const fetchProducts = async () => {
-      const response = await stripe.products.list({ limit: 5 })
+      const response = await stripe.products.list({ limit: 5, active: true })
       setProducts(response.data)
     }
 

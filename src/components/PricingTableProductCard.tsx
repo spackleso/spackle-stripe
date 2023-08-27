@@ -9,6 +9,7 @@ const PricingTableProductCard = ({
 }: {
   pricingTable: PricingTable
   product: PricingTableProduct
+  isEditable?: boolean
 }) => {
   return (
     <Box
