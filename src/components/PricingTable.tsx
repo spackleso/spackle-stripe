@@ -1,4 +1,11 @@
-import { Box, Button, Icon, Inline, Spinner } from '@stripe/ui-extension-sdk/ui'
+import {
+  Badge,
+  Box,
+  Button,
+  Icon,
+  Inline,
+  Spinner,
+} from '@stripe/ui-extension-sdk/ui'
 import { PricingTable } from '../types'
 import PricingTablesProductList from './PricingTablesProductList'
 import { useState } from 'react'
@@ -41,23 +48,34 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
       <Box
         css={{
           stack: 'x',
-          gapX: 'large',
+          alignY: 'center',
+          distribute: 'space-between',
         }}
       >
-        <Button
-          type="secondary"
-          onPress={() => setShowForm(true)}
-          css={{ width: 'fill' }}
-        >
-          Edit
-        </Button>
-        <Button type="secondary" css={{ width: 'fill' }}>
-          Preview
-          <Icon name="external" size="xsmall" />
-        </Button>
+        <Box css={{ stack: 'x', gapX: 'small' }}>
+          <Button
+            type="secondary"
+            onPress={() => setShowForm(true)}
+            css={{ width: 'fill' }}
+          >
+            Edit
+          </Button>
+          <Button type="secondary" css={{ width: 'fill' }}>
+            Preview
+            <Icon name="external" size="xsmall" />
+          </Button>
+        </Box>
+        <Box>
+          {pricingTable.mode === 0 ? (
+            <Badge type="info">Live</Badge>
+          ) : (
+            <Badge type="warning">Test</Badge>
+          )}
+        </Box>
       </Box>
 
       <Box css={{ stack: 'y', gapY: 'small' }}>
+        <Box css={{ font: 'heading', fontWeight: 'bold' }}>Products</Box>
         {pricingTableProducts.length ? (
           <PricingTablesProductList
             pricingTable={pricingTable}
@@ -70,7 +88,6 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
               padding: 'medium',
               font: 'caption',
               borderRadius: 'small',
-              margin: 'medium',
               textAlign: 'center',
             }}
           >

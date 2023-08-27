@@ -57,6 +57,7 @@ export type Override = ProductFeature | PriceFeature | CustomerFeature
 export type PricingTable = {
   id: number
   name: string
+  mode: number
   monthly_enabled: boolean
   annual_enabled: boolean
 }
