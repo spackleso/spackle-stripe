@@ -75,7 +75,9 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
       </Box>
 
       <Box css={{ stack: 'y', gapY: 'small' }}>
-        <Box css={{ font: 'heading', fontWeight: 'bold' }}>Products</Box>
+        <Box css={{ font: 'heading', fontWeight: 'bold' }}>
+          Pricing Table Products
+        </Box>
         {pricingTableProducts.length ? (
           <PricingTablesProductList
             pricingTable={pricingTable}
