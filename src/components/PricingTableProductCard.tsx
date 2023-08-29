@@ -1,4 +1,4 @@
-import { Box, Divider, Inline } from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Divider, Inline, Link } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
   PricingTable,
@@ -6,15 +6,21 @@ import {
 } from '../types'
 import PricingTableProductCardFeatures from './PricingTableProductCardFeatures'
 import { stripePriceDisplay } from '../utils'
+import { useState } from 'react'
 
 const PricingTableProductCard = ({
   pricingTable,
   product,
+  onDelete,
+  onUpdate,
 }: {
   pricingTable: PricingTable
   product: PricingTableProduct | NewPricingTableProduct
-  isEditable?: boolean
+  onDelete?: () => void
+  onUpdate?: () => void
 }) => {
+  const [showForm, setShowForm] = useState(false)
+
   return (
     <Box
       key={
@@ -46,6 +52,20 @@ const PricingTableProductCard = ({
       </Box>
       <Divider />
       <PricingTableProductCardFeatures product={product} />
+      {(onDelete || onUpdate) && (
+        <Box css={{ stack: 'x', gapX: 'small', alignX: 'end' }}>
+          {onUpdate && (
+            <Link type="primary" onPress={() => setShowForm(true)}>
+              Edit
+            </Link>
+          )}
+          {onDelete && (
+            <Link type="secondary" onPress={() => onDelete()}>
+              Delete
+            </Link>
+          )}
+        </Box>
+      )}
     </Box>
   )
 }

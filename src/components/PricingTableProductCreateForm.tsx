@@ -9,7 +9,7 @@ import {
 import Stripe from 'stripe'
 import stripe from '../stripe'
 
-const PricingTableAddProductForm = ({
+const PricingTableProductCreateForm = ({
   pricingTable,
   pricingTableProducts,
   setPricingTableProducts,
@@ -197,4 +197,4 @@ const PricingTableAddProductForm = ({
   )
 }
 
-export default PricingTableAddProductForm
+export default PricingTableProductCreateForm

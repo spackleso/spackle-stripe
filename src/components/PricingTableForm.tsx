@@ -12,7 +12,7 @@ import {
 } from '../types'
 import { useCallback, useState } from 'react'
 import PricingTablesProductList from './PricingTablesProductList'
-import PricingTableAddProductForm from './PricingTableAddProductForm'
+import PricingTableAddProductForm from './PricingTableProductCreateForm'
 import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
 import { useMutation } from '@tanstack/react-query'
@@ -59,7 +59,6 @@ const PricingTableForm = ({
   const [confirmClose, setConfirmClose] = useState<boolean>(true)
 
   const savePricingTable = useMutation(async (data: PricingTableUpdateData) => {
-    console.log(data)
     const response = await post(`/stripe/update_pricing_table`, data)
     queryClient.invalidateQueries(['pricingTables', userContext.account.id])
     queryClient.invalidateQueries(['pricingTableProducts', pricingTable.id])
@@ -186,6 +185,8 @@ const PricingTableForm = ({
           <PricingTablesProductList
             pricingTable={updatedPricingTable}
             pricingTableProducts={updatedPricingTableProducts}
+            isEditable={true}
+            setPricingTableProducts={setUpdatedPricingTableProducts}
           />
           <PricingTableAddProductForm
             pricingTable={updatedPricingTable}

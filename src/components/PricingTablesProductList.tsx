@@ -9,9 +9,15 @@ import PricingTableProductCard from './PricingTableProductCard'
 const PricingTablesProductList = ({
   pricingTable,
   pricingTableProducts,
+  isEditable,
+  setPricingTableProducts,
 }: {
   pricingTable: PricingTable
   pricingTableProducts: (PricingTableProduct | NewPricingTableProduct)[]
+  isEditable?: boolean
+  setPricingTableProducts: (
+    val: (PricingTableProduct | NewPricingTableProduct)[],
+  ) => void
 }) => {
   if (pricingTable.monthly_enabled) {
     pricingTableProducts = pricingTableProducts.sort((a, b) => {
@@ -45,6 +51,14 @@ const PricingTablesProductList = ({
           }
           pricingTable={pricingTable}
           product={product}
+          onDelete={
+            isEditable
+              ? () =>
+                  setPricingTableProducts(
+                    pricingTableProducts.filter((ptp) => ptp !== product),
+                  )
+              : undefined
+          }
         />
       ))}
     </Box>
