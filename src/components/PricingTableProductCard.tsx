@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Inline, Link } from '@stripe/ui-extension-sdk/ui'
+import { Box, Divider, Inline, Link, Select } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
   PricingTable,
@@ -6,7 +6,9 @@ import {
 } from '../types'
 import PricingTableProductCardFeatures from './PricingTableProductCardFeatures'
 import { stripePriceDisplay } from '../utils'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import Stripe from 'stripe'
+import stripe from '../stripe'
 
 const PricingTableProductCard = ({
   pricingTable,
@@ -17,9 +19,27 @@ const PricingTableProductCard = ({
   pricingTable: PricingTable
   product: PricingTableProduct | NewPricingTableProduct
   onDelete?: () => void
-  onUpdate?: () => void
+  onUpdate?: (ptp: PricingTableProduct | NewPricingTableProduct) => void
 }) => {
-  const [showForm, setShowForm] = useState(false)
+  const [prices, setPrices] = useState<Stripe.Price[]>([])
+
+  useEffect(() => {
+    const fetchPrices = async () => {
+      if (!onUpdate) {
+        setPrices([])
+        return
+      }
+
+      const result = await stripe.prices.list({
+        limit: 100,
+        active: true,
+        product: product.product_id,
+      })
+      setPrices(result.data)
+    }
+
+    fetchPrices()
+  }, [onUpdate, product.product_id])
 
   return (
     <Box
@@ -41,29 +61,79 @@ const PricingTableProductCard = ({
     >
       <Box css={{ stack: 'x', gapX: 'small' }}>
         <Box css={{ fontWeight: 'bold' }}>{product.name}</Box>
-        <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>
-          {pricingTable.monthly_enabled && product.monthly_stripe_price && (
-            <Inline>{stripePriceDisplay(product.monthly_stripe_price)}</Inline>
-          )}
-          {pricingTable.annual_enabled && product.annual_stripe_price && (
-            <Inline>{stripePriceDisplay(product.annual_stripe_price)}</Inline>
-          )}
-        </Box>
+        {onUpdate ? (
+          <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>
+            {pricingTable.monthly_enabled && (
+              <Select
+                defaultValue={product.monthly_stripe_price?.id}
+                onChange={(e) =>
+                  onUpdate({
+                    ...product,
+                    monthly_stripe_price: prices.find(
+                      (p) => p.id === e.target.value,
+                    ),
+                  })
+                }
+              >
+                {prices
+                  .filter(
+                    (p) =>
+                      p.recurring?.interval === 'month' &&
+                      p.recurring?.interval_count === 1,
+                  )
+                  .map((price) => (
+                    <option value={price.id} key={price.id}>
+                      {stripePriceDisplay(price)}
+                    </option>
+                  ))}
+              </Select>
+            )}
+            {pricingTable.annual_enabled && (
+              <Select
+                defaultValue={product.annual_stripe_price?.id}
+                onChange={(e) =>
+                  onUpdate({
+                    ...product,
+                    annual_stripe_price: prices.find(
+                      (p) => p.id === e.target.value,
+                    ),
+                  })
+                }
+              >
+                {prices
+                  .filter(
+                    (p) =>
+                      p.recurring?.interval === 'year' &&
+                      p.recurring?.interval_count === 1,
+                  )
+                  .map((price) => (
+                    <option value={price.id} key={price.id}>
+                      {stripePriceDisplay(price)}
+                    </option>
+                  ))}
+              </Select>
+            )}
+          </Box>
+        ) : (
+          <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>
+            {pricingTable.monthly_enabled && product.monthly_stripe_price && (
+              <Inline>
+                {stripePriceDisplay(product.monthly_stripe_price)}
+              </Inline>
+            )}
+            {pricingTable.annual_enabled && product.annual_stripe_price && (
+              <Inline>{stripePriceDisplay(product.annual_stripe_price)}</Inline>
+            )}
+          </Box>
+        )}
       </Box>
       <Divider />
       <PricingTableProductCardFeatures product={product} />
-      {(onDelete || onUpdate) && (
+      {onDelete && (
         <Box css={{ stack: 'x', gapX: 'small', alignX: 'end' }}>
-          {onUpdate && (
-            <Link type="primary" onPress={() => setShowForm(true)}>
-              Edit
-            </Link>
-          )}
-          {onDelete && (
-            <Link type="secondary" onPress={() => onDelete()}>
-              Delete
-            </Link>
-          )}
+          <Link type="secondary" onPress={() => onDelete()}>
+            Delete
+          </Link>
         </Box>
       )}
     </Box>

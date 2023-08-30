@@ -15,7 +15,7 @@ const PricingTablesProductList = ({
   pricingTable: PricingTable
   pricingTableProducts: (PricingTableProduct | NewPricingTableProduct)[]
   isEditable?: boolean
-  setPricingTableProducts: (
+  setPricingTableProducts?: (
     val: (PricingTableProduct | NewPricingTableProduct)[],
   ) => void
 }) => {
@@ -51,8 +51,19 @@ const PricingTablesProductList = ({
           }
           pricingTable={pricingTable}
           product={product}
+          onUpdate={
+            isEditable && setPricingTableProducts
+              ? (ptp: PricingTableProduct | NewPricingTableProduct) => {
+                  const index = pricingTableProducts.findIndex(
+                    (ptp2) => ptp2 === product,
+                  )
+                  pricingTableProducts[index] = ptp
+                  setPricingTableProducts([...pricingTableProducts])
+                }
+              : undefined
+          }
           onDelete={
-            isEditable
+            isEditable && setPricingTableProducts
               ? () =>
                   setPricingTableProducts(
                     pricingTableProducts.filter((ptp) => ptp !== product),

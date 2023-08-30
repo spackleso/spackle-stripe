@@ -50,12 +50,13 @@ const PricingTableForm = ({
 }) => {
   const { post } = useApi()
   const { userContext } = useStripeContext()
-  const [updatedPricingTable, setUpdatedPricingTable] =
-    useState<PricingTable>(pricingTable)
+  const [updatedPricingTable, setUpdatedPricingTable] = useState<PricingTable>({
+    ...pricingTable,
+  })
   const [updatedPricingTableProducts, setUpdatedPricingTableProducts] =
-    useState<(PricingTableProduct | NewPricingTableProduct)[]>(
-      pricingTableProducts,
-    )
+    useState<(PricingTableProduct | NewPricingTableProduct)[]>([
+      ...pricingTableProducts,
+    ])
   const [confirmClose, setConfirmClose] = useState<boolean>(true)
 
   const savePricingTable = useMutation(async (data: PricingTableUpdateData) => {
@@ -128,6 +129,8 @@ const PricingTableForm = ({
                 annual_stripe_price_id: p.annual_stripe_price
                   ? p.annual_stripe_price.id
                   : null,
+                monthly_stripe_price: undefined,
+                annual_stripe_price: undefined,
               })),
             })
             closeWithoutConfirm()
