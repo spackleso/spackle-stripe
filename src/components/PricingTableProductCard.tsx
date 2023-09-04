@@ -59,7 +59,7 @@ const PricingTableProductCard = ({
         borderRadius: 'medium',
       }}
     >
-      <Box css={{ stack: 'x', gapX: 'small' }}>
+      <Box css={{ stack: onUpdate ? 'x' : 'y', gapX: 'small', gapY: 'small' }}>
         <Box css={{ fontWeight: 'bold' }}>{product.name}</Box>
         {onUpdate ? (
           <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>
@@ -75,6 +75,7 @@ const PricingTableProductCard = ({
                   })
                 }
               >
+                <option value="">Choose an option</option>
                 {prices
                   .filter(
                     (p) =>
@@ -100,6 +101,7 @@ const PricingTableProductCard = ({
                   })
                 }
               >
+                <option value="">Choose an option</option>
                 {prices
                   .filter(
                     (p) =>
@@ -115,14 +117,12 @@ const PricingTableProductCard = ({
             )}
           </Box>
         ) : (
-          <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>
+          <Box css={{ stack: 'x', gapX: 'small', alignX: 'start' }}>
             {pricingTable.monthly_enabled && product.monthly_stripe_price && (
-              <Inline>
-                {stripePriceDisplay(product.monthly_stripe_price)}
-              </Inline>
+              <Box>{stripePriceDisplay(product.monthly_stripe_price)}</Box>
             )}
             {pricingTable.annual_enabled && product.annual_stripe_price && (
-              <Inline>{stripePriceDisplay(product.annual_stripe_price)}</Inline>
+              <Box>{stripePriceDisplay(product.annual_stripe_price)}</Box>
             )}
           </Box>
         )}

@@ -61,9 +61,13 @@ const PricingTableForm = ({
 
   const savePricingTable = useMutation(async (data: PricingTableUpdateData) => {
     const response = await post(`/stripe/update_pricing_table`, data)
+    if (!response.ok) {
+      const { error } = await response.json()
+      throw new Error(error)
+    }
     queryClient.invalidateQueries(['pricingTables', userContext.account.id])
     queryClient.invalidateQueries(['pricingTableProducts', pricingTable.id])
-    return response
+    closeWithoutConfirm()
   })
 
   const resetForm = useCallback(() => {
@@ -133,14 +137,20 @@ const PricingTableForm = ({
                 annual_stripe_price: undefined,
               })),
             })
-            closeWithoutConfirm()
           }}
-          disabled={!isModified}
+          disabled={!isModified || savePricingTable.isLoading}
         >
           Save
         </Button>
       }
-      secondaryAction={<Button onPress={closeWithConfirm}>Cancel</Button>}
+      secondaryAction={
+        <Button
+          onPress={closeWithConfirm}
+          disabled={savePricingTable.isLoading}
+        >
+          Cancel
+        </Button>
+      }
     >
       <Box css={{ stack: 'y', gapY: 'large' }}>
         <Box>
@@ -183,8 +193,21 @@ const PricingTableForm = ({
             }}
           >
             These are the products that will be displayed in your pricing table
-            with their associated features.
+            with their associated features. Example: Basic, Premium, Pro
           </Box>
+
+          {(savePricingTable.error as Error | undefined)?.message && (
+            <Box
+              css={{
+                color: 'critical',
+                fontWeight: 'semibold',
+                textAlign: 'center',
+              }}
+            >
+              {(savePricingTable.error as Error).message}
+            </Box>
+          )}
+
           <PricingTablesProductList
             pricingTable={updatedPricingTable}
             pricingTableProducts={updatedPricingTableProducts}

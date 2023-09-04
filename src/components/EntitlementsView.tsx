@@ -63,7 +63,7 @@ const EntitlementsView = () => {
           {customers.map((customer) => (
             <Box key={customer.id}>
               <Box css={{ padding: 'small' }}>
-                <Link href={`${customerBase}/${customer.id}`}>
+                <Link type="secondary" href={`${customerBase}/${customer.id}`}>
                   <Box css={{ stack: 'x', alignY: 'center', gapX: 'small' }}>
                     <Box>{customer.email}</Box>
                     <Icon name="arrowRight" size="xsmall" />
@@ -89,7 +89,7 @@ const EntitlementsView = () => {
           {products.map((product) => (
             <Box key={product.id}>
               <Box css={{ padding: 'small' }}>
-                <Link href={`${productBase}/${product.id}`}>
+                <Link type="secondary" href={`${productBase}/${product.id}`}>
                   <Box css={{ stack: 'x', alignY: 'center', gapX: 'small' }}>
                     <Box>{product.name}</Box>
                     <Icon name="arrowRight" size="xsmall" />
