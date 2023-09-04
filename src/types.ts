@@ -55,7 +55,7 @@ export type NewOverride =
 export type Override = ProductFeature | PriceFeature | CustomerFeature
 
 export type PricingTable = {
-  id: number
+  id: string
   name: string
   mode: number
   monthly_enabled: boolean

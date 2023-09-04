@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import useApi from './useApi'
 import { PricingTableProduct } from '../types'
 
-const usePricingTableProducts = (pricingTableId: number) => {
+const usePricingTableProducts = (pricingTableId: string) => {
   const { post } = useApi()
   return useQuery(['pricingTableProducts', pricingTableId], async () => {
     return (await (

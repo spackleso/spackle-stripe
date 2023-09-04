@@ -3,7 +3,15 @@ import {
   Button,
   FocusView,
   FormFieldGroup,
+  Icon,
+  Spinner,
   Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  TextArea,
 } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
@@ -17,6 +25,8 @@ import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
 import { useMutation } from '@tanstack/react-query'
 import { queryClient } from '../query'
+import useToken from '../hooks/useToken'
+import { clipboardWriteText, showToast } from '@stripe/ui-extension-sdk/utils'
 
 const confirmCloseMessages = {
   title: 'Your pricing table will not be saved',
@@ -26,7 +36,7 @@ const confirmCloseMessages = {
 }
 
 type PricingTableUpdateData = {
-  id: number
+  id: string
   monthly_enabled: boolean
   annual_enabled: boolean
   pricing_table_products: {
@@ -50,6 +60,7 @@ const PricingTableForm = ({
 }) => {
   const { post } = useApi()
   const { userContext } = useStripeContext()
+  const { data: token } = useToken(userContext.account.id)
   const [updatedPricingTable, setUpdatedPricingTable] = useState<PricingTable>({
     ...pricingTable,
   })
@@ -106,6 +117,38 @@ const PricingTableForm = ({
     })
   )
 
+  const curlCode = `
+curl https://api.spackle.so/v1/pricing_tables/${pricingTable.id}/state \\
+  -H 'Content-Type: application/json' \\
+  -H 'Authorization: Bearer ${token?.token}'
+`.trim()
+
+  const nodeCode = `
+import Spackle from 'spackle-node';
+const spackle = new Spackle('${token?.token}')
+await spackle.pricingTables.retrieve('${pricingTable.id}')
+`.trim()
+
+  const phpCode = `
+<?php
+require_once('vendor/autoload.php');
+\\Spackle\\Spackle::setApiKey('${token?.token}');
+\\Spackle\\PricingTable::retrieve('${pricingTable.id}');
+?>
+`.trim()
+
+  const pythonCode = `
+import spackle
+spackle.api_key = '${token?.token}'
+spackle.PricingTable.retrieve('${pricingTable.id}')
+`.trim()
+
+  const rubyCode = `
+require 'spackle'
+Spackle.api_key = "${token?.token}"
+Spackle::PricingTable.retrieve('${pricingTable.id}')
+`.trim()
+
   return (
     <FocusView
       confirmCloseMessages={
@@ -152,7 +195,7 @@ const PricingTableForm = ({
         </Button>
       }
     >
-      <Box css={{ stack: 'y', gapY: 'large' }}>
+      <Box css={{ stack: 'y', gapY: 'xlarge' }}>
         <Box>
           <Box css={{ font: 'heading', marginBottom: 'medium' }}>Settings</Box>
           <FormFieldGroup
@@ -219,6 +262,144 @@ const PricingTableForm = ({
             pricingTableProducts={updatedPricingTableProducts}
             setPricingTableProducts={setUpdatedPricingTableProducts}
           />
+        </Box>
+        <Box>
+          <Box css={{ font: 'heading' }}>Integrate</Box>
+          <Box
+            css={{
+              font: 'caption',
+              color: 'secondary',
+              marginBottom: 'medium',
+            }}
+          >
+            Use the Spackle SDKs to retrieve your pricing table. Read the docs
+            for full integration details.
+          </Box>
+          {token ? (
+            <Tabs size="small">
+              <TabList>
+                <Tab tabKey="curl">cURL</Tab>
+                <Tab tabKey="nodejs">Node.js</Tab>
+                <Tab tabKey="php">PHP</Tab>
+                <Tab tabKey="python">Python</Tab>
+                <Tab tabKey="ruby">Ruby</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel tabKey="curl">
+                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
+                    <TextArea
+                      defaultValue={curlCode}
+                      disabled={true}
+                      resizeable={false}
+                      rows={3}
+                      wrap="off"
+                    />
+                    <Button
+                      onPress={async () => {
+                        await clipboardWriteText(curlCode)
+                        showToast('Copied to clipboard')
+                      }}
+                    >
+                      <Icon name="clipboard" />
+                      Copy
+                    </Button>
+                  </Box>
+                </TabPanel>
+                <TabPanel tabKey="nodejs">
+                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
+                    <TextArea
+                      defaultValue={nodeCode}
+                      disabled={true}
+                      resizeable={false}
+                      rows={3}
+                      wrap="off"
+                    />
+                    <Button
+                      onPress={async () => {
+                        await clipboardWriteText(nodeCode)
+                        showToast('Copied to clipboard')
+                      }}
+                    >
+                      <Icon name="clipboard" />
+                      Copy
+                    </Button>
+                  </Box>
+                </TabPanel>
+                <TabPanel tabKey="php">
+                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
+                    <TextArea
+                      defaultValue={phpCode}
+                      disabled={true}
+                      resizeable={false}
+                      rows={5}
+                      wrap="off"
+                    />
+                    <Button
+                      onPress={async () => {
+                        await clipboardWriteText(phpCode)
+                        showToast('Copied to clipboard')
+                      }}
+                    >
+                      <Icon name="clipboard" />
+                      Copy
+                    </Button>
+                  </Box>
+                </TabPanel>
+                <TabPanel tabKey="python">
+                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
+                    <TextArea
+                      defaultValue={pythonCode}
+                      disabled={true}
+                      resizeable={false}
+                      rows={3}
+                      wrap="off"
+                    />
+                    <Button
+                      onPress={async () => {
+                        await clipboardWriteText(pythonCode)
+                        showToast('Copied to clipboard')
+                      }}
+                    >
+                      <Icon name="clipboard" />
+                      Copy
+                    </Button>
+                  </Box>
+                </TabPanel>
+                <TabPanel tabKey="ruby">
+                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
+                    <TextArea
+                      defaultValue={rubyCode}
+                      disabled={true}
+                      resizeable={false}
+                      rows={3}
+                      wrap="off"
+                    />
+                    <Button
+                      onPress={async () => {
+                        await clipboardWriteText(rubyCode)
+                        showToast('Copied to clipboard')
+                      }}
+                    >
+                      <Icon name="clipboard" />
+                      Copy
+                    </Button>
+                  </Box>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          ) : (
+            <Box
+              css={{
+                stack: 'x',
+                alignX: 'center',
+                alignY: 'center',
+                width: 'fill',
+                height: 'fill',
+              }}
+            >
+              <Spinner />
+            </Box>
+          )}
         </Box>
       </Box>
     </FocusView>

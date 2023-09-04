@@ -2,7 +2,6 @@ import {
   Badge,
   Box,
   Button,
-  Icon,
   Inline,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
@@ -58,11 +57,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
             onPress={() => setShowForm(true)}
             css={{ width: 'fill' }}
           >
-            Edit
-          </Button>
-          <Button type="secondary" css={{ width: 'fill' }}>
-            Preview
-            <Icon name="external" size="xsmall" />
+            Settings
           </Button>
         </Box>
         <Box>
@@ -94,7 +89,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
             }}
           >
             Add products to your pricing table by clicking the{' '}
-            <Inline css={{ fontWeight: 'bold' }}>&quot;Edit&quot;</Inline>{' '}
+            <Inline css={{ fontWeight: 'bold' }}>&quot;Settings&quot;</Inline>{' '}
             button above
             {/* TODO: add a link to documentation/getting started */}
           </Box>
