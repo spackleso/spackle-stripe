@@ -51,23 +51,20 @@ const FeatureList = ({
 
   return (
     <>
-      <Box css={{ stack: 'y' }}>
-        {features.data.sort(sortFeatures).map((f) => (
-          <>
-            <FeatureItem
-              key={f.key}
-              feature={f}
-              overrideMap={overrideMap}
-              setOverrideMap={setOverrideMap}
-            />
-          </>
-        ))}
-      </Box>
+      <Box css={{ stack: 'x', marginY: 'large', gap: 'small' }}>
+        <Button
+          type="primary"
+          css={{ width: 'fill' }}
+          disabled={!isModified || isLoading}
+          onPress={() => saveOverrides.mutate(Object.values(overrideMap))}
+        >
+          {saveOverrides.isLoading ? <Spinner /> : <>Save</>}
+        </Button>
 
-      <Box css={{ stack: 'x', marginY: 'large', gap: 'small', alignX: 'end' }}>
         {!saveOverrides.isLoading && (
           <Button
             type="secondary"
+            css={{ width: 'fill' }}
             disabled={!isModified || isLoading}
             onPress={() => {
               setOverrideMap(
@@ -81,13 +78,19 @@ const FeatureList = ({
             Cancel
           </Button>
         )}
-        <Button
-          type="primary"
-          disabled={!isModified || isLoading}
-          onPress={() => saveOverrides.mutate(Object.values(overrideMap))}
-        >
-          {saveOverrides.isLoading ? <Spinner /> : <>Save</>}
-        </Button>
+      </Box>
+
+      <Box css={{ stack: 'y' }}>
+        {features.data.sort(sortFeatures).map((f) => (
+          <>
+            <FeatureItem
+              key={f.key}
+              feature={f}
+              overrideMap={overrideMap}
+              setOverrideMap={setOverrideMap}
+            />
+          </>
+        ))}
       </Box>
     </>
   )
