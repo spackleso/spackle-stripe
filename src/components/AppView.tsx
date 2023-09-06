@@ -9,7 +9,7 @@ import BrandIcon from '../views/icon.svg'
 import { Tabs, Tab, TabList, TabPanels } from '@stripe/ui-extension-sdk/ui'
 import EntitlementsTab from '../components/EntitlementsTab'
 import PricingTableTab from '../components/PricingTableTab'
-import { useState } from 'react'
+import { Key, useEffect, useState } from 'react'
 import useStripeContext from '../hooks/useStripeContext'
 import { useEntitlements } from '../hooks/useEntitlements'
 import FeaturesForm from './FeaturesForm'
@@ -19,12 +19,22 @@ const ENTITLEMENTS_TAB_KEY = '2'
 
 const AppView = () => {
   const { environment, userContext } = useStripeContext()
+  const [key, setKey] = useState<Key>(PRICING_TABLE_TAB_KEY)
 
   const entitlements = useEntitlements(userContext.account.id)
   const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
   const entitled =
     entitlements.data?.flag('entitlements') || environment.mode === 'test'
+
+  useEffect(() => {
+    if (
+      environment.objectContext?.object === 'customer' ||
+      environment.objectContext?.object === 'product'
+    ) {
+      setKey(ENTITLEMENTS_TAB_KEY)
+    }
+  }, [environment.objectContext?.object])
 
   return (
     <ContextView
@@ -66,7 +76,7 @@ const AppView = () => {
           <Spinner />
         </Box>
       ) : (
-        <Tabs size="small" fitted>
+        <Tabs size="small" fitted selectedKey={key} onSelectionChange={setKey}>
           <TabList>
             <Tab tabKey={PRICING_TABLE_TAB_KEY}>Pricing Table</Tab>
             <Tab tabKey={ENTITLEMENTS_TAB_KEY}>Entitlements</Tab>

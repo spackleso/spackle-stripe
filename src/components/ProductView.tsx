@@ -70,83 +70,59 @@ const ProductView = () => {
     track()
   }, [])
 
-  return (
-    <ContextView
-      title="Entitlements"
-      brandColor="#FFFFFF"
-      brandIcon={BrandIcon}
-      externalLink={{
-        label: 'Documentation',
-        href: 'https://docs.spackle.so',
-      }}
-      footerContent={
-        entitled && (
-          <>
-            <Box>
-              <Link
-                type="secondary"
-                onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
-              >
-                <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-                  <Icon name="settings" />
-                  Manage Features
-                </Box>
-              </Link>
-            </Box>
-          </>
-        )
-      }
-    >
-      {isLoading ? (
-        <Box
-          css={{
-            stack: 'x',
-            alignX: 'center',
-            alignY: 'center',
-            width: 'fill',
-            height: 'fill',
-          }}
-        >
-          <Spinner />
-        </Box>
-      ) : entitled ? (
-        <Box>
-          {accountState.data.length ? (
-            <FeatureList
-              features={accountState}
-              overrides={productFeatures}
-              saveOverrides={saveOverrides}
-            />
-          ) : (
-            <Box
-              css={{
-                keyline: 'neutral',
-                padding: 'medium',
-                font: 'caption',
-                borderRadius: 'small',
-                margin: 'medium',
-                textAlign: 'center',
-              }}
-            >
-              You don&apos;t have any features yet. Create a new feature by
-              clicking{' '}
-              <Inline css={{ fontWeight: 'bold' }}>
-                &quot;Manage Features&quot;
-              </Inline>{' '}
-              below
-              {/* TODO: add a link to documentation/getting started */}
-            </Box>
-          )}
-          <FeaturesForm
-            shown={isShowingFeaturesForm}
-            setShown={setIsShowingFeaturesForm}
+  if (isLoading) {
+    return (
+      <Box
+        css={{
+          stack: 'x',
+          alignX: 'center',
+          alignY: 'center',
+          width: 'fill',
+          height: 'fill',
+          marginTop: 'xlarge',
+        }}
+      >
+        <Spinner />
+      </Box>
+    )
+  } else if (entitled) {
+    return (
+      <Box css={{ marginTop: 'medium' }}>
+        {accountState.data.length ? (
+          <FeatureList
+            features={accountState}
+            overrides={productFeatures}
+            saveOverrides={saveOverrides}
           />
-        </Box>
-      ) : (
-        <EntitlementsPaywall />
-      )}
-    </ContextView>
-  )
+        ) : (
+          <Box
+            css={{
+              keyline: 'neutral',
+              padding: 'medium',
+              font: 'caption',
+              borderRadius: 'small',
+              margin: 'medium',
+              textAlign: 'center',
+            }}
+          >
+            You don&apos;t have any features yet. Create a new feature by
+            clicking{' '}
+            <Inline css={{ fontWeight: 'bold' }}>
+              &quot;Manage Features&quot;
+            </Inline>{' '}
+            below
+            {/* TODO: add a link to documentation/getting started */}
+          </Box>
+        )}
+        <FeaturesForm
+          shown={isShowingFeaturesForm}
+          setShown={setIsShowingFeaturesForm}
+        />
+      </Box>
+    )
+  } else {
+    return <EntitlementsPaywall />
+  }
 }
 
 export default ProductView

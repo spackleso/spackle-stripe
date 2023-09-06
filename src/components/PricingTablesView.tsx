@@ -33,7 +33,7 @@ const PricingTablesView = () => {
       css={{
         stack: 'y',
         gapY: 'large',
-        marginTop: 'large',
+        marginTop: 'medium',
       }}
     >
       <Box css={{ stack: 'y', gapY: 'small' }}>
