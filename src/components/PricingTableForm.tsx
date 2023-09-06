@@ -118,7 +118,7 @@ const PricingTableForm = ({
   )
 
   const curlCode = `
-curl https://api.spackle.so/v1/pricing_tables/${pricingTable.id}/state \\
+curl https://api.spackle.so/v1/pricing_tables/${pricingTable.id} \\
   -H 'Content-Type: application/json' \\
   -H 'Authorization: Bearer ${token?.token}'
 `.trim()
