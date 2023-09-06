@@ -1,5 +1,10 @@
 import { Box, Icon, Spinner } from '@stripe/ui-extension-sdk/ui'
-import { Feature, NewPricingTableProduct, PricingTableProduct } from '../types'
+import {
+  Feature,
+  FeatureType,
+  NewPricingTableProduct,
+  PricingTableProduct,
+} from '../types'
 import useStripeContext from '../hooks/useStripeContext'
 import useProductState from '../hooks/useProductState'
 
@@ -49,13 +54,23 @@ const PricingTableProductCardFeatures = ({
           }}
         >
           <Box>{feature.name}</Box>
-          <Box>
-            {feature.value_flag ? (
-              <Icon name="check" size="xsmall" css={{ fill: 'success' }} />
-            ) : (
-              <Icon name="delete" size="xsmall" css={{ fill: 'critical' }} />
-            )}
-          </Box>
+          {feature.type === FeatureType.Flag && (
+            <Box>
+              {feature.value_flag ? (
+                <Icon name="check" size="xsmall" css={{ fill: 'success' }} />
+              ) : (
+                <Icon name="delete" size="xsmall" css={{ fill: 'critical' }} />
+              )}
+            </Box>
+          )}
+
+          {feature.type === FeatureType.Limit && (
+            <Box>
+              {feature.value_limit === null
+                ? '∞'
+                : feature.value_limit.toString()}
+            </Box>
+          )}
         </Box>
       ))}
     </Box>

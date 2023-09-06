@@ -25,8 +25,8 @@ const EntitlementsView = () => {
       setProducts(response.data)
     }
 
-    // fetchCustomers()
-    // fetchProducts()
+    fetchCustomers()
+    fetchProducts()
   }, [])
 
   return (

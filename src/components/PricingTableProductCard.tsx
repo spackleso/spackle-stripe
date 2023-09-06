@@ -1,4 +1,4 @@
-import { Box, Divider, Inline, Link, Select } from '@stripe/ui-extension-sdk/ui'
+import { Box, Divider, Link, Select } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
   PricingTable,
