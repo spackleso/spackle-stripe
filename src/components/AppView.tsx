@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   ContextView,
   Icon,
   Link,
@@ -41,26 +42,31 @@ const AppView = () => {
       title="Spackle"
       brandColor="#FFFFFF"
       brandIcon={BrandIcon}
-      externalLink={{
-        label: 'Documentation',
-        href: 'https://docs.spackle.so',
-      }}
-      footerContent={
-        entitled && (
-          <>
-            <Box>
-              <Link
-                type="secondary"
-                onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
-              >
-                <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-                  <Icon name="settings" />
-                  Manage Features
-                </Box>
-              </Link>
+      actions={
+        <Box css={{ stack: 'x', gapX: 'small' }}>
+          <Button
+            type="secondary"
+            size="small"
+            css={{ width: 'fill' }}
+            onPress={() => setIsShowingFeaturesForm(!isShowingFeaturesForm)}
+          >
+            <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+              <Icon name="settings" />
+              Manage Features
             </Box>
-          </>
-        )
+          </Button>
+          <Button
+            type="secondary"
+            size="small"
+            href="https://docs.spackle.so"
+            target="_blank"
+          >
+            <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+              Docs
+              <Icon name="external" />
+            </Box>
+          </Button>
+        </Box>
       }
     >
       {entitlements.isLoading ? (
@@ -78,7 +84,12 @@ const AppView = () => {
       ) : (
         <Tabs size="small" fitted selectedKey={key} onSelectionChange={setKey}>
           <TabList>
-            <Tab tabKey={PRICING_TABLE_TAB_KEY}>Pricing Table</Tab>
+            <Tab
+              disabled={environment.objectContext?.object === 'customer'}
+              tabKey={PRICING_TABLE_TAB_KEY}
+            >
+              Pricing Table
+            </Tab>
             <Tab tabKey={ENTITLEMENTS_TAB_KEY}>Entitlements</Tab>
           </TabList>
           <TabPanels>

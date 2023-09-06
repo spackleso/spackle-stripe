@@ -1,16 +1,7 @@
-import {
-  ContextView,
-  Box,
-  Link,
-  Icon,
-  Spinner,
-  Inline,
-} from '@stripe/ui-extension-sdk/ui'
+import { Box, Spinner, Inline, Button, Icon } from '@stripe/ui-extension-sdk/ui'
 import { useEffect, useState } from 'react'
-import BrandIcon from '../views/icon.svg'
 import useApi from '../hooks/useApi'
-import FeatureList from '../components/FeatureList'
-import FeaturesForm from '../components/FeaturesForm'
+import EntitlementsForm from './EntitlementsForm'
 import { queryClient } from '../query'
 import useSubscriptionsState from '../hooks/useSubscriptionsState'
 import useCustomerFeatures from '../hooks/useCustomerFeatures'
@@ -19,6 +10,10 @@ import { NewOverride, Override } from '../types'
 import { useMutation } from '@tanstack/react-query'
 import { useEntitlements } from '../hooks/useEntitlements'
 import EntitlementsPaywall from './EntitlementsPaywall'
+import { sortFeatures } from '../utils'
+import EntitlementItem from './EntitlementItem'
+import stripe from '../stripe'
+import useCustomerState from '../hooks/useCustomerState'
 
 const CustomerView = () => {
   const { environment, userContext } = useStripeContext()
@@ -26,7 +21,11 @@ const CustomerView = () => {
   const { post } = useApi()
   const entitlements = useEntitlements(userContext.account.id)
   const subscriptionsState = useSubscriptionsState(customerId, environment.mode)
+  const customerState = useCustomerState(customerId, environment.mode)
   const customerFeatures = useCustomerFeatures(customerId, environment.mode)
+  const [isShowingForm, setIsShowingForm] = useState(false)
+  const [stripeCustomer, setStripeCustomer] = useState<any>(null)
+
   const saveOverrides = useMutation(
     async (overrides: Override[] | NewOverride[]) => {
       const response = await post(`/stripe/update_customer_features`, {
@@ -36,15 +35,21 @@ const CustomerView = () => {
       })
       queryClient.invalidateQueries(['subscriptionsState', customerId])
       queryClient.invalidateQueries(['customerFeatures', customerId])
+      queryClient.invalidateQueries(['customerState', customerId])
+      setIsShowingForm(false)
       return response
     },
   )
-  const [isShowingFeaturesForm, setIsShowingFeaturesForm] = useState(false)
 
   const isLoading =
     entitlements.isLoading ||
     subscriptionsState.isLoading ||
-    customerFeatures.isLoading
+    subscriptionsState.isRefetching ||
+    customerFeatures.isLoading ||
+    customerState.isLoading ||
+    !stripeCustomer
+
+  console.log(customerState.data)
 
   const entitled =
     entitlements.data?.flag('entitlements') || environment.mode === 'test'
@@ -64,6 +69,16 @@ const CustomerView = () => {
     track()
   }, [])
 
+  useEffect(() => {
+    const fetchStripeCustomer = async () => {
+      if (!customerId) return
+      const response = await stripe.customers.retrieve(customerId)
+      setStripeCustomer(response)
+    }
+
+    fetchStripeCustomer()
+  }, [customerId])
+
   if (isLoading) {
     return (
       <Box
@@ -81,13 +96,51 @@ const CustomerView = () => {
     )
   } else if (entitled) {
     return (
-      <Box css={{ marginTop: 'medium' }}>
-        {subscriptionsState.data.length ? (
-          <FeatureList
-            features={subscriptionsState}
-            overrides={customerFeatures}
-            saveOverrides={saveOverrides}
-          />
+      <Box css={{ stack: 'y', marginTop: 'medium', gapY: 'large' }}>
+        <Box>
+          <Box css={{ stack: 'x', gapX: 'small' }}>
+            <Button
+              type="secondary"
+              size="small"
+              onPress={() => setIsShowingForm(true)}
+            >
+              <Box
+                css={{
+                  width: 'fill',
+                  stack: 'x',
+                  gapX: 'small',
+                  alignY: 'center',
+                }}
+              >
+                <Icon name="edit"></Icon>
+                Edit
+              </Box>
+            </Button>
+          </Box>
+        </Box>
+
+        {customerState.data.features.length ? (
+          <Box css={{ stack: 'y', gapY: 'small' }}>
+            <Box
+              css={{
+                font: 'heading',
+                fontWeight: 'bold',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Entitlements{' '}
+              {stripeCustomer?.name
+                ? `for ${stripeCustomer.name}`
+                : stripeCustomer?.email
+                ? `for ${stripeCustomer.email}`
+                : ''}
+            </Box>
+            {customerState.data.features.sort(sortFeatures).map((f: any) => (
+              <EntitlementItem key={f.key} entitlement={f} />
+            ))}
+          </Box>
         ) : (
           <Box
             css={{
@@ -104,13 +157,16 @@ const CustomerView = () => {
             <Inline css={{ fontWeight: 'bold' }}>
               &quot;Manage Features&quot;
             </Inline>{' '}
-            below
+            above
           </Box>
         )}
-
-        <FeaturesForm
-          shown={isShowingFeaturesForm}
-          setShown={setIsShowingFeaturesForm}
+        <EntitlementsForm
+          name={stripeCustomer?.name || stripeCustomer?.email || ''}
+          features={subscriptionsState}
+          overrides={customerFeatures}
+          saveOverrides={saveOverrides}
+          shown={isShowingForm}
+          setShown={setIsShowingForm}
         />
       </Box>
     )

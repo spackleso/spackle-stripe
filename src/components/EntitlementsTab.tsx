@@ -1,8 +1,8 @@
 import { TabPanel } from '@stripe/ui-extension-sdk/ui'
-import EntitlementsView from './EntitlementsView'
+import EntitlementsPlaceholderView from './EntitlementsPlaceholderView'
 import useStripeContext from '../hooks/useStripeContext'
-import CustomerView from './CustomerView'
-import ProductView from './ProductView'
+import CustomerEntitlementsView from './CustomerEntitlementsView'
+import ProductEntitlementsView from './ProductEntitlementsView'
 
 const EntitlementsTab = ({ tabKey }: { tabKey: string }) => {
   const { environment } = useStripeContext()
@@ -10,11 +10,11 @@ const EntitlementsTab = ({ tabKey }: { tabKey: string }) => {
   return (
     <TabPanel tabKey={tabKey}>
       {environment.objectContext?.object === 'customer' ? (
-        <CustomerView />
+        <CustomerEntitlementsView />
       ) : environment.objectContext?.object === 'product' ? (
-        <ProductView />
+        <ProductEntitlementsView />
       ) : (
-        <EntitlementsView />
+        <EntitlementsPlaceholderView />
       )}
     </TabPanel>
   )

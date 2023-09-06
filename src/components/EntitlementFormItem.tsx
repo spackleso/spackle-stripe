@@ -1,8 +1,8 @@
-import { Box, Divider } from "@stripe/ui-extension-sdk/ui"
-import { Feature, NewOverride, Override } from "../types"
-import FeatureValue from "./FeatureValue"
+import { Box } from '@stripe/ui-extension-sdk/ui'
+import { Feature, NewOverride, Override } from '../types'
+import FeatureValue from './EntitlementValue'
 
-const FeatureItem = ({
+const EntitlementFormItem = ({
   feature,
   overrideMap,
   setOverrideMap,
@@ -14,10 +14,9 @@ const FeatureItem = ({
   return (
     <Box
       css={{
-        stack: 'y',
+        stack: 'x',
         distribute: 'space-between',
         padding: 'medium',
-        marginY: 'small',
         alignY: 'center',
         gap: 'medium',
         background: 'container',
@@ -29,8 +28,7 @@ const FeatureItem = ({
         {/* TODO: click to copy */}
         <Box css={{ font: 'caption', color: 'secondary' }}>{feature.key}</Box>
       </Box>
-      <Divider />
-      <Box css={{ stack: 'x' }}>
+      <Box>
         <FeatureValue
           feature={feature}
           override={overrideMap[feature.id]}
@@ -49,4 +47,4 @@ const FeatureItem = ({
   )
 }
 
-export default FeatureItem
+export default EntitlementFormItem

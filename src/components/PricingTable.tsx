@@ -2,6 +2,7 @@ import {
   Badge,
   Box,
   Button,
+  Icon,
   Inline,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
@@ -54,10 +55,21 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
         <Box css={{ stack: 'x', gapX: 'small' }}>
           <Button
             type="secondary"
+            size="small"
             onPress={() => setShowForm(true)}
             css={{ width: 'fill' }}
           >
-            Settings
+            <Box
+              css={{
+                width: 'fill',
+                stack: 'x',
+                gapX: 'small',
+                alignY: 'center',
+              }}
+            >
+              <Icon name="edit"></Icon>
+              Edit
+            </Box>
           </Button>
         </Box>
         <Box>
