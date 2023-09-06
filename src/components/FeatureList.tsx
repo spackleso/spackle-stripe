@@ -51,6 +51,18 @@ const FeatureList = ({
 
   return (
     <>
+      <Box css={{ stack: 'y' }}>
+        {features.data.sort(sortFeatures).map((f) => (
+          <>
+            <FeatureItem
+              key={f.key}
+              feature={f}
+              overrideMap={overrideMap}
+              setOverrideMap={setOverrideMap}
+            />
+          </>
+        ))}
+      </Box>
       <Box css={{ stack: 'x', marginY: 'large', gap: 'small' }}>
         <Button
           type="primary"
@@ -78,19 +90,6 @@ const FeatureList = ({
             Cancel
           </Button>
         )}
-      </Box>
-
-      <Box css={{ stack: 'y' }}>
-        {features.data.sort(sortFeatures).map((f) => (
-          <>
-            <FeatureItem
-              key={f.key}
-              feature={f}
-              overrideMap={overrideMap}
-              setOverrideMap={setOverrideMap}
-            />
-          </>
-        ))}
       </Box>
     </>
   )
