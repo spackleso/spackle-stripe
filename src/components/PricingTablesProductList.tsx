@@ -21,10 +21,22 @@ const PricingTablesProductList = ({
 }) => {
   if (pricingTable.monthly_enabled) {
     pricingTableProducts = pricingTableProducts.sort((a, b) => {
-      if (!a.monthly_stripe_price || !a.monthly_stripe_price.unit_amount)
+      if (
+        a.monthly_stripe_price === null ||
+        a.monthly_stripe_price === undefined ||
+        a.monthly_stripe_price.unit_amount === null
+      ) {
         return 1
-      if (!b.monthly_stripe_price || !b.monthly_stripe_price.unit_amount)
+      }
+
+      if (
+        b.monthly_stripe_price === null ||
+        b.monthly_stripe_price === undefined ||
+        b.monthly_stripe_price.unit_amount === null
+      ) {
         return -1
+      }
+
       return (
         a.monthly_stripe_price.unit_amount - b.monthly_stripe_price.unit_amount
       )
