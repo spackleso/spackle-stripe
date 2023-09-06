@@ -35,7 +35,9 @@ const currencySymbols: { [key: string]: string } = {
 }
 
 export function stripePriceDisplay(price: Stripe.Price): string {
-  if (!price.unit_amount) return price.nickname || price.id
+  if (price.unit_amount === null || price.unit_amount === undefined) {
+    return price.nickname || price.id
+  }
 
   let display = ''
 

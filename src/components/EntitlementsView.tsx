@@ -25,8 +25,8 @@ const EntitlementsView = () => {
       setProducts(response.data)
     }
 
-    fetchCustomers()
-    fetchProducts()
+    // fetchCustomers()
+    // fetchProducts()
   }, [])
 
   return (
@@ -60,6 +60,18 @@ const EntitlementsView = () => {
       <Box css={{ stack: 'y', gapY: 'small' }}>
         <Box css={{ font: 'heading' }}>Customers</Box>
         <Box css={{ stack: 'y', gapY: 'small' }}>
+          {customers.length === 0 && (
+            <Box
+              css={{
+                textAlign: 'center',
+                paddingY: 'small',
+                color: 'secondary',
+              }}
+            >
+              No customers found
+            </Box>
+          )}
+
           {customers.map((customer) => (
             <Box key={customer.id}>
               <Box css={{ padding: 'small' }}>
@@ -86,6 +98,18 @@ const EntitlementsView = () => {
       <Box css={{ stack: 'y', gapY: 'small' }}>
         <Box css={{ font: 'heading' }}>Products</Box>
         <List onAction={(e) => console.log(e)}>
+          {products.length === 0 && (
+            <Box
+              css={{
+                textAlign: 'center',
+                paddingY: 'small',
+                color: 'secondary',
+              }}
+            >
+              No products found
+            </Box>
+          )}
+
           {products.map((product) => (
             <Box key={product.id}>
               <Box css={{ padding: 'small' }}>
