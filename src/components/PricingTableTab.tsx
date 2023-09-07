@@ -1,10 +1,12 @@
-import { TabPanel } from '@stripe/ui-extension-sdk/ui'
+import { Box, TabPanel } from '@stripe/ui-extension-sdk/ui'
 import PricingTablesView from './PricingTablesView'
 
 const PricingTableTab = ({ tabKey }: { tabKey: string }) => {
   return (
     <TabPanel tabKey={tabKey}>
-      <PricingTablesView />
+      <Box key={tabKey}>
+        <PricingTablesView />
+      </Box>
     </TabPanel>
   )
 }
