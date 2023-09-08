@@ -12,6 +12,7 @@ import {
   TabPanels,
   Tabs,
   TextArea,
+  TextField,
 } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
@@ -274,6 +275,23 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
           >
             Use the Spackle SDKs to retrieve your pricing table. Read the docs
             for full integration details.
+          </Box>
+          <Box css={{ stack: 'x', alignY: 'bottom', gapX: 'small' }}>
+            <TextField
+              disabled
+              value={pricingTable.id}
+              label="Table ID"
+              size="small"
+            />
+            <Button
+              size="small"
+              onPress={async () => {
+                await clipboardWriteText(pricingTable.id)
+                showToast('Copied to clipboard')
+              }}
+            >
+              <Icon name="clipboard" />
+            </Button>
           </Box>
           {token ? (
             <Tabs size="small">
