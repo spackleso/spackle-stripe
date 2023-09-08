@@ -1,11 +1,7 @@
 const host = process.env.POSTHOG_HOST ?? 'https://app.posthog.com'
 const key = process.env.POSTHOG_API_KEY ?? ''
 
-export const identify = (
-  userId: string,
-  properties: any,
-  path: string = '/',
-) => {
+export const identify = (userId: string, properties: any, path = '/') => {
   return fetch(`${host}/capture`, {
     method: 'POST',
     headers: {

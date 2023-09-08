@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
 import useApi from '../hooks/useApi'
 
-const EntitlementsPaywall = () => {
+const PricingTablesPaywall = () => {
   const { environment, userContext } = useStripeContext()
   const { post } = useApi()
   const [sig, setSig] = useState('')
@@ -50,10 +50,10 @@ const EntitlementsPaywall = () => {
           <Box>Upgrade to continue</Box>
         </Box>
         <Box>
-          <Inline css={{ font: 'caption' }}>
+          <Box css={{ font: 'caption' }}>
             Spackle Pro is free to get started. Add a payment method to enable
-            entitlements in live mode.
-          </Inline>
+            pricing tables in live mode.
+          </Box>
         </Box>
       </Box>
       <Box css={{ stack: 'x', width: 'fill', gapX: 'small' }}>
@@ -80,4 +80,4 @@ const EntitlementsPaywall = () => {
   )
 }
 
-export default EntitlementsPaywall
+export default PricingTablesPaywall

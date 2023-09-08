@@ -1,4 +1,11 @@
-import { Box, Checkbox, Link, Switch, TextField, Tooltip } from '@stripe/ui-extension-sdk/ui'
+import {
+  Box,
+  Checkbox,
+  Link,
+  Switch,
+  TextField,
+  Tooltip,
+} from '@stripe/ui-extension-sdk/ui'
 import { Feature, FeatureType, NewOverride, Override } from '../types'
 
 const FeatureValue = ({
@@ -14,12 +21,13 @@ const FeatureValue = ({
     return (
       <Box
         css={{
-          stack: 'x',
-          alignY: 'center',
-          alignX: 'stretch',
+          stack: 'y',
+          gapY: 'small',
+          alignX: 'end',
+          minWidth: '1/4',
         }}
       >
-        <Box css={{ width: '1/2' }}>
+        <Box>
           {feature.type === FeatureType.Flag ? (
             <Switch
               checked={!!override.value_flag}
@@ -33,9 +41,11 @@ const FeatureValue = ({
           ) : feature.type === FeatureType.Limit ? (
             <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
               <TextField
-                type={override.value_limit === null ? "text" : "number"}
+                type={override.value_limit === null ? 'text' : 'number'}
                 size="small"
-                value={override.value_limit === null ? '∞' : override.value_limit}
+                value={
+                  override.value_limit === null ? '∞' : override.value_limit
+                }
                 disabled={override.value_limit === null}
                 onChange={(e) =>
                   setOverride({
@@ -52,7 +62,9 @@ const FeatureValue = ({
                     label="∞"
                     defaultChecked={override.value_limit === null}
                     onChange={(e) => {
-                      const val = e.target.checked ? null : feature.value_limit || 0
+                      const val = e.target.checked
+                        ? null
+                        : feature.value_limit || 0
                       setOverride({
                         ...override,
                         value_limit: val,
@@ -80,20 +92,17 @@ const FeatureValue = ({
     return (
       <Box
         css={{
-          stack: 'x',
-          alignY: 'center',
-          alignX: 'stretch',
+          stack: 'y',
+          gapY: 'small',
+          alignX: 'end',
         }}
       >
-        <Box css={{ width: '1/4' }}>
+        <Box>
           {feature.type === FeatureType.Flag ? (
-            <Switch
-              checked={!!feature.value_flag}
-              disabled={true}
-            ></Switch>
+            <Switch checked={!!feature.value_flag} disabled={true}></Switch>
           ) : feature.type === FeatureType.Limit ? (
             <TextField
-              type={feature.value_limit === null ? "text" : "number"}
+              type={feature.value_limit === null ? 'text' : 'number'}
               size="small"
               value={feature.value_limit === null ? '∞' : feature.value_limit}
               disabled={true}

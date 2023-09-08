@@ -1,12 +1,12 @@
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
-import { QueryClientProvider } from '@tanstack/react-query'
-import AccountWrapper from '../components/AccountWrapper'
-import AppView from '../components/AppView'
-import { queryClient } from '../query'
 import { StripeContext } from '../hooks/useStripeContext'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { ApiContext, createApi } from '../hooks/useApi'
+import AccountWrapper from '../components/AccountWrapper'
+import { queryClient } from '../query'
+import AppView from '../components/AppView'
 
-const View = (context: ExtensionContextValue) => {
+const App = (context: ExtensionContextValue) => {
   return (
     <QueryClientProvider client={queryClient}>
       {context.userContext && (
@@ -22,4 +22,4 @@ const View = (context: ExtensionContextValue) => {
   )
 }
 
-export default View
+export default App
