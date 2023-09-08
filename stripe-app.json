@@ -1,6 +1,6 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "name": "Spackle",
   "icon": "./icon.png",
   "permissions": [
@@ -58,7 +58,7 @@
   },
   "post_install_action": {
     "type": "external",
-    "url": "https://docs.spackle.so"
+    "url": "https://docs.spackle.so/getting-started"
   },
   "constants": {
     "API_HOST": "https://api.spackle.so",
