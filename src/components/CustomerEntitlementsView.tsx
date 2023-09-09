@@ -49,8 +49,6 @@ const CustomerView = () => {
     customerState.isLoading ||
     !stripeCustomer
 
-  console.log(customerState.data)
-
   const entitled =
     entitlements.data?.flag('entitlements') || environment.mode === 'test'
 

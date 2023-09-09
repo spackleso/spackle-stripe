@@ -97,7 +97,7 @@ const EntitlementsView = () => {
 
       <Box css={{ stack: 'y', gapY: 'small' }}>
         <Box css={{ font: 'heading' }}>Products</Box>
-        <List onAction={(e) => console.log(e)}>
+        <List>
           {products.length === 0 && (
             <Box
               css={{

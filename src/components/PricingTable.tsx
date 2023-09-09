@@ -8,11 +8,13 @@ import {
 } from '@stripe/ui-extension-sdk/ui'
 import { PricingTable } from '../types'
 import PricingTablesProductList from './PricingTablesProductList'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PricingTableForm from './PricingTableForm'
 import usePricingTableProducts from '../hooks/usePricingTableProducts'
+import useApi from '../hooks/useApi'
 
 const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
+  const { post } = useApi()
   const [showForm, setShowForm] = useState(false)
 
   const {
@@ -20,6 +22,21 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
     isLoading,
     isRefetching,
   } = usePricingTableProducts(pricingTable.id)
+
+  useEffect(() => {
+    const track = async () => {
+      await post('/stripe/identify', {
+        path: `/pricing_tables/${pricingTable.id}`,
+      })
+      await post('/stripe/track', {
+        event: '$pageview',
+        properties: {
+          $current_url: `https://stripe.spackle.so/pricing_tables/${pricingTable.id}`,
+        },
+      })
+    }
+    track()
+  }, [])
 
   if (isLoading || isRefetching || !pricingTableProducts) {
     return (
