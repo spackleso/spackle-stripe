@@ -10,11 +10,13 @@ import Stripe from 'stripe'
 import stripe from '../stripe'
 
 const PricingTableProductCreateForm = ({
-  pricingTable,
+  monthlyEnabled,
+  annualEnabled,
   pricingTableProducts,
   setPricingTableProducts,
 }: {
-  pricingTable: PricingTable
+  monthlyEnabled: boolean
+  annualEnabled: boolean
   pricingTableProducts: (PricingTableProduct | NewPricingTableProduct)[]
   setPricingTableProducts: (
     val: (PricingTableProduct | NewPricingTableProduct)[],
@@ -22,7 +24,7 @@ const PricingTableProductCreateForm = ({
 }) => {
   const [showForm, setShowForm] = useState(false)
   const [products, setProducts] = useState<Stripe.Product[]>([])
-  const [prices, setPrices] = useState<Stripe.Price[]>([])
+  const [prices, setPrices] = useState<{ [key: string]: Stripe.Price[] }>({})
   const [selectedProductId, setSelectedProductId] = useState<string>('')
   const [selectedMonthlyPriceId, setSelectedMonthlyPriceId] =
     useState<string>('')
@@ -31,28 +33,65 @@ const PricingTableProductCreateForm = ({
   useEffect(() => {
     const fetchProducts = async () => {
       const result = await stripe.products.list({ limit: 100, active: true })
-      setProducts(result.data)
+      const _products: Stripe.Product[] = []
+      const _prices: { [key: string]: Stripe.Price[] } = {}
+      for (const product of result.data) {
+        if (pricingTableProducts.find((ptp) => product.id === ptp.product_id)) {
+          continue
+        }
+
+        if (!annualEnabled && !monthlyEnabled) {
+          _products.push(product)
+        }
+
+        const _pricesResult = await stripe.prices.list({
+          limit: 100,
+          active: true,
+          product: product.id,
+        })
+
+        let monthlyPrice: Stripe.Price | null = null
+        let annualPrice: Stripe.Price | null = null
+        for (const price of _pricesResult.data) {
+          if (
+            monthlyEnabled &&
+            price.recurring?.interval === 'month' &&
+            price.recurring?.interval_count === 1
+          ) {
+            monthlyPrice = price
+          }
+
+          if (
+            annualEnabled &&
+            price.recurring?.interval === 'year' &&
+            price.recurring?.interval_count === 1
+          ) {
+            annualPrice = price
+          }
+        }
+
+        if (monthlyEnabled && annualEnabled) {
+          if (monthlyPrice && annualPrice) {
+            _products.push(product)
+            _prices[product.id] = [monthlyPrice, annualPrice]
+          }
+        } else if (monthlyEnabled) {
+          if (monthlyPrice) {
+            _products.push(product)
+            _prices[product.id] = [monthlyPrice]
+          }
+        } else if (annualEnabled) {
+          if (annualPrice) {
+            _products.push(product)
+            _prices[product.id] = [annualPrice]
+          }
+        }
+      }
+      setProducts(_products)
+      setPrices(_prices)
     }
     fetchProducts()
-  }, [])
-
-  useEffect(() => {
-    const fetchPrices = async () => {
-      if (!selectedProductId) {
-        setPrices([])
-        return
-      }
-
-      const result = await stripe.prices.list({
-        limit: 100,
-        active: true,
-        product: selectedProductId,
-      })
-      setPrices(result.data)
-    }
-
-    fetchPrices()
-  }, [selectedProductId])
+  }, [annualEnabled, monthlyEnabled, pricingTableProducts])
 
   const resetForm = useCallback(() => {
     setSelectedProductId('')
@@ -71,10 +110,14 @@ const PricingTableProductCreateForm = ({
         name: product.name,
         product_id: product.id,
         monthly_stripe_price: selectedMonthlyPriceId
-          ? prices.find((p) => p.id === selectedMonthlyPriceId)
+          ? prices[selectedProductId].find(
+              (p) => p.id === selectedMonthlyPriceId,
+            )
           : undefined,
         annual_stripe_price: selectedAnnualPriceId
-          ? prices.find((p) => p.id === selectedAnnualPriceId)
+          ? prices[selectedProductId].find(
+              (p) => p.id === selectedAnnualPriceId,
+            )
           : undefined,
       }
       setPricingTableProducts([...pricingTableProducts, newProduct])
@@ -110,62 +153,61 @@ const PricingTableProductCreateForm = ({
               css={{ width: '1/3' }}
               onChange={(e) => {
                 setSelectedProductId(e.target.value)
+                setSelectedMonthlyPriceId('')
+                setSelectedAnnualPriceId('')
               }}
             >
               <option value="">Choose an option</option>
-              {products
-                .filter(
-                  (p) =>
-                    !pricingTableProducts.find(
-                      (ptp) => p.id === ptp.product_id,
-                    ),
-                )
-                .map((product) => (
-                  <option value={product.id} key={product.id || Math.random()}>
-                    {product.name}{' '}
-                  </option>
-                ))}
+              {products.map((product) => (
+                <option value={product.id} key={product.id || Math.random()}>
+                  {product.name}{' '}
+                </option>
+              ))}
             </Select>
-            {pricingTable.monthly_enabled && selectedProductId && (
-              <Select
-                label="Monthly Price"
-                css={{ width: '1/3' }}
-                onChange={(e) => setSelectedMonthlyPriceId(e.target.value)}
-              >
-                <option value="">Choose an option</option>
-                {prices
-                  .filter(
-                    (p) =>
-                      p.recurring?.interval === 'month' &&
-                      p.recurring?.interval_count === 1,
-                  )
-                  .map((price) => (
-                    <option value={price.id} key={price.id}>
-                      {stripePriceDisplay(price)}
-                    </option>
-                  ))}
-              </Select>
-            )}
-            {pricingTable.annual_enabled && selectedProductId && (
-              <Select
-                label="Yearly Price"
-                css={{ width: '1/3' }}
-                onChange={(e) => setSelectedAnnualPriceId(e.target.value)}
-              >
-                <option value="">Choose an option</option>
-                {prices
-                  .filter(
-                    (p) =>
-                      p.recurring?.interval === 'year' &&
-                      p.recurring?.interval_count === 1,
-                  )
-                  .map((price) => (
-                    <option value={price.id} key={price.id}>
-                      {stripePriceDisplay(price)}
-                    </option>
-                  ))}
-              </Select>
-            )}
+            {monthlyEnabled &&
+              selectedProductId &&
+              prices[selectedProductId] && (
+                <Select
+                  label="Monthly Price"
+                  css={{ width: '1/3' }}
+                  onChange={(e) => setSelectedMonthlyPriceId(e.target.value)}
+                >
+                  <option value="">Choose an option</option>
+                  {prices[selectedProductId]
+                    .filter(
+                      (p) =>
+                        p.recurring?.interval === 'month' &&
+                        p.recurring?.interval_count === 1,
+                    )
+                    .map((price) => (
+                      <option value={price.id} key={price.id}>
+                        {stripePriceDisplay(price)}
+                      </option>
+                    ))}
+                </Select>
+              )}
+            {annualEnabled &&
+              selectedProductId &&
+              prices[selectedProductId] && (
+                <Select
+                  label="Yearly Price"
+                  css={{ width: '1/3' }}
+                  onChange={(e) => setSelectedAnnualPriceId(e.target.value)}
+                >
+                  <option value="">Choose an option</option>
+                  {prices[selectedProductId]
+                    .filter(
+                      (p) =>
+                        p.recurring?.interval === 'year' &&
+                        p.recurring?.interval_count === 1,
+                    )
+                    .map((price) => (
+                      <option value={price.id} key={price.id}>
+                        {stripePriceDisplay(price)}
+                      </option>
+                    ))}
+                </Select>
+              )}
           </Box>
           <Box css={{ stack: 'x', gapX: 'small', alignX: 'end' }}>
             <Button
@@ -173,8 +215,8 @@ const PricingTableProductCreateForm = ({
               onPress={() => {
                 if (
                   selectedProductId &&
-                  (!pricingTable.monthly_enabled || selectedMonthlyPriceId) &&
-                  (!pricingTable.annual_enabled || selectedAnnualPriceId)
+                  (!monthlyEnabled || selectedMonthlyPriceId) &&
+                  (!annualEnabled || selectedAnnualPriceId)
                 ) {
                   addProduct(selectedProductId)
                 }

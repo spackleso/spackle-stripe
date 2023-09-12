@@ -259,7 +259,8 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
             setPricingTableProducts={setUpdatedPricingTableProducts}
           />
           <PricingTableAddProductForm
-            pricingTable={updatedPricingTable}
+            monthlyEnabled={updatedPricingTable.monthly_enabled}
+            annualEnabled={updatedPricingTable.annual_enabled}
             pricingTableProducts={updatedPricingTableProducts}
             setPricingTableProducts={setUpdatedPricingTableProducts}
           />
