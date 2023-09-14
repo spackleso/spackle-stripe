@@ -24,6 +24,7 @@
   "scripts": {
     "dev": "stripe apps start --manifest stripe-app.dev.json",
     "lint": "eslint --ext ts,tsx src",
+    "start": "stripe apps start",
     "test": "jest",
     "upload": "stripe apps upload"
   },
