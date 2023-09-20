@@ -28,6 +28,7 @@ import { useMutation } from '@tanstack/react-query'
 import { queryClient } from '../query'
 import useToken from '../hooks/useToken'
 import { clipboardWriteText, showToast } from '@stripe/ui-extension-sdk/utils'
+import usePublishableToken from '../hooks/usePublishableToken'
 
 const confirmCloseMessages = {
   title: 'Your pricing table will not be saved',
@@ -61,7 +62,8 @@ const PricingTableForm = ({
 }) => {
   const { post } = useApi()
   const { userContext } = useStripeContext()
-  const { data: token } = useToken(userContext.account.id)
+  const { data: secretToken } = useToken(userContext.account.id)
+  const { data: publishableToken } = usePublishableToken(userContext.account.id)
   const [updatedPricingTable, setUpdatedPricingTable] = useState<PricingTable>({
     ...pricingTable,
   })
@@ -121,32 +123,44 @@ const PricingTableForm = ({
   const curlCode = `
 curl https://api.spackle.so/v1/pricing_tables/${pricingTable.id} \\
   -H 'Content-Type: application/json' \\
-  -H 'Authorization: Bearer ${token?.token}'
+  -H 'Authorization: Bearer ${publishableToken?.token}'
+`.trim()
+
+  const browserCode = `
+fetch('https://api.spackle.so/v1/pricing_tables/${pricingTable.id}', {
+    headers: {
+        Authorization: 'Bearer ${publishableToken?.token}',
+    }
+})
 `.trim()
 
   const nodeCode = `
+// Warning this uses your secret token, do not share this with anyone!
 import Spackle from 'spackle-node';
-const spackle = new Spackle('${token?.token}')
+const spackle = new Spackle('${secretToken?.token}')
 await spackle.pricingTables.retrieve('${pricingTable.id}')
 `.trim()
 
   const phpCode = `
 <?php
+// Warning this uses your secret token, do not share this with anyone!
 require_once('vendor/autoload.php');
-\\Spackle\\Spackle::setApiKey('${token?.token}');
+\\Spackle\\Spackle::setApiKey('${secretToken?.token}');
 \\Spackle\\PricingTable::retrieve('${pricingTable.id}');
 ?>
 `.trim()
 
   const pythonCode = `
-import spackle
-spackle.api_key = '${token?.token}'
+# Warning this uses your secret token, do not share this with anyone!
+import spacklek
+spackle.api_key = '${secretToken?.token}'
 spackle.PricingTable.retrieve('${pricingTable.id}')
 `.trim()
 
   const rubyCode = `
+# Warning this uses your secret token, do not share this with anyone!
 require 'spackle'
-Spackle.api_key = "${token?.token}"
+Spackle.api_key = "${secretToken?.token}"
 Spackle::PricingTable.retrieve('${pricingTable.id}')
 `.trim()
 
@@ -277,7 +291,14 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
             Use the Spackle SDKs to retrieve your pricing table. Read the docs
             for full integration details.
           </Box>
-          <Box css={{ stack: 'x', alignY: 'bottom', gapX: 'small' }}>
+          <Box
+            css={{
+              stack: 'x',
+              alignY: 'bottom',
+              gapX: 'small',
+              marginY: 'small',
+            }}
+          >
             <TextField
               disabled
               value={pricingTable.id}
@@ -294,10 +315,11 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
               <Icon name="clipboard" />
             </Button>
           </Box>
-          {token ? (
+          {secretToken && publishableToken ? (
             <Tabs size="small">
               <TabList>
                 <Tab tabKey="curl">cURL</Tab>
+                <Tab tabKey="browser">Browser</Tab>
                 <Tab tabKey="nodejs">Node.js</Tab>
                 <Tab tabKey="php">PHP</Tab>
                 <Tab tabKey="python">Python</Tab>
@@ -324,13 +346,33 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
                     </Button>
                   </Box>
                 </TabPanel>
+                <TabPanel tabKey="browser">
+                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
+                    <TextArea
+                      defaultValue={browserCode}
+                      disabled={true}
+                      resizeable={false}
+                      rows={5}
+                      wrap="off"
+                    />
+                    <Button
+                      onPress={async () => {
+                        await clipboardWriteText(browserCode)
+                        showToast('Copied to clipboard')
+                      }}
+                    >
+                      <Icon name="clipboard" />
+                      Copy
+                    </Button>
+                  </Box>
+                </TabPanel>
                 <TabPanel tabKey="nodejs">
                   <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
                     <TextArea
                       defaultValue={nodeCode}
                       disabled={true}
                       resizeable={false}
-                      rows={3}
+                      rows={4}
                       wrap="off"
                     />
                     <Button
@@ -350,7 +392,7 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
                       defaultValue={phpCode}
                       disabled={true}
                       resizeable={false}
-                      rows={5}
+                      rows={6}
                       wrap="off"
                     />
                     <Button
@@ -370,7 +412,7 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
                       defaultValue={pythonCode}
                       disabled={true}
                       resizeable={false}
-                      rows={3}
+                      rows={4}
                       wrap="off"
                     />
                     <Button
@@ -390,7 +432,7 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
                       defaultValue={rubyCode}
                       disabled={true}
                       resizeable={false}
-                      rows={3}
+                      rows={4}
                       wrap="off"
                     />
                     <Button
