@@ -1,6 +1,6 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "name": "Spackle",
   "icon": "./icon.png",
   "permissions": [

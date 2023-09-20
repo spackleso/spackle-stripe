@@ -19,10 +19,14 @@ import { SettingsView as StripeSettingsView } from '@stripe/ui-extension-sdk/ui'
 import { Entitlements, useEntitlements } from '../hooks/useEntitlements'
 import { useState, useEffect } from 'react'
 import useApi from '../hooks/useApi'
+import usePublishableToken from '../hooks/usePublishableToken'
 
 const ConfigurationSettings = () => {
   const { userContext } = useStripeContext()
-  const { data } = useToken(userContext?.account.id)
+  const { data: secretToken } = useToken(userContext?.account.id)
+  const { data: publishableToken } = usePublishableToken(
+    userContext?.account.id,
+  )
   return (
     <Box css={{ stack: 'y', gapY: 'small', maxWidth: '1/2' }}>
       <Box css={{ stack: 'x', distribute: 'space-between' }}>
@@ -42,19 +46,46 @@ const ConfigurationSettings = () => {
           alignY: 'bottom',
           gapX: 'small',
           width: 'fit',
-          minWidth: '1/3',
+          minWidth: '1/2',
+          maxWidth: '1/2',
           marginTop: 'small',
         }}
       >
         <TextField
           disabled
-          value={data?.token || ''}
-          label="Access Token"
-          description="Your access token is used when adding one of Spackle's SDKs to your project"
+          value={secretToken?.token || ''}
+          label="Secret Key"
+          description="Your secret key is used when adding one of Spackle's SDKs to your project. Keep this secret!"
         />
         <Button
           onPress={async () => {
-            await clipboardWriteText(data.token)
+            await clipboardWriteText(secretToken.token)
+            showToast('Copied!', { type: 'success' })
+          }}
+        >
+          <Icon name="clipboard" />
+        </Button>
+      </Box>
+      <Box
+        css={{
+          stack: 'x',
+          alignY: 'bottom',
+          gapX: 'small',
+          width: 'fit',
+          minWidth: '1/2',
+          maxWidth: '1/2',
+          marginTop: 'small',
+        }}
+      >
+        <TextField
+          disabled
+          value={publishableToken?.token || ''}
+          label="Publishable Key"
+          description="Your publishable key can be used to fetch pricing tables for embedding in your website."
+        />
+        <Button
+          onPress={async () => {
+            await clipboardWriteText(publishableToken.token)
             showToast('Copied!', { type: 'success' })
           }}
         >
@@ -160,7 +191,7 @@ const BillingSettings = () => {
 
   return (
     <Box css={{ stack: 'y', gapY: 'small', maxWidth: '1/2' }}>
-      <Box css={{ font: 'subtitle' }}>Billing</Box>
+      <Box css={{ font: 'subtitle' }}>Subscription</Box>
       <Box
         css={{
           stack: 'x',
