@@ -42,6 +42,7 @@ const EntitlementsForm = ({
     overrides.data.every((o) => {
       const override = overrideMap[o.feature_id]
       return (
+        override &&
         override.value_limit === o.value_limit &&
         override.value_flag === o.value_flag
       )
