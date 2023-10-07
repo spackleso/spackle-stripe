@@ -1,6 +1,6 @@
 {
   "id": "so.spackle.stripe",
-  "version": "0.0.49",
+  "version": "0.0.50",
   "name": "Spackle",
   "icon": "./icon.png",
   "permissions": [
@@ -14,6 +14,10 @@
     },
     {
       "permission": "invoice_read",
+      "purpose": "Required to track MTR"
+    },
+    {
+      "permission": "charge_read",
       "purpose": "Required to track MTR"
     },
     {
