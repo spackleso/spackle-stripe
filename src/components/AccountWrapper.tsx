@@ -43,6 +43,21 @@ const SetupInterstitial = ({ account }: { account: any }) => {
     return response
   })
 
+  useEffect(() => {
+    const track = async () => {
+      await post('/stripe/identify', {
+        path: `/setup`,
+      })
+      await post('/stripe/track', {
+        event: '$pageview',
+        properties: {
+          $current_url: `https://stripe.spackle.so/setup`,
+        },
+      })
+    }
+    track()
+  }, [])
+
   return (
     <Box
       css={{
