@@ -5,6 +5,13 @@ import {
   Inline,
   Link,
   Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
   TextField,
 } from '@stripe/ui-extension-sdk/ui'
 import {
@@ -137,8 +144,10 @@ const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
 const NewPlan = () => {
   const { environment, userContext } = useStripeContext()
   const host = environment.constants?.API_HOST ?? ''
+  const { post } = useApi()
   const [email, setEmail] = useState('')
   const [sig, setSig] = useState('')
+  const [mtr, setMtr] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchParams = async () => {
@@ -149,25 +158,39 @@ const NewPlan = () => {
     fetchParams()
   }, [])
 
+  useEffect(() => {
+    const fetchMtr = async () => {
+      const response = await post('/stripe/get_mtr_estimate', {})
+      const { mtr } = await response.json()
+      setMtr(mtr)
+    }
+
+    fetchMtr()
+  }, [post])
+
   return (
-    <Box css={{ stack: 'y', gapY: 'small' }}>
-      <Box>
-        <Inline css={{ font: 'bodyEmphasized' }}>Current Plan:</Inline>{' '}
-        <Inline>Free - Test mode only</Inline>
-      </Box>
-      <Box>
-        <Inline css={{ font: 'bodyEmphasized' }}>Current MTR:</Inline>{' '}
-        <Inline>$0</Inline>
-      </Box>
-      <Box css={{ stack: 'y', gapY: 'small' }}>
-        <Box css={{ stack: 'y' }}>
-          <Inline css={{ font: 'bodyEmphasized' }}>Add Payment Method</Inline>
-          <Inline css={{ font: 'caption' }}>
-            Add a payment method to enable Spackle in live mode. Your first
-            $1,000 MTR is always free.
-          </Inline>
+    <Box css={{ stack: 'y', gapY: 'medium' }}>
+      <Box
+        css={{
+          stack: 'y',
+          keyline: 'neutral',
+          padding: 'large',
+          width: 'fit',
+          borderRadius: 'medium',
+          gapY: 'medium',
+        }}
+      >
+        <Box css={{ font: 'bodyEmphasized' }}>
+          Add a Payment Method to enable Spackle in live mode
         </Box>
-        <Box css={{ stack: 'x', alignY: 'center', gapX: 'small' }}>
+        <Box
+          css={{
+            stack: 'y',
+            alignX: 'center',
+            alignY: 'center',
+            gapY: 'small',
+          }}
+        >
           <Button
             type="primary"
             href={`${host}/stripe/checkout_redirect?user_id=${userContext.id}&account_id=${userContext.account.id}&email=${email}&sig=${sig}`}
@@ -176,9 +199,82 @@ const NewPlan = () => {
             Add Payment Method
             <Icon name="external" />
           </Button>
-          <Link external href="https://spackle.so">
+          <Link external target="_blank" href="https://spackle.so/pricing">
             View Pricing
           </Link>
+        </Box>
+      </Box>
+      <Box>
+        <Box>
+          <Inline css={{ font: 'bodyEmphasized' }}>Current Plan:</Inline>{' '}
+          <Inline>Trialing - Test mode only</Inline>
+        </Box>
+        <Box css={{ font: 'caption' }}>
+          Spackle is free to use in test mode as you get set up. Add a billing
+          method to access all of Spackle&apos;s features in live mode. The
+          first $1,000 of MTR is always free.{' '}
+        </Box>
+      </Box>
+      <Box css={{ stack: 'y', gapY: 'medium' }}>
+        <Box css={{ width: 'fit' }}>
+          <Box css={{ stack: 'y' }}>
+            <Inline css={{ font: 'bodyEmphasized' }}>Estimated Cost</Inline>
+            <Inline css={{ font: 'caption' }}>
+              Based on last month&apos;s usage
+            </Inline>
+          </Box>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Charge type</TableHeaderCell>
+                <TableHeaderCell>Amount</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <Inline css={{ font: 'caption' }}>MTR Subtotal</Inline>
+                </TableCell>
+                <TableCell>
+                  <Inline css={{ font: 'caption' }}>${mtr}</Inline>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Inline css={{ font: 'caption' }}>
+                    First $1,000 MTR Free
+                  </Inline>
+                </TableCell>
+                <TableCell>
+                  <Inline css={{ font: 'caption' }}>-$1,000</Inline>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Inline css={{ font: 'caption' }}>MTR</Inline>
+                </TableCell>
+                <TableCell>
+                  <Inline css={{ font: 'caption' }}>
+                    ${Math.max((mtr || 0) - 1000, 0)}
+                  </Inline>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell>
+                  <Inline css={{ font: 'caption', fontWeight: 'bold' }}>
+                    Total ($3 per $1,000 MTR)
+                  </Inline>
+                </TableCell>
+                <TableCell>
+                  <Inline css={{ font: 'caption', fontWeight: 'bold' }}>
+                    ${Math.ceil(Math.max((mtr || 0) - 1000, 0) / 1000) * 3}
+                  </Inline>
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
         </Box>
       </Box>
     </Box>
@@ -191,7 +287,7 @@ const BillingSettings = () => {
 
   return (
     <Box css={{ stack: 'y', gapY: 'small', maxWidth: '1/2' }}>
-      <Box css={{ font: 'subtitle' }}>Subscription</Box>
+      <Box css={{ font: 'subtitle' }}>Billing</Box>
       <Box
         css={{
           stack: 'x',
