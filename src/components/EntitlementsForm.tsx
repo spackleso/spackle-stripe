@@ -23,7 +23,7 @@ const EntitlementsForm = ({
   name: string | undefined
   features: QueryObserverResult<Feature[]>
   overrides: QueryObserverResult<Override[] | NewOverride[]>
-  saveOverrides: UseMutationResult<any, unknown, Override[] | NewOverride[]>
+  saveOverrides: UseMutationResult<unknown, unknown, Override[] | NewOverride[]>
   shown: boolean
   setShown: (val: boolean) => void
 }) => {

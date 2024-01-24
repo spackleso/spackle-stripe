@@ -27,19 +27,21 @@ const ProductEntitlementsView = () => {
   const productFeatures = useProductFeatures(productId, environment.mode)
   const productState = useProductState(productId, environment.mode)
 
-  const saveOverrides = useMutation(
-    async (overrides: Override[] | NewOverride[]) => {
+  const saveOverrides = useMutation({
+    mutationFn: async (overrides: Override[] | NewOverride[]) => {
       const response = await post(`/stripe/update_product_features`, {
         product_id: productId,
         product_features: overrides,
         mode: environment.mode,
       })
-      queryClient.invalidateQueries(['productFeatures', productId])
-      queryClient.invalidateQueries(['productState', productId])
+      queryClient.invalidateQueries({
+        queryKey: ['productFeatures', productId],
+      })
+      queryClient.invalidateQueries({ queryKey: ['productState', productId] })
       setIsShowingForm(false)
       return response
     },
-  )
+  })
 
   const isLoading =
     accountState.isLoading ||

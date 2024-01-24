@@ -6,9 +6,9 @@ const useProductFeatures = (
   mode: 'live' | 'test',
 ) => {
   const { post } = useApi()
-  return useQuery(
-    ['productFeatures', productId],
-    async () => {
+  return useQuery({
+    queryKey: ['productFeatures', productId],
+    queryFn: async () => {
       if (productId) {
         const response = await (
           await post(`/stripe/get_product_features`, {
@@ -19,8 +19,8 @@ const useProductFeatures = (
         return response.data
       }
     },
-    { enabled: !!productId },
-  )
+    enabled: !!productId,
+  })
 }
 
 export default useProductFeatures

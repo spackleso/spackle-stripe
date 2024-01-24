@@ -30,28 +30,31 @@ export type Entitlements = {
 
 export const useEntitlements = (accountId: string) => {
   const { post } = useApi()
-  return useQuery(['entitlements', accountId], async () => {
-    const entitlements = await (
-      await post(`/stripe/get_entitlements`, {})
-    ).json()
-    return {
-      entitlements,
-      flag: (key: string) => {
-        for (const feature of entitlements?.features || []) {
-          if (feature.type === 0 && feature.key === key) {
-            return feature.value_flag
+  return useQuery({
+    queryKey: ['entitlements', accountId],
+    queryFn: async () => {
+      const entitlements = await (
+        await post(`/stripe/get_entitlements`, {})
+      ).json()
+      return {
+        entitlements,
+        flag: (key: string) => {
+          for (const feature of entitlements?.features || []) {
+            if (feature.type === 0 && feature.key === key) {
+              return feature.value_flag
+            }
           }
-        }
-        return false
-      },
-      limit: (key: string) => {
-        for (const feature of entitlements?.features || []) {
-          if (feature.type === 1 && feature.key === key) {
-            return feature.value_limit
+          return false
+        },
+        limit: (key: string) => {
+          for (const feature of entitlements?.features || []) {
+            if (feature.type === 1 && feature.key === key) {
+              return feature.value_limit
+            }
           }
-        }
-        return 0
-      },
-    }
+          return 0
+        },
+      }
+    },
   })
 }

@@ -26,20 +26,24 @@ const CustomerView = () => {
   const [isShowingForm, setIsShowingForm] = useState(false)
   const [stripeCustomer, setStripeCustomer] = useState<any>(null)
 
-  const saveOverrides = useMutation(
-    async (overrides: Override[] | NewOverride[]) => {
+  const saveOverrides = useMutation({
+    mutationFn: async (overrides: Override[] | NewOverride[]) => {
       const response = await post(`/stripe/update_customer_features`, {
         customer_id: customerId,
         customer_features: overrides,
         mode: environment.mode,
       })
-      queryClient.invalidateQueries(['subscriptionsState', customerId])
-      queryClient.invalidateQueries(['customerFeatures', customerId])
-      queryClient.invalidateQueries(['customerState', customerId])
+      queryClient.invalidateQueries({
+        queryKey: ['subscriptionsState', customerId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['customerFeatures', customerId],
+      })
+      queryClient.invalidateQueries({ queryKey: ['customerState', customerId] })
       setIsShowingForm(false)
       return response
     },
-  )
+  })
 
   const isLoading =
     entitlements.isLoading ||
@@ -132,8 +136,8 @@ const CustomerView = () => {
               {stripeCustomer?.name
                 ? `for ${stripeCustomer.name}`
                 : stripeCustomer?.email
-                ? `for ${stripeCustomer.email}`
-                : ''}
+                  ? `for ${stripeCustomer.email}`
+                  : ''}
             </Box>
             {customerState.data.features.sort(sortFeatures).map((f: any) => (
               <EntitlementItem key={f.key} entitlement={f} />

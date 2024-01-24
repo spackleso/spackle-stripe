@@ -28,54 +28,58 @@ const FeaturesForm = ({
 }) => {
   const { userContext } = useStripeContext()
   const [isShowingNewForm, setIsShowingNewForm] = useState<boolean>(false)
-  const {
-    data: features,
-    isLoading,
-    isRefetching,
-  } = useAccountFeatures(userContext.account.id)
+  const { data: features, isLoading } = useAccountFeatures(
+    userContext.account.id,
+  )
   const { post } = useApi()
 
-  const update = useMutation(async (feature: Feature | NewFeature) => {
-    const response = await post(`/stripe/update_account_feature`, feature)
-    if (response.status !== 200) {
-      const error = (await response.json()).error
-      throw new Error(error)
-    }
+  const update = useMutation({
+    mutationFn: async (feature: Feature | NewFeature) => {
+      const response = await post(`/stripe/update_account_feature`, feature)
+      if (response.status !== 200) {
+        const error = (await response.json()).error
+        throw new Error(error)
+      }
 
-    queryClient.invalidateQueries(['accountFeatures'])
-    queryClient.invalidateQueries(['accountState'])
-    queryClient.invalidateQueries(['customerFeatures'])
-    queryClient.invalidateQueries(['productState'])
-    queryClient.invalidateQueries(['subscriptionsState'])
-    return response
+      queryClient.invalidateQueries({ queryKey: ['accountFeatures'] })
+      queryClient.invalidateQueries({ queryKey: ['accountState'] })
+      queryClient.invalidateQueries({ queryKey: ['customerFeatures'] })
+      queryClient.invalidateQueries({ queryKey: ['productState'] })
+      queryClient.invalidateQueries({ queryKey: ['subscriptionsState'] })
+      return response
+    },
   })
 
-  const create = useMutation(async (feature: NewFeature | Feature) => {
-    const response = await post(`/stripe/create_account_feature`, feature)
-    if (response.status !== 201) {
-      const error = (await response.json()).error
-      throw new Error(error)
-    }
+  const create = useMutation({
+    mutationFn: async (feature: NewFeature | Feature) => {
+      const response = await post(`/stripe/create_account_feature`, feature)
+      if (response.status !== 201) {
+        const error = (await response.json()).error
+        throw new Error(error)
+      }
 
-    queryClient.invalidateQueries(['accountFeatures'])
-    queryClient.invalidateQueries(['accountState'])
-    queryClient.invalidateQueries(['customerFeatures'])
-    queryClient.invalidateQueries(['productState'])
-    queryClient.invalidateQueries(['subscriptionsState'])
-    setIsShowingNewForm(false)
-    return response
+      queryClient.invalidateQueries({ queryKey: ['accountFeatures'] })
+      queryClient.invalidateQueries({ queryKey: ['accountState'] })
+      queryClient.invalidateQueries({ queryKey: ['customerFeatures'] })
+      queryClient.invalidateQueries({ queryKey: ['productState'] })
+      queryClient.invalidateQueries({ queryKey: ['subscriptionsState'] })
+      setIsShowingNewForm(false)
+      return response
+    },
   })
 
-  const destroy = useMutation(async (feature: Feature) => {
-    const response = await post(`/stripe/delete_account_feature`, {
-      feature_id: feature.id,
-    })
-    queryClient.invalidateQueries(['accountFeatures'])
-    queryClient.invalidateQueries(['accountState'])
-    queryClient.invalidateQueries(['customerFeatures'])
-    queryClient.invalidateQueries(['productState'])
-    queryClient.invalidateQueries(['subscriptionsState'])
-    return response
+  const destroy = useMutation({
+    mutationFn: async (feature: Feature) => {
+      const response = await post(`/stripe/delete_account_feature`, {
+        feature_id: feature.id,
+      })
+      queryClient.invalidateQueries({ queryKey: ['accountFeatures'] })
+      queryClient.invalidateQueries({ queryKey: ['accountState'] })
+      queryClient.invalidateQueries({ queryKey: ['customerFeatures'] })
+      queryClient.invalidateQueries({ queryKey: ['productState'] })
+      queryClient.invalidateQueries({ queryKey: ['subscriptionsState'] })
+      return response
+    },
   })
 
   return (
@@ -150,7 +154,7 @@ const FeaturesForm = ({
                         isNew={false}
                         save={update}
                         destroy={destroy}
-                        isLoading={isLoading || isRefetching}
+                        isLoading={isLoading}
                       />
                     </AccordionItem>
                   ))}

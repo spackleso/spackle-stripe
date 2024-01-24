@@ -6,9 +6,9 @@ const useSubscriptionsState = (
   mode: 'live' | 'test',
 ) => {
   const { post } = useApi()
-  return useQuery(
-    ['subscriptionsState', customerId],
-    async () => {
+  return useQuery({
+    queryKey: ['subscriptionsState', customerId],
+    queryFn: async () => {
       const response = await (
         await post(`/stripe/get_subscriptions_state`, {
           customer_id: customerId,
@@ -17,8 +17,8 @@ const useSubscriptionsState = (
       ).json()
       return response.data
     },
-    { enabled: !!customerId },
-  )
+    enabled: !!customerId,
+  })
 }
 
 export default useSubscriptionsState

@@ -3,8 +3,11 @@ import useApi from './useApi'
 
 const useToken = (accountId: string) => {
   const { post } = useApi()
-  return useQuery(['token', accountId], async () => {
-    return await (await post(`/stripe/get_token`, {})).json()
+  return useQuery({
+    queryKey: ['token', accountId],
+    queryFn: async () => {
+      return await (await post(`/stripe/get_token`, {})).json()
+    },
   })
 }
 

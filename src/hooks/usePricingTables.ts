@@ -6,12 +6,15 @@ import { PricingTable } from '../types'
 const usePricingTables = (accountId: string) => {
   const { post } = useApi()
   const { environment } = useStripeContext()
-  return useQuery(['pricingTables', accountId], async () => {
-    return (await (
-      await post(`/stripe/get_pricing_tables`, {
-        mode: environment.mode,
-      })
-    ).json()) as PricingTable[]
+  return useQuery({
+    queryKey: ['pricingTables', accountId],
+    queryFn: async () => {
+      return (await (
+        await post(`/stripe/get_pricing_tables`, {
+          mode: environment.mode,
+        })
+      ).json()) as PricingTable[]
+    },
   })
 }
 

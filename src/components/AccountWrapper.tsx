@@ -31,16 +31,20 @@ const LoadingSpinner = ({ children }: { children?: ReactNode }) => {
 const SetupInterstitial = ({ account }: { account: any }) => {
   const { post } = useApi()
 
-  const acknowledgeSetup = useMutation(async () => {
-    const response = await post('/stripe/acknowledge_setup', {})
+  const acknowledgeSetup = useMutation({
+    mutationFn: async () => {
+      const response = await post('/stripe/acknowledge_setup', {})
 
-    if (response.status !== 200) {
-      const error = (await response.json()).error
-      throw new Error(error)
-    }
+      if (response.status !== 200) {
+        const error = (await response.json()).error
+        throw new Error(error)
+      }
 
-    queryClient.invalidateQueries(['account', account.stripe_id])
-    return response
+      queryClient.invalidateQueries({
+        queryKey: ['account', account.stripe_id],
+      })
+      return response
+    },
   })
 
   useEffect(() => {

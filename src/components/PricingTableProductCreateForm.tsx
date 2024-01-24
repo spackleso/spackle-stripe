@@ -1,11 +1,7 @@
 import { Box, Button, Icon, Inline, Select } from '@stripe/ui-extension-sdk/ui'
 import { stripePriceDisplay } from '../utils'
 import { useCallback, useEffect, useState } from 'react'
-import {
-  NewPricingTableProduct,
-  PricingTable,
-  PricingTableProduct,
-} from '../types'
+import { NewPricingTableProduct, PricingTableProduct } from '../types'
 import Stripe from 'stripe'
 import stripe from '../stripe'
 
@@ -69,7 +65,7 @@ const PricingTableProductCreateForm = ({
   }, [])
 
   const addProduct = useCallback(
-    async (selectedProductId) => {
+    async (selectedProductId: string) => {
       const product = products.find((p) => p.id === selectedProductId)
       if (!product) {
         return

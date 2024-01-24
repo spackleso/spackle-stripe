@@ -6,6 +6,7 @@ import Stripe from 'stripe'
 
 const stripe = new Stripe(STRIPE_API_KEY, {
   httpClient: createHttpClient(),
+  // @ts-expect-error: This is the account's default api version. TODO: ugprade
   apiVersion: '2022-08-01',
 })
 

@@ -60,7 +60,7 @@ const FeatureForm = ({
           </Button>
           <Button
             type="destructive"
-            disabled={save.isLoading || destroy?.isLoading || isLoading}
+            disabled={save.isLoading || destroy?.isPaused || isLoading}
             onPress={() => destroy && destroy.mutate(feature as Feature)}
           >
             {destroy?.isLoading ? <Spinner /> : <>Delete</>}
@@ -146,11 +146,14 @@ const FeatureForm = ({
           <Box>
             <Box css={{ marginBottom: 'small' }}>
               <Box css={{ fontWeight: 'semibold' }}>Default Limit</Box>
-              <Box css={{ font: 'caption', color: 'secondary' }}>This will be the value unless overridden by products, prices, or customers</Box>
+              <Box css={{ font: 'caption', color: 'secondary' }}>
+                This will be the value unless overridden by products, prices, or
+                customers
+              </Box>
             </Box>
             <Box css={{ stack: 'x', gapX: 'small', alignY: 'bottom' }}>
               <TextField
-                type={valueLimit === null ? "text" : "number"}
+                type={valueLimit === null ? 'text' : 'number'}
                 value={valueLimit === null ? '∞' : valueLimit}
                 disabled={valueLimit === null}
                 onChange={(e) => setValueLimit(parseInt(e.target.value) || 0)}

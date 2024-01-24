@@ -6,9 +6,9 @@ const useCustomerFeatures = (
   mode: 'live' | 'test',
 ) => {
   const { post } = useApi()
-  return useQuery(
-    ['customerFeatures', customerId],
-    async () => {
+  return useQuery({
+    queryKey: ['customerFeatures', customerId],
+    queryFn: async () => {
       if (customerId) {
         const response = await (
           await post(`/stripe/get_customer_features`, {
@@ -19,8 +19,8 @@ const useCustomerFeatures = (
         return response.data
       }
     },
-    { enabled: !!customerId },
-  )
+    enabled: !!customerId,
+  })
 }
 
 export default useCustomerFeatures

@@ -6,9 +6,9 @@ const useProductState = (
   mode: 'live' | 'test',
 ) => {
   const { post } = useApi()
-  return useQuery(
-    ['productState', productId],
-    async () => {
+  return useQuery({
+    queryKey: ['productState', productId],
+    queryFn: async () => {
       const response = await (
         await post(`/stripe/get_product_state`, {
           product_id: productId,
@@ -17,8 +17,8 @@ const useProductState = (
       ).json()
       return response.data
     },
-    { enabled: !!productId },
-  )
+    enabled: !!productId,
+  })
 }
 
 export default useProductState

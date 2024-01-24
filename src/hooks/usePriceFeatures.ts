@@ -6,9 +6,9 @@ const usePriceFeatures = (
   mode: 'live' | 'test',
 ) => {
   const { post } = useApi()
-  return useQuery(
-    ['priceFeatures', priceId],
-    async () => {
+  return useQuery({
+    queryKey: ['priceFeatures', priceId],
+    queryFn: async () => {
       if (priceId) {
         const response = await (
           await post(`/stripe/get_price_features`, {
@@ -19,8 +19,8 @@ const usePriceFeatures = (
         return response.data
       }
     },
-    { enabled: !!priceId },
-  )
+    enabled: !!priceId,
+  })
 }
 
 export default usePriceFeatures

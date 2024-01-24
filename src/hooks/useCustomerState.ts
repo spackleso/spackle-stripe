@@ -6,9 +6,9 @@ const useCustomerState = (
   mode: 'live' | 'test',
 ) => {
   const { post } = useApi()
-  return useQuery(
-    ['customerState', customerId],
-    async () => {
+  return useQuery({
+    queryKey: ['customerState', customerId],
+    queryFn: async () => {
       const response = await (
         await post(`/stripe/get_customer_state`, {
           customer_id: customerId,
@@ -17,8 +17,8 @@ const useCustomerState = (
       ).json()
       return response.data
     },
-    { enabled: !!customerId },
-  )
+    enabled: !!customerId,
+  })
 }
 
 export default useCustomerState

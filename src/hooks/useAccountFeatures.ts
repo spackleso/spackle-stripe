@@ -3,11 +3,14 @@ import useApi from './useApi'
 
 const useAccountFeatures = (accountId: string) => {
   const { post } = useApi()
-  return useQuery(['accountFeatures', accountId], async () => {
-    const response = await (
-      await post(`/stripe/get_account_features`, {})
-    ).json()
-    return response.data
+  return useQuery({
+    queryKey: ['accountFeatures', accountId],
+    queryFn: async () => {
+      const response = await (
+        await post(`/stripe/get_account_features`, {})
+      ).json()
+      return response.data
+    },
   })
 }
 

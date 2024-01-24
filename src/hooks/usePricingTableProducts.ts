@@ -4,12 +4,15 @@ import { PricingTableProduct } from '../types'
 
 const usePricingTableProducts = (pricingTableId: string) => {
   const { post } = useApi()
-  return useQuery(['pricingTableProducts', pricingTableId], async () => {
-    return (await (
-      await post(`/stripe/get_pricing_table_products`, {
-        pricing_table_id: pricingTableId,
-      })
-    ).json()) as PricingTableProduct[]
+  return useQuery({
+    queryKey: ['pricingTableProducts', pricingTableId],
+    queryFn: async () => {
+      return (await (
+        await post(`/stripe/get_pricing_table_products`, {
+          pricing_table_id: pricingTableId,
+        })
+      ).json()) as PricingTableProduct[]
+    },
   })
 }
 

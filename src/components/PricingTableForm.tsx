@@ -73,15 +73,21 @@ const PricingTableForm = ({
     ])
   const [confirmClose, setConfirmClose] = useState<boolean>(true)
 
-  const savePricingTable = useMutation(async (data: PricingTableUpdateData) => {
-    const response = await post(`/stripe/update_pricing_table`, data)
-    if (!response.ok) {
-      const { error } = await response.json()
-      throw new Error(error)
-    }
-    queryClient.invalidateQueries(['pricingTables', userContext.account.id])
-    queryClient.invalidateQueries(['pricingTableProducts', pricingTable.id])
-    closeWithoutConfirm()
+  const savePricingTable = useMutation({
+    mutationFn: async (data: PricingTableUpdateData) => {
+      const response = await post(`/stripe/update_pricing_table`, data)
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(error)
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTables', userContext.account.id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTableProducts', pricingTable.id],
+      })
+      closeWithoutConfirm()
+    },
   })
 
   const resetForm = useCallback(() => {
