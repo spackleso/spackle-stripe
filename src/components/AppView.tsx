@@ -63,7 +63,7 @@ const AppView = () => {
             disabled={environment.objectContext?.object === 'customer'}
             tabKey={PRICING_TABLE_TAB_KEY}
           >
-            Pricing Table
+            Pricing Tables
           </Tab>
           <Tab tabKey={ENTITLEMENTS_TAB_KEY}>Entitlements</Tab>
         </TabList>

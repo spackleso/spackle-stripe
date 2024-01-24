@@ -59,7 +59,13 @@ const PricingTableProductCard = ({
         borderRadius: 'medium',
       }}
     >
-      <Box css={{ stack: onUpdate ? 'x' : 'y', gapX: 'small', gapY: 'small' }}>
+      <Box
+        css={{
+          stack: onUpdate ? 'x' : 'y',
+          gapX: 'small',
+          alignY: 'center',
+        }}
+      >
         <Box css={{ fontWeight: 'bold' }}>{product.name}</Box>
         {onUpdate ? (
           <Box css={{ stack: 'x', alignX: 'end', gapX: 'medium' }}>

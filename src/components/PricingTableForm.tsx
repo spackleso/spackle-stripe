@@ -106,6 +106,7 @@ const PricingTableForm = ({
   }, [setShown, setConfirmClose, resetForm])
 
   const isModified = !(
+    updatedPricingTable.name === pricingTable.name &&
     updatedPricingTable.monthly_enabled === pricingTable.monthly_enabled &&
     updatedPricingTable.annual_enabled === pricingTable.annual_enabled &&
     updatedPricingTableProducts.length === pricingTableProducts.length &&
@@ -182,7 +183,9 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
         }
         setShown(val)
       }}
-      title={'Pricing Table'}
+      title={
+        pricingTable.name ? `Pricing Table: ${pricingTable.name}` : 'Untitled'
+      }
       primaryAction={
         <Button
           type="primary"
@@ -219,32 +222,46 @@ Spackle::PricingTable.retrieve('${pricingTable.id}')
       <Box css={{ stack: 'y', gapY: 'xlarge' }}>
         <Box>
           <Box css={{ font: 'heading', marginBottom: 'medium' }}>Settings</Box>
-          <FormFieldGroup
-            legend="Intervals"
-            description="Choose the billing intervals customers can select from your pricing table. Only monthly and annual intervals are supported at this time."
-            layout="column"
-          >
-            <Switch
-              label="Monthly"
-              defaultChecked={updatedPricingTable.monthly_enabled}
+          <Box css={{ stack: 'y', gapY: 'medium' }}>
+            <TextField
+              defaultValue={pricingTable.name}
+              label="Name"
+              size="small"
               onChange={(e) => {
                 setUpdatedPricingTable({
                   ...updatedPricingTable,
-                  monthly_enabled: e.target.checked,
+                  name: e.target.value,
                 })
               }}
             />
-            <Switch
-              label="Annual"
-              defaultChecked={updatedPricingTable.annual_enabled}
-              onChange={(e) => {
-                setUpdatedPricingTable({
-                  ...updatedPricingTable,
-                  annual_enabled: e.target.checked,
-                })
-              }}
-            />
-          </FormFieldGroup>
+
+            <FormFieldGroup
+              legend="Intervals"
+              description="Choose the billing intervals customers can select from your pricing table. Only monthly and annual intervals are supported at this time."
+              layout="column"
+            >
+              <Switch
+                label="Monthly"
+                defaultChecked={updatedPricingTable.monthly_enabled}
+                onChange={(e) => {
+                  setUpdatedPricingTable({
+                    ...updatedPricingTable,
+                    monthly_enabled: e.target.checked,
+                  })
+                }}
+              />
+              <Switch
+                label="Annual"
+                defaultChecked={updatedPricingTable.annual_enabled}
+                onChange={(e) => {
+                  setUpdatedPricingTable({
+                    ...updatedPricingTable,
+                    annual_enabled: e.target.checked,
+                  })
+                }}
+              />
+            </FormFieldGroup>
+          </Box>
         </Box>
 
         <Box>

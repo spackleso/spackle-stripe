@@ -1,22 +1,20 @@
 import { Box, Spinner } from '@stripe/ui-extension-sdk/ui'
 import usePricingTables from '../hooks/usePricingTables'
 import useStripeContext from '../hooks/useStripeContext'
-import PricingTable from './PricingTable'
 import { useEntitlements } from '../hooks/useEntitlements'
 import PricingTablesPaywall from './PricingTablesPaywall'
+import PricingTablesList from './PricingTablesList'
 
 const PricingTablesView = () => {
   const { environment, userContext } = useStripeContext()
   const entitlements = useEntitlements(userContext.account.id)
-  const {
-    data: pricingTables,
-    isLoading,
-    isRefetching,
-  } = usePricingTables(userContext.account.id)
+  const { data: pricingTables, isPending } = usePricingTables(
+    userContext.account.id,
+  )
   const entitled =
     entitlements.data?.flag('pricing_tables') || environment.mode === 'test'
 
-  if (isLoading || isRefetching) {
+  if (isPending) {
     return (
       <Box
         css={{
@@ -38,13 +36,12 @@ const PricingTablesView = () => {
       <Box
         css={{
           stack: 'y',
-          gapY: 'large',
           marginTop: 'medium',
         }}
       >
         <Box css={{ stack: 'y', gapY: 'small' }}>
           {pricingTables ? (
-            <PricingTable pricingTable={pricingTables[0]} />
+            <PricingTablesList pricingTables={pricingTables} />
           ) : (
             'Something went wrong'
           )}
