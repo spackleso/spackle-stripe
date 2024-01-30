@@ -1,5 +1,17 @@
 import Stripe from 'stripe'
 
+export type NavKey =
+  | 'home'
+  | 'pricingTables'
+  | 'entitlements'
+  | 'settings'
+  | 'pricingTable'
+
+export type NavState = {
+  key: NavKey
+  param: string
+}
+
 export enum FeatureType {
   Flag = 0,
   Limit = 1,

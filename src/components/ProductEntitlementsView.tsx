@@ -96,7 +96,7 @@ const ProductEntitlementsView = () => {
     )
   } else if (entitled) {
     return (
-      <Box css={{ stack: 'y', marginTop: 'medium', gapY: 'large' }}>
+      <Box css={{ stack: 'y', gapY: 'large' }}>
         <Box>
           <Box css={{ stack: 'x', gapX: 'small' }}>
             <Button

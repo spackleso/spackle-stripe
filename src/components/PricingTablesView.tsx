@@ -8,13 +8,13 @@ import PricingTablesList from './PricingTablesList'
 const PricingTablesView = () => {
   const { environment, userContext } = useStripeContext()
   const entitlements = useEntitlements(userContext.account.id)
-  const { data: pricingTables, isPending } = usePricingTables(
+  const { data: pricingTables, isLoading } = usePricingTables(
     userContext.account.id,
   )
   const entitled =
     entitlements.data?.flag('pricing_tables') || environment.mode === 'test'
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <Box
         css={{

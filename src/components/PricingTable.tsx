@@ -23,6 +23,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
     isRefetching,
   } = usePricingTableProducts(pricingTable.id)
 
+  // TODO: move these to the navigation hook
   useEffect(() => {
     const track = async () => {
       await post('/stripe/identify', {
