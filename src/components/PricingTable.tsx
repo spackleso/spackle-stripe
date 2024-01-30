@@ -70,9 +70,19 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
           distribute: 'space-between',
         }}
       >
+        <Box
+          css={{ font: 'heading', stack: 'x', gapX: 'small', alignY: 'center' }}
+        >
+          {pricingTable.name}
+          {pricingTable.mode === 0 ? (
+            <Badge type="info">Live</Badge>
+          ) : (
+            <Badge type="warning">Test</Badge>
+          )}
+        </Box>
         <Box css={{ stack: 'x', gapX: 'small' }}>
           <Button
-            type="secondary"
+            type="primary"
             size="small"
             onPress={() => setShowForm(true)}
             css={{ width: 'fill' }}
@@ -90,17 +100,10 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
             </Box>
           </Button>
         </Box>
-        <Box>
-          {pricingTable.mode === 0 ? (
-            <Badge type="info">Live</Badge>
-          ) : (
-            <Badge type="warning">Test</Badge>
-          )}
-        </Box>
       </Box>
 
       <Box css={{ stack: 'y', gapY: 'small' }}>
-        <Box css={{ font: 'heading', fontWeight: 'bold' }}>
+        <Box css={{ font: 'subheading', fontWeight: 'bold' }}>
           Pricing Table Products
         </Box>
         {pricingTableProducts.length ? (

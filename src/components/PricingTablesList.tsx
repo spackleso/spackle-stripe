@@ -1,4 +1,4 @@
-import { Box } from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, Icon } from '@stripe/ui-extension-sdk/ui'
 import useNavigation from '../hooks/useNavigation'
 import { PricingTable } from '../types'
 import NavItem from './NavItem'
@@ -11,13 +11,28 @@ const PricingTablesList = ({ pricingTables }: Props) => {
   const { navigate } = useNavigation()
   return (
     <Box css={{ stack: 'y', gapY: 'large' }}>
-      {pricingTables.map((pt) => (
-        <NavItem
-          key={pt.id}
-          label={pt.name}
-          onPress={() => navigate({ key: 'pricingTable', param: pt.id })}
-        />
-      ))}
+      <Box css={{ stack: 'x', distribute: 'space-between', alignY: 'center' }}>
+        <Box css={{ font: 'heading' }}>Pricing Tables</Box>
+        <Button
+          type="primary"
+          size="small"
+          onPress={() => setIsShowingPricingTableForm(true)}
+        >
+          <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+            <Icon name="add" />
+            Create
+          </Box>
+        </Button>
+      </Box>
+      <Box css={{ stack: 'y', gapY: 'large' }}>
+        {pricingTables.map((pt) => (
+          <NavItem
+            key={pt.id}
+            label={pt.name}
+            onPress={() => navigate({ key: 'pricingTable', param: pt.id })}
+          />
+        ))}
+      </Box>
     </Box>
   )
 }

@@ -34,28 +34,26 @@ const ActionBar = ({
           <Icon name="home" />
         </Box>
       </Link>
-      {navState.key === 'pricingTables' && (
+      {navState.key.startsWith('pricingTable') && (
         <Button
           type="secondary"
           size="small"
-          onPress={() => setIsShowingPricingTableForm(true)}
+          href="https://docs.spackle.so/pricing-tables"
+          target="_blank"
         >
-          <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-            <Icon name="add" />
-            Create New Table
-          </Box>
+          Docs
+          <Icon name="external" size="xsmall" />
         </Button>
       )}
       {navState.key === 'entitlements' && (
         <Button
           type="secondary"
           size="small"
-          onPress={() => setIsShowingFeaturesForm(true)}
+          href="https://docs.spackle.so/entitlements"
+          target="_blank"
         >
-          <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-            <Icon name="settings" />
-            Manage Features
-          </Box>
+          Docs
+          <Icon name="external" size="xsmall" />
         </Button>
       )}
     </Box>

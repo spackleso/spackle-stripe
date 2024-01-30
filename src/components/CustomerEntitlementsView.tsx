@@ -98,46 +98,53 @@ const CustomerView = () => {
     )
   } else if (entitled) {
     return (
-      <Box css={{ stack: 'y', gapY: 'large' }}>
-        <Box>
-          <Box css={{ stack: 'x', gapX: 'small' }}>
-            <Button
-              type="secondary"
-              size="small"
-              onPress={() => setIsShowingForm(true)}
-            >
-              <Box
-                css={{
-                  width: 'fill',
-                  stack: 'x',
-                  gapX: 'small',
-                  alignY: 'center',
-                }}
-              >
-                <Icon name="edit"></Icon>
-                Edit
-              </Box>
-            </Button>
-          </Box>
-        </Box>
-
+      <Box>
         {customerState.data.features.length ? (
-          <Box css={{ stack: 'y', gapY: 'small' }}>
+          <Box css={{ stack: 'y', gapY: 'large' }}>
             <Box
               css={{
-                font: 'heading',
-                fontWeight: 'bold',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
+                stack: 'x',
+                distribute: 'space-between',
+                alignY: 'center',
               }}
             >
-              Entitlements{' '}
-              {stripeCustomer?.name
-                ? `for ${stripeCustomer.name}`
-                : stripeCustomer?.email
-                  ? `for ${stripeCustomer.email}`
-                  : ''}
+              <Box css={{ stack: 'y' }}>
+                <Box
+                  css={{
+                    font: 'heading',
+                    fontWeight: 'bold',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Entitlements
+                </Box>
+                <Box css={{ font: 'subheading' }}>
+                  {stripeCustomer?.name
+                    ? `for ${stripeCustomer.name}`
+                    : stripeCustomer?.email
+                      ? `for ${stripeCustomer.email}`
+                      : ''}
+                </Box>
+              </Box>
+              <Button
+                type="primary"
+                size="small"
+                onPress={() => setIsShowingForm(true)}
+              >
+                <Box
+                  css={{
+                    width: 'fill',
+                    stack: 'x',
+                    gapX: 'small',
+                    alignY: 'center',
+                  }}
+                >
+                  <Icon name="edit"></Icon>
+                  Edit
+                </Box>
+              </Button>
             </Box>
             {customerState.data.features.sort(sortFeatures).map((f: any) => (
               <EntitlementItem key={f.key} entitlement={f} />

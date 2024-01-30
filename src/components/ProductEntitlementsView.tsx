@@ -96,41 +96,49 @@ const ProductEntitlementsView = () => {
     )
   } else if (entitled) {
     return (
-      <Box css={{ stack: 'y', gapY: 'large' }}>
-        <Box>
-          <Box css={{ stack: 'x', gapX: 'small' }}>
-            <Button
-              type="secondary"
-              size="small"
-              onPress={() => setIsShowingForm(true)}
-            >
-              <Box
-                css={{
-                  width: 'fill',
-                  stack: 'x',
-                  gapX: 'small',
-                  alignY: 'center',
-                }}
-              >
-                <Icon name="edit"></Icon>
-                Edit
-              </Box>
-            </Button>
-          </Box>
-        </Box>
-
+      <Box>
         {accountState.data.length ? (
-          <Box css={{ stack: 'y', gapY: 'small' }}>
+          <Box css={{ stack: 'y', gapY: 'large' }}>
             <Box
               css={{
-                font: 'heading',
-                fontWeight: 'bold',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
+                stack: 'x',
+                distribute: 'space-between',
+                alignY: 'center',
               }}
             >
-              Entitlements {stripeProduct?.name && `for ${stripeProduct.name}`}
+              <Box css={{ stack: 'y' }}>
+                <Box
+                  css={{
+                    font: 'heading',
+                    fontWeight: 'bold',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Entitlements
+                </Box>
+                <Box css={{ font: 'subheading' }}>
+                  {stripeProduct?.name && `for ${stripeProduct.name}`}
+                </Box>
+              </Box>
+              <Button
+                type="primary"
+                size="small"
+                onPress={() => setIsShowingForm(true)}
+              >
+                <Box
+                  css={{
+                    width: 'fill',
+                    stack: 'x',
+                    gapX: 'small',
+                    alignY: 'center',
+                  }}
+                >
+                  <Icon name="edit"></Icon>
+                  Edit
+                </Box>
+              </Button>
             </Box>
             {productState.data.sort(sortFeatures).map((f: any) => (
               <EntitlementItem key={f.key} entitlement={f} />

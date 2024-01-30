@@ -1,4 +1,3 @@
-import { Box } from '@stripe/ui-extension-sdk/ui'
 import EntitlementsPlaceholderView from './EntitlementsPlaceholderView'
 import useStripeContext from '../hooks/useStripeContext'
 import CustomerEntitlementsView from './CustomerEntitlementsView'
@@ -8,17 +7,9 @@ const EntitlementsView = () => {
   const { environment } = useStripeContext()
 
   if (environment.objectContext?.object === 'customer') {
-    return (
-      <Box>
-        <CustomerEntitlementsView />
-      </Box>
-    )
+    return <CustomerEntitlementsView />
   } else if (environment.objectContext?.object === 'product') {
-    return (
-      <Box>
-        <ProductEntitlementsView />
-      </Box>
-    )
+    return <ProductEntitlementsView />
   } else {
     return <EntitlementsPlaceholderView />
   }

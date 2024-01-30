@@ -33,19 +33,12 @@ const PricingTablesView = () => {
 
   if (entitled) {
     return (
-      <Box
-        css={{
-          stack: 'y',
-          marginTop: 'medium',
-        }}
-      >
-        <Box css={{ stack: 'y', gapY: 'small' }}>
-          {pricingTables ? (
-            <PricingTablesList pricingTables={pricingTables} />
-          ) : (
-            'Something went wrong'
-          )}
-        </Box>
+      <Box css={{ stack: 'y', gapY: 'small' }}>
+        {pricingTables ? (
+          <PricingTablesList pricingTables={pricingTables} />
+        ) : (
+          'Something went wrong'
+        )}
       </Box>
     )
   } else {

@@ -1,4 +1,11 @@
-import { Box, Divider, Icon, Link, List } from '@stripe/ui-extension-sdk/ui'
+import {
+  Box,
+  Button,
+  Divider,
+  Icon,
+  Link,
+  List,
+} from '@stripe/ui-extension-sdk/ui'
 import { useEffect, useState } from 'react'
 import Stripe from 'stripe'
 import stripe from '../stripe'
@@ -34,9 +41,20 @@ const EntitlementsView = () => {
       css={{
         stack: 'y',
         gapY: 'large',
-        marginTop: 'large',
       }}
     >
+      <Box css={{ stack: 'x', alignX: 'end' }}>
+        <Button
+          type="primary"
+          size="small"
+          onPress={() => setIsShowingFeaturesForm(true)}
+        >
+          <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+            <Icon name="settings" />
+            Manage Features
+          </Box>
+        </Button>
+      </Box>
       <Box
         css={{
           background: 'container',
