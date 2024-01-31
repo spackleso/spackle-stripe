@@ -1,5 +1,6 @@
 import { Box, Button, Icon } from '@stripe/ui-extension-sdk/ui'
 import useNavigation from '../contexts/NavigationContext'
+import { usePricingTableForm } from '../contexts/PricingTableFormContext'
 import { PricingTable } from '../types'
 import NavItem from './NavItem'
 
@@ -9,6 +10,8 @@ interface Props {
 
 const PricingTablesList = ({ pricingTables }: Props) => {
   const { navigate } = useNavigation()
+  const { setIsShowingPricingTableForm } = usePricingTableForm()
+
   return (
     <Box css={{ stack: 'y', gapY: 'large' }}>
       <Box css={{ stack: 'x', distribute: 'space-between', alignY: 'center' }}>

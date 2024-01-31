@@ -4,6 +4,7 @@ import AccountWrapper from '../components/AccountWrapper'
 import AppView from '../components/AppView'
 import { FeaturesFormProvider } from '../contexts/FeaturesFormContext'
 import { NavigationProvider } from '../contexts/NavigationContext'
+import { PricingTableFormProvider } from '../contexts/PricingTableFormContext'
 import { ApiContext, createApi } from '../hooks/useApi'
 import { StripeContext } from '../hooks/useStripeContext'
 import { queryClient } from '../query'
@@ -17,7 +18,9 @@ const View = (context: ExtensionContextValue) => {
             <AccountWrapper>
               <NavigationProvider defaultKey="entitlements">
                 <FeaturesFormProvider>
-                  <AppView />
+                  <PricingTableFormProvider>
+                    <AppView />
+                  </PricingTableFormProvider>
                 </FeaturesFormProvider>
               </NavigationProvider>
             </AccountWrapper>

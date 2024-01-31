@@ -3,17 +3,17 @@ import {
   NewPricingTableProduct,
   PricingTable,
   PricingTableProduct,
+  PricingTableUpdateData,
 } from '../types'
 import { useCallback, useState } from 'react'
-import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
-import { useMutation } from '@tanstack/react-query'
-import { queryClient } from '../query'
+import { UseMutationResult } from '@tanstack/react-query'
 import useToken from '../hooks/useToken'
 import usePublishableToken from '../hooks/usePublishableToken'
 import PricingTableFormSettings from './PricingTableFormSettings'
 import PricingTableFormProducts from './PricingTableFormProducts'
 import PricingTableFormIntegrate from './PricingTableFormIntegrate'
+import { usePricingTableForm } from '../contexts/PricingTableFormContext'
 
 const confirmCloseMessages = {
   title: 'Your pricing table will not be saved',
@@ -22,32 +22,24 @@ const confirmCloseMessages = {
   exitAction: 'Exit',
 }
 
-type PricingTableUpdateData = {
-  id: string
-  monthly_enabled: boolean
-  annual_enabled: boolean
-  pricing_table_products: {
-    id?: number
-    product_id: string
-    monthly_stripe_price_id: string | null
-    annual_stripe_price_id: string | null
-  }[]
-}
-
 type PricingTableFormProps = {
   pricingTable: PricingTable
   pricingTableProducts: PricingTableProduct[]
-  shown: boolean
-  setShown: (val: boolean) => void
+  savePricingTable: UseMutationResult<
+    void,
+    unknown,
+    PricingTableUpdateData,
+    unknown
+  >
 }
 
 const PricingTableForm = ({
   pricingTable,
   pricingTableProducts,
-  shown,
-  setShown,
+  savePricingTable,
 }: PricingTableFormProps) => {
-  const { post } = useApi()
+  const { isShowingPricingTableForm, setIsShowingPricingTableForm } =
+    usePricingTableForm()
   const { userContext } = useStripeContext()
   const { data: secretToken } = useToken(userContext.account.id)
   const { data: publishableToken } = usePublishableToken(userContext.account.id)
@@ -58,24 +50,6 @@ const PricingTableForm = ({
     useState<(PricingTableProduct | NewPricingTableProduct)[]>([
       ...pricingTableProducts,
     ])
-  const [confirmClose, setConfirmClose] = useState<boolean>(true)
-
-  const savePricingTable = useMutation({
-    mutationFn: async (data: PricingTableUpdateData) => {
-      const response = await post(`/stripe/update_pricing_table`, data)
-      if (!response.ok) {
-        const { error } = await response.json()
-        throw new Error(error)
-      }
-      queryClient.invalidateQueries({
-        queryKey: ['pricingTables', userContext.account.id],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['pricingTableProducts', pricingTable.id],
-      })
-      closeWithoutConfirm()
-    },
-  })
 
   const resetForm = useCallback(() => {
     setUpdatedPricingTable(pricingTable)
@@ -83,14 +57,8 @@ const PricingTableForm = ({
   }, [pricingTable, pricingTableProducts])
 
   const closeWithConfirm = useCallback(() => {
-    setShown(false)
-  }, [setShown])
-
-  const closeWithoutConfirm = useCallback(() => {
-    setConfirmClose(false)
-    setShown(false)
-    resetForm()
-  }, [setShown, setConfirmClose, resetForm])
+    setIsShowingPricingTableForm(false)
+  }, [setIsShowingPricingTableForm])
 
   const isModified = !(
     updatedPricingTable.name === pricingTable.name &&
@@ -116,15 +84,13 @@ const PricingTableForm = ({
 
   return (
     <FocusView
-      confirmCloseMessages={
-        confirmClose && isModified ? confirmCloseMessages : undefined
-      }
-      shown={shown}
+      confirmCloseMessages={isModified ? confirmCloseMessages : undefined}
+      shown={isShowingPricingTableForm}
       setShown={(val) => {
         if (!val) {
           resetForm()
         }
-        setShown(val)
+        setIsShowingPricingTableForm(val)
       }}
       title={
         pricingTable.name ? `Pricing Table: ${pricingTable.name}` : 'Untitled'

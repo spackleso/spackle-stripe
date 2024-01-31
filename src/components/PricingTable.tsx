@@ -6,16 +6,21 @@ import {
   Inline,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
-import { PricingTable } from '../types'
+import { PricingTable, PricingTableUpdateData } from '../types'
 import PricingTablesProductList from './PricingTablesProductList'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import PricingTableForm from './PricingTableForm'
 import usePricingTableProducts from '../hooks/usePricingTableProducts'
 import useApi from '../hooks/useApi'
+import { usePricingTableForm } from '../contexts/PricingTableFormContext'
+import { queryClient } from '../query'
+import { useMutation } from '@tanstack/react-query'
+import useStripeContext from '../hooks/useStripeContext'
 
 const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
   const { post } = useApi()
-  const [showForm, setShowForm] = useState(false)
+  const { userContext } = useStripeContext()
+  const { setIsShowingPricingTableForm } = usePricingTableForm()
 
   const {
     data: pricingTableProducts,
@@ -38,6 +43,26 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
     }
     track()
   }, [])
+
+  const savePricingTable = useMutation({
+    mutationFn: async (data: PricingTableUpdateData) => {
+      const response = await post(`/stripe/update_pricing_table`, data)
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(error)
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTables', userContext.account.id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTable', pricingTable.id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTableProducts', pricingTable.id],
+      })
+      setIsShowingPricingTableForm(false)
+    },
+  })
 
   if (isLoading || isRefetching || !pricingTableProducts) {
     return (
@@ -84,7 +109,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
           <Button
             type="primary"
             size="small"
-            onPress={() => setShowForm(true)}
+            onPress={() => setIsShowingPricingTableForm(true)}
             css={{ width: 'fill' }}
           >
             <Box
@@ -131,8 +156,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
       <PricingTableForm
         pricingTable={pricingTable}
         pricingTableProducts={pricingTableProducts}
-        shown={showForm}
-        setShown={setShowForm}
+        savePricingTable={savePricingTable}
       />
     </Box>
   )

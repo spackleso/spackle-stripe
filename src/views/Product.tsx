@@ -7,6 +7,7 @@ import { StripeContext } from '../hooks/useStripeContext'
 import { ApiContext, createApi } from '../hooks/useApi'
 import { FeaturesFormProvider } from '../contexts/FeaturesFormContext'
 import { NavigationProvider } from '../contexts/NavigationContext'
+import { PricingTableFormProvider } from '../contexts/PricingTableFormContext'
 
 const View = (context: ExtensionContextValue) => {
   return (
@@ -17,7 +18,9 @@ const View = (context: ExtensionContextValue) => {
             <AccountWrapper>
               <NavigationProvider defaultKey="entitlements">
                 <FeaturesFormProvider>
-                  <AppView />
+                  <PricingTableFormProvider>
+                    <AppView />
+                  </PricingTableFormProvider>
                 </FeaturesFormProvider>
               </NavigationProvider>
             </AccountWrapper>

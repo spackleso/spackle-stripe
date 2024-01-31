@@ -7,6 +7,7 @@ import { queryClient } from '../query'
 import AppView from '../components/AppView'
 import { FeaturesFormProvider } from '../contexts/FeaturesFormContext'
 import { NavigationProvider } from '../contexts/NavigationContext'
+import { PricingTableFormProvider } from '../contexts/PricingTableFormContext'
 
 const App = (context: ExtensionContextValue) => {
   return (
@@ -17,7 +18,9 @@ const App = (context: ExtensionContextValue) => {
             <AccountWrapper>
               <NavigationProvider>
                 <FeaturesFormProvider>
-                  <AppView />
+                  <PricingTableFormProvider>
+                    <AppView />
+                  </PricingTableFormProvider>
                 </FeaturesFormProvider>
               </NavigationProvider>
             </AccountWrapper>
