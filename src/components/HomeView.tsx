@@ -9,12 +9,12 @@ const HomeView = () => {
     <Box css={{ stack: 'y', gapY: 'large' }}>
       <NavItem
         label="Pricing Tables"
-        description="Create pricing tables"
+        description="Create and manage pricing tables for new and returning customers"
         onPress={() => navigate({ key: 'pricingTables', param: '' })}
       />
       <NavItem
         label="Entitlements"
-        description="Manage feature access"
+        description="Manage feature access at the product and customer level"
         onPress={() => {
           navigate({ key: 'entitlements', param: '' })
         }}

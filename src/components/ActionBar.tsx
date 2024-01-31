@@ -1,15 +1,7 @@
 import { Box, Button, Icon, Link } from '@stripe/ui-extension-sdk/ui'
 import useNavigation from '../hooks/useNavigation'
 
-interface Props {
-  setIsShowingPricingTableForm: (isShowing: boolean) => void
-  setIsShowingFeaturesForm: (isShowing: boolean) => void
-}
-
-const ActionBar = ({
-  setIsShowingFeaturesForm,
-  setIsShowingPricingTableForm,
-}: Props) => {
+const ActionBar = () => {
   const { navigate, navState } = useNavigation()
 
   if (navState.key === 'home') {
@@ -46,15 +38,28 @@ const ActionBar = ({
         </Button>
       )}
       {navState.key === 'entitlements' && (
-        <Button
-          type="secondary"
-          size="small"
-          href="https://docs.spackle.so/entitlements"
-          target="_blank"
-        >
-          Docs
-          <Icon name="external" size="xsmall" />
-        </Button>
+        <Box css={{ stack: 'x', gapX: 'small' }}>
+          <Button
+            type="secondary"
+            size="small"
+            onPress={() => setIsShowingFeaturesForm(true)}
+          >
+            <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+              <Icon name="settings" />
+              Manage Features
+            </Box>
+          </Button>
+
+          <Button
+            type="secondary"
+            size="small"
+            href="https://docs.spackle.so/entitlements"
+            target="_blank"
+          >
+            Docs
+            <Icon name="external" size="xsmall" />
+          </Button>
+        </Box>
       )}
     </Box>
   )

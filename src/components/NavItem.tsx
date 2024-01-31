@@ -31,10 +31,11 @@ const NavItem = ({
           padding: 'medium',
           borderRadius: 'medium',
           distribute: 'space-between',
+          gapX: 'medium',
         }}
       >
-        <Box>
-          <Box css={{ font: 'subheading' }}>{label}</Box>
+        <Box css={{ stack: 'y', gapY: 'xsmall' }}>
+          <Box css={{ font: 'subheading', fontWeight: 'bold' }}>{label}</Box>
           {description && <Box css={{ font: 'caption' }}>{description}</Box>}
         </Box>
         <Box>
