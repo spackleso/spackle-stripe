@@ -85,8 +85,7 @@ export type PricingTableProduct = NewPricingTableProduct & {
   id: number
 }
 
-export type PricingTableUpdateData = {
-  id: string
+export type PricingTableCreateData = {
   monthly_enabled: boolean
   annual_enabled: boolean
   pricing_table_products: {
@@ -95,4 +94,8 @@ export type PricingTableUpdateData = {
     monthly_stripe_price_id: string | null
     annual_stripe_price_id: string | null
   }[]
+}
+
+export type PricingTableUpdateData = PricingTableCreateData & {
+  id: string
 }

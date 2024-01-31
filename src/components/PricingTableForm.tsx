@@ -2,6 +2,7 @@ import { Box, Button, FocusView } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
   PricingTable,
+  PricingTableCreateData,
   PricingTableProduct,
   PricingTableUpdateData,
 } from '../types'
@@ -28,7 +29,7 @@ type PricingTableFormProps = {
   savePricingTable: UseMutationResult<
     void,
     unknown,
-    PricingTableUpdateData,
+    PricingTableCreateData | PricingTableUpdateData,
     unknown
   >
 }

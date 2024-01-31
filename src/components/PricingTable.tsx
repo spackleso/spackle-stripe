@@ -6,7 +6,11 @@ import {
   Inline,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
-import { PricingTable, PricingTableUpdateData } from '../types'
+import {
+  PricingTable,
+  PricingTableCreateData,
+  PricingTableUpdateData,
+} from '../types'
 import PricingTablesProductList from './PricingTablesProductList'
 import { useEffect } from 'react'
 import PricingTableForm from './PricingTableForm'
@@ -45,7 +49,9 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
   }, [])
 
   const savePricingTable = useMutation({
-    mutationFn: async (data: PricingTableUpdateData) => {
+    mutationFn: async (
+      data: PricingTableCreateData | PricingTableUpdateData,
+    ) => {
       const response = await post(`/stripe/update_pricing_table`, data)
       if (!response.ok) {
         const { error } = await response.json()
