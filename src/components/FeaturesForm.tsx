@@ -18,14 +18,10 @@ import { queryClient } from '../query'
 import useStripeContext from '../hooks/useStripeContext'
 import { useMutation } from '@tanstack/react-query'
 import { sortFeatures } from '../utils'
+import { useFeaturesForm } from '../contexts/FeaturesFormContext'
 
-const FeaturesForm = ({
-  shown,
-  setShown,
-}: {
-  shown: boolean
-  setShown: (val: boolean) => void
-}) => {
+const FeaturesForm = () => {
+  const { isShowingFeaturesForm, setIsShowingFeaturesForm } = useFeaturesForm()
   const { userContext } = useStripeContext()
   const [isShowingNewForm, setIsShowingNewForm] = useState<boolean>(false)
   const { data: features, isLoading } = useAccountFeatures(
@@ -85,12 +81,12 @@ const FeaturesForm = ({
   return (
     <FocusView
       title={'Features'}
-      shown={shown}
+      shown={isShowingFeaturesForm}
       setShown={(val) => {
         if (!val) {
           setIsShowingNewForm(false)
         }
-        setShown(val)
+        setIsShowingFeaturesForm(val)
       }}
     >
       {isShowingNewForm ? (

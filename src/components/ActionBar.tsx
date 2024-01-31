@@ -1,8 +1,10 @@
 import { Box, Button, Icon, Link } from '@stripe/ui-extension-sdk/ui'
-import useNavigation from '../hooks/useNavigation'
+import { useFeaturesForm } from '../contexts/FeaturesFormContext'
+import useNavigation from '../contexts/NavigationContext'
 
 const ActionBar = () => {
   const { navigate, navState } = useNavigation()
+  const { setIsShowingFeaturesForm } = useFeaturesForm()
 
   if (navState.key === 'home') {
     return null

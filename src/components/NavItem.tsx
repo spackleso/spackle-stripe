@@ -21,6 +21,7 @@ const NavItem = ({
       }}
       href={href}
       onPress={onPress}
+      target={external ? '_blank' : undefined}
     >
       <Box
         css={{

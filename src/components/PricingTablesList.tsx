@@ -1,5 +1,5 @@
 import { Box, Button, Icon } from '@stripe/ui-extension-sdk/ui'
-import useNavigation from '../hooks/useNavigation'
+import useNavigation from '../contexts/NavigationContext'
 import { PricingTable } from '../types'
 import NavItem from './NavItem'
 

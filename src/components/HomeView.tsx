@@ -1,5 +1,5 @@
 import { Box } from '@stripe/ui-extension-sdk/ui'
-import useNavigation from '../hooks/useNavigation'
+import useNavigation from '../contexts/NavigationContext'
 import NavItem from './NavItem'
 
 const HomeView = () => {
