@@ -32,12 +32,14 @@ type PricingTableFormProps = {
     PricingTableCreateData | PricingTableUpdateData,
     unknown
   >
+  deletePricingTable?: UseMutationResult<void, unknown, string, unknown>
 }
 
 const PricingTableForm = ({
   pricingTable,
   pricingTableProducts,
   savePricingTable,
+  deletePricingTable,
 }: PricingTableFormProps) => {
   const { isShowingPricingTableForm, setIsShowingPricingTableForm } =
     usePricingTableForm()
@@ -51,6 +53,7 @@ const PricingTableForm = ({
     useState<(PricingTableProduct | NewPricingTableProduct)[]>([
       ...pricingTableProducts,
     ])
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const resetForm = useCallback(() => {
     setUpdatedPricingTable(pricingTable)
@@ -130,26 +133,68 @@ const PricingTableForm = ({
           Cancel
         </Button>
       }
+      footerContent={
+        deletePricingTable && (
+          <Button type="destructive" onPress={() => setIsDeleting(true)}>
+            Delete
+          </Button>
+        )
+      }
     >
-      <Box css={{ stack: 'y', gapY: 'xlarge' }}>
-        <PricingTableFormSettings
-          pricingTable={updatedPricingTable}
-          setUpdatedPricingTable={setUpdatedPricingTable}
-        />
-        <PricingTableFormProducts
-          error={savePricingTable.error as Error | undefined}
-          pricingTable={updatedPricingTable}
-          pricingTableProducts={updatedPricingTableProducts}
-          setPricingTableProducts={setUpdatedPricingTableProducts}
-        />
-        {pricingTable.id && (
-          <PricingTableFormIntegrate
+      {isDeleting ? (
+        <Box css={{ stack: 'x', paddingTop: 'large' }}>
+          <Box
+            css={{
+              stack: 'y',
+              keyline: 'neutral',
+              padding: 'large',
+              borderRadius: 'medium',
+              gapY: 'large',
+            }}
+          >
+            <Box css={{ font: 'heading', textAlign: 'center' }}>
+              Are you sure you want to delete{' '}
+              {pricingTable.name ? pricingTable.name : 'Pricing Table'}?
+            </Box>
+            <Box
+              css={{
+                stack: 'x',
+                alignY: 'center',
+                alignX: 'center',
+                gapX: 'medium',
+              }}
+            >
+              <Button
+                type="destructive"
+                onPress={() => deletePricingTable?.mutate(pricingTable.id)}
+              >
+                Delete
+              </Button>
+              <Button onPress={() => setIsDeleting(false)}>Cancel</Button>
+            </Box>
+          </Box>
+        </Box>
+      ) : (
+        <Box css={{ stack: 'y', gapY: 'xlarge' }}>
+          <PricingTableFormSettings
             pricingTable={updatedPricingTable}
-            secretToken={secretToken?.token}
-            publishableToken={publishableToken?.token}
+            setUpdatedPricingTable={setUpdatedPricingTable}
           />
-        )}
-      </Box>
+          <PricingTableFormProducts
+            error={savePricingTable.error as Error | undefined}
+            pricingTable={updatedPricingTable}
+            pricingTableProducts={updatedPricingTableProducts}
+            setPricingTableProducts={setUpdatedPricingTableProducts}
+          />
+          {pricingTable.id && (
+            <PricingTableFormIntegrate
+              pricingTable={updatedPricingTable}
+              secretToken={secretToken?.token}
+              publishableToken={publishableToken?.token}
+            />
+          )}
+        </Box>
+      )}
     </FocusView>
   )
 }

@@ -70,6 +70,22 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
     },
   })
 
+  const deletePricingTable = useMutation({
+    mutationFn: async (
+      data: PricingTableCreateData | PricingTableUpdateData,
+    ) => {
+      const response = await post(`/stripe/delete_pricing_table`, data)
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(error)
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTables', userContext.account.id],
+      })
+      setIsShowingPricingTableForm(false)
+    },
+  })
+
   if (isLoading || isRefetching || !pricingTableProducts) {
     return (
       <Box
@@ -161,6 +177,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
         pricingTable={pricingTable}
         pricingTableProducts={pricingTableProducts}
         savePricingTable={savePricingTable}
+        deletePricingTable={deletePricingTable}
       />
     </Box>
   )
