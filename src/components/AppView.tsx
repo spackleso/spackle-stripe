@@ -1,6 +1,5 @@
 import { ContextView } from '@stripe/ui-extension-sdk/ui'
 import BrandIcon from '../views/icon.svg'
-import { useState } from 'react'
 import FeaturesForm from './FeaturesForm'
 import PricingTablesView from './PricingTablesView'
 import EntitlementsView from './EntitlementsView'
@@ -11,21 +10,13 @@ import PricingTableView from './PricingTableView'
 
 const AppView = () => {
   const { navState } = useNavigation()
-  const [isShowingPricingTableForm, setIsShowingPricingTableForm] =
-    useState(false)
 
   return (
     <ContextView
       title="Spackle"
       brandColor="#FFFFFF"
       brandIcon={BrandIcon}
-      actions={
-        navState.key !== 'home' && (
-          <ActionBar
-            setIsShowingPricingTableForm={setIsShowingPricingTableForm}
-          />
-        )
-      }
+      actions={navState.key !== 'home' && <ActionBar />}
     >
       {navState.key === 'home' ? (
         <HomeView />

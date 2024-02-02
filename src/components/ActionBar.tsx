@@ -19,15 +19,27 @@ const ActionBar = () => {
         distribute: 'space-between',
       }}
     >
-      <Link
-        type="secondary"
-        onPress={() => navigate({ key: 'home', param: '' })}
-      >
-        <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-          <Icon name="arrowLeft" size="xsmall" />
-          <Icon name="home" />
-        </Box>
-      </Link>
+      {navState.key === 'pricingTable' ? (
+        <Link
+          type="secondary"
+          onPress={() => navigate({ key: 'pricingTables', param: '' })}
+        >
+          <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+            <Icon name="arrowLeft" size="xsmall" />
+            <Box>Pricing Tables</Box>
+          </Box>
+        </Link>
+      ) : (
+        <Link
+          type="secondary"
+          onPress={() => navigate({ key: 'home', param: '' })}
+        >
+          <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+            <Icon name="arrowLeft" size="xsmall" />
+            <Icon name="home" size="small" />
+          </Box>
+        </Link>
+      )}
       {navState.key.startsWith('pricingTable') && (
         <Button
           type="secondary"

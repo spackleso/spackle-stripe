@@ -85,7 +85,9 @@ const PricingTableForm = ({
 
   return (
     <FocusView
-      confirmCloseMessages={isModified ? confirmCloseMessages : undefined}
+      confirmCloseMessages={
+        pricingTable.id && isModified ? confirmCloseMessages : undefined
+      }
       shown={isShowingPricingTableForm}
       setShown={(val) => {
         if (!val) {
@@ -140,11 +142,13 @@ const PricingTableForm = ({
           pricingTableProducts={updatedPricingTableProducts}
           setPricingTableProducts={setUpdatedPricingTableProducts}
         />
-        <PricingTableFormIntegrate
-          pricingTable={updatedPricingTable}
-          secretToken={secretToken?.token}
-          publishableToken={publishableToken?.token}
-        />
+        {pricingTable.id && (
+          <PricingTableFormIntegrate
+            pricingTable={updatedPricingTable}
+            secretToken={secretToken?.token}
+            publishableToken={publishableToken?.token}
+          />
+        )}
       </Box>
     </FocusView>
   )

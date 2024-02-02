@@ -40,7 +40,7 @@ const PricingTablesList = ({ pricingTables }: Props) => {
   })
 
   return (
-    <Box css={{ stack: 'y', gapY: 'large' }}>
+    <Box css={{ stack: 'y', gapY: 'medium' }}>
       <Box css={{ stack: 'x', distribute: 'space-between', alignY: 'center' }}>
         <Box css={{ font: 'heading' }}>Pricing Tables</Box>
         <Button

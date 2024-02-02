@@ -126,8 +126,8 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
                 alignY: 'center',
               }}
             >
-              <Icon name="edit"></Icon>
-              Edit
+              <Icon name="settings"></Icon>
+              Configure
             </Box>
           </Button>
         </Box>
