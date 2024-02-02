@@ -71,10 +71,8 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
   })
 
   const deletePricingTable = useMutation({
-    mutationFn: async (
-      data: PricingTableCreateData | PricingTableUpdateData,
-    ) => {
-      const response = await post(`/stripe/delete_pricing_table`, data)
+    mutationFn: async (id: string) => {
+      const response = await post(`/stripe/delete_pricing_table`, { id })
       if (!response.ok) {
         const { error } = await response.json()
         throw new Error(error)
