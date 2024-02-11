@@ -34,7 +34,6 @@ const EntitlementsView = () => {
       css={{
         stack: 'y',
         gapY: 'large',
-        marginTop: 'large',
       }}
     >
       <Box

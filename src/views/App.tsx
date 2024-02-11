@@ -5,6 +5,9 @@ import { ApiContext, createApi } from '../hooks/useApi'
 import AccountWrapper from '../components/AccountWrapper'
 import { queryClient } from '../query'
 import AppView from '../components/AppView'
+import { FeaturesFormProvider } from '../contexts/FeaturesFormContext'
+import { NavigationProvider } from '../contexts/NavigationContext'
+import { PricingTableFormProvider } from '../contexts/PricingTableFormContext'
 
 const App = (context: ExtensionContextValue) => {
   return (
@@ -13,7 +16,13 @@ const App = (context: ExtensionContextValue) => {
         <StripeContext.Provider value={context}>
           <ApiContext.Provider value={createApi(context)}>
             <AccountWrapper>
-              <AppView />
+              <NavigationProvider>
+                <FeaturesFormProvider>
+                  <PricingTableFormProvider>
+                    <AppView />
+                  </PricingTableFormProvider>
+                </FeaturesFormProvider>
+              </NavigationProvider>
             </AccountWrapper>
           </ApiContext.Provider>
         </StripeContext.Provider>

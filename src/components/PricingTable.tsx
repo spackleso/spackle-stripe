@@ -6,16 +6,27 @@ import {
   Inline,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui'
-import { PricingTable } from '../types'
+import {
+  PricingTable,
+  PricingTableCreateData,
+  PricingTableUpdateData,
+} from '../types'
 import PricingTablesProductList from './PricingTablesProductList'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import PricingTableForm from './PricingTableForm'
 import usePricingTableProducts from '../hooks/usePricingTableProducts'
 import useApi from '../hooks/useApi'
+import { usePricingTableForm } from '../contexts/PricingTableFormContext'
+import { queryClient } from '../query'
+import { useMutation } from '@tanstack/react-query'
+import useStripeContext from '../hooks/useStripeContext'
+import useNavigation from '../contexts/NavigationContext'
 
 const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
   const { post } = useApi()
-  const [showForm, setShowForm] = useState(false)
+  const navigation = useNavigation()
+  const { userContext } = useStripeContext()
+  const { setIsShowingPricingTableForm } = usePricingTableForm()
 
   const {
     data: pricingTableProducts,
@@ -23,6 +34,7 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
     isRefetching,
   } = usePricingTableProducts(pricingTable.id)
 
+  // TODO: move these to the navigation hook
   useEffect(() => {
     const track = async () => {
       await post('/stripe/identify', {
@@ -37,6 +49,46 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
     }
     track()
   }, [])
+
+  const savePricingTable = useMutation({
+    mutationFn: async (
+      data: PricingTableCreateData | PricingTableUpdateData,
+    ) => {
+      const response = await post(`/stripe/update_pricing_table`, data)
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(error)
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTables', userContext.account.id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTable', pricingTable.id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTableProducts', pricingTable.id],
+      })
+      setIsShowingPricingTableForm(false)
+    },
+  })
+
+  const deletePricingTable = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await post(`/stripe/delete_pricing_table`, { id })
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(error)
+      }
+      queryClient.invalidateQueries({
+        queryKey: ['pricingTables', userContext.account.id],
+      })
+      setIsShowingPricingTableForm(false)
+      navigation.navigate({
+        key: 'pricingTables',
+        param: '',
+      })
+    },
+  })
 
   if (isLoading || isRefetching || !pricingTableProducts) {
     return (
@@ -69,11 +121,21 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
           distribute: 'space-between',
         }}
       >
+        <Box
+          css={{ font: 'heading', stack: 'x', gapX: 'small', alignY: 'center' }}
+        >
+          {pricingTable.name}
+          {pricingTable.mode === 0 ? (
+            <Badge type="info">Live</Badge>
+          ) : (
+            <Badge type="warning">Test</Badge>
+          )}
+        </Box>
         <Box css={{ stack: 'x', gapX: 'small' }}>
           <Button
-            type="secondary"
+            type="primary"
             size="small"
-            onPress={() => setShowForm(true)}
+            onPress={() => setIsShowingPricingTableForm(true)}
             css={{ width: 'fill' }}
           >
             <Box
@@ -84,24 +146,15 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
                 alignY: 'center',
               }}
             >
-              <Icon name="edit"></Icon>
-              Edit
+              <Icon name="settings"></Icon>
+              Configure
             </Box>
           </Button>
-        </Box>
-        <Box>
-          {pricingTable.mode === 0 ? (
-            <Badge type="info">Live</Badge>
-          ) : (
-            <Badge type="warning">Test</Badge>
-          )}
         </Box>
       </Box>
 
       <Box css={{ stack: 'y', gapY: 'small' }}>
-        <Box css={{ font: 'heading', fontWeight: 'bold' }}>
-          Pricing Table Products
-        </Box>
+        <Box css={{ font: 'subheading', fontWeight: 'bold' }}>Products</Box>
         {pricingTableProducts.length ? (
           <PricingTablesProductList
             pricingTable={pricingTable}
@@ -127,8 +180,8 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
       <PricingTableForm
         pricingTable={pricingTable}
         pricingTableProducts={pricingTableProducts}
-        shown={showForm}
-        setShown={setShowForm}
+        savePricingTable={savePricingTable}
+        deletePricingTable={deletePricingTable}
       />
     </Box>
   )

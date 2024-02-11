@@ -1,5 +1,17 @@
 import Stripe from 'stripe'
 
+export type NavKey =
+  | 'home'
+  | 'pricingTables'
+  | 'entitlements'
+  | 'settings'
+  | 'pricingTable'
+
+export type NavState = {
+  key: NavKey
+  param: string
+}
+
 export enum FeatureType {
   Flag = 0,
   Limit = 1,
@@ -71,4 +83,19 @@ export type NewPricingTableProduct = {
 
 export type PricingTableProduct = NewPricingTableProduct & {
   id: number
+}
+
+export type PricingTableCreateData = {
+  monthly_enabled: boolean
+  annual_enabled: boolean
+  pricing_table_products: {
+    id?: number
+    product_id: string
+    monthly_stripe_price_id: string | null
+    annual_stripe_price_id: string | null
+  }[]
+}
+
+export type PricingTableUpdateData = PricingTableCreateData & {
+  id: string
 }

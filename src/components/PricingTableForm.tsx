@@ -1,34 +1,20 @@
-import {
-  Box,
-  Button,
-  FocusView,
-  FormFieldGroup,
-  Icon,
-  Spinner,
-  Switch,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TextArea,
-  TextField,
-} from '@stripe/ui-extension-sdk/ui'
+import { Box, Button, FocusView } from '@stripe/ui-extension-sdk/ui'
 import {
   NewPricingTableProduct,
   PricingTable,
+  PricingTableCreateData,
   PricingTableProduct,
+  PricingTableUpdateData,
 } from '../types'
 import { useCallback, useState } from 'react'
-import PricingTablesProductList from './PricingTablesProductList'
-import PricingTableAddProductForm from './PricingTableProductCreateForm'
-import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
-import { useMutation } from '@tanstack/react-query'
-import { queryClient } from '../query'
+import { UseMutationResult } from '@tanstack/react-query'
 import useToken from '../hooks/useToken'
-import { clipboardWriteText, showToast } from '@stripe/ui-extension-sdk/utils'
 import usePublishableToken from '../hooks/usePublishableToken'
+import PricingTableFormSettings from './PricingTableFormSettings'
+import PricingTableFormProducts from './PricingTableFormProducts'
+import PricingTableFormIntegrate from './PricingTableFormIntegrate'
+import { usePricingTableForm } from '../contexts/PricingTableFormContext'
 
 const confirmCloseMessages = {
   title: 'Your pricing table will not be saved',
@@ -37,30 +23,26 @@ const confirmCloseMessages = {
   exitAction: 'Exit',
 }
 
-type PricingTableUpdateData = {
-  id: string
-  monthly_enabled: boolean
-  annual_enabled: boolean
-  pricing_table_products: {
-    id?: number
-    product_id: string
-    monthly_stripe_price_id: string | null
-    annual_stripe_price_id: string | null
-  }[]
+type PricingTableFormProps = {
+  pricingTable: PricingTable
+  pricingTableProducts: PricingTableProduct[]
+  savePricingTable: UseMutationResult<
+    void,
+    unknown,
+    PricingTableCreateData | PricingTableUpdateData,
+    unknown
+  >
+  deletePricingTable?: UseMutationResult<void, unknown, string, unknown>
 }
 
 const PricingTableForm = ({
   pricingTable,
   pricingTableProducts,
-  shown,
-  setShown,
-}: {
-  pricingTable: PricingTable
-  pricingTableProducts: PricingTableProduct[]
-  shown: boolean
-  setShown: (val: boolean) => void
-}) => {
-  const { post } = useApi()
+  savePricingTable,
+  deletePricingTable,
+}: PricingTableFormProps) => {
+  const { isShowingPricingTableForm, setIsShowingPricingTableForm } =
+    usePricingTableForm()
   const { userContext } = useStripeContext()
   const { data: secretToken } = useToken(userContext.account.id)
   const { data: publishableToken } = usePublishableToken(userContext.account.id)
@@ -71,24 +53,7 @@ const PricingTableForm = ({
     useState<(PricingTableProduct | NewPricingTableProduct)[]>([
       ...pricingTableProducts,
     ])
-  const [confirmClose, setConfirmClose] = useState<boolean>(true)
-
-  const savePricingTable = useMutation({
-    mutationFn: async (data: PricingTableUpdateData) => {
-      const response = await post(`/stripe/update_pricing_table`, data)
-      if (!response.ok) {
-        const { error } = await response.json()
-        throw new Error(error)
-      }
-      queryClient.invalidateQueries({
-        queryKey: ['pricingTables', userContext.account.id],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['pricingTableProducts', pricingTable.id],
-      })
-      closeWithoutConfirm()
-    },
-  })
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const resetForm = useCallback(() => {
     setUpdatedPricingTable(pricingTable)
@@ -96,16 +61,11 @@ const PricingTableForm = ({
   }, [pricingTable, pricingTableProducts])
 
   const closeWithConfirm = useCallback(() => {
-    setShown(false)
-  }, [setShown])
-
-  const closeWithoutConfirm = useCallback(() => {
-    setConfirmClose(false)
-    setShown(false)
-    resetForm()
-  }, [setShown, setConfirmClose, resetForm])
+    setIsShowingPricingTableForm(false)
+  }, [setIsShowingPricingTableForm])
 
   const isModified = !(
+    updatedPricingTable.name === pricingTable.name &&
     updatedPricingTable.monthly_enabled === pricingTable.monthly_enabled &&
     updatedPricingTable.annual_enabled === pricingTable.annual_enabled &&
     updatedPricingTableProducts.length === pricingTableProducts.length &&
@@ -126,349 +86,121 @@ const PricingTableForm = ({
     })
   )
 
-  const curlCode = `
-curl https://api.spackle.so/v1/pricing_tables/${pricingTable.id} \\
-  -H 'Content-Type: application/json' \\
-  -H 'Authorization: Bearer ${publishableToken?.token}'
-`.trim()
-
-  const browserCode = `
-fetch('https://api.spackle.so/v1/pricing_tables/${pricingTable.id}', {
-    headers: {
-        Authorization: 'Bearer ${publishableToken?.token}',
-    }
-})
-`.trim()
-
-  const nodeCode = `
-// Warning this uses your secret token, do not share this with anyone!
-import Spackle from 'spackle-node';
-const spackle = new Spackle('${secretToken?.token}')
-await spackle.pricingTables.retrieve('${pricingTable.id}')
-`.trim()
-
-  const phpCode = `
-<?php
-// Warning this uses your secret token, do not share this with anyone!
-require_once('vendor/autoload.php');
-\\Spackle\\Spackle::setApiKey('${secretToken?.token}');
-\\Spackle\\PricingTable::retrieve('${pricingTable.id}');
-?>
-`.trim()
-
-  const pythonCode = `
-# Warning this uses your secret token, do not share this with anyone!
-import spacklek
-spackle.api_key = '${secretToken?.token}'
-spackle.PricingTable.retrieve('${pricingTable.id}')
-`.trim()
-
-  const rubyCode = `
-# Warning this uses your secret token, do not share this with anyone!
-require 'spackle'
-Spackle.api_key = "${secretToken?.token}"
-Spackle::PricingTable.retrieve('${pricingTable.id}')
-`.trim()
-
   return (
     <FocusView
       confirmCloseMessages={
-        confirmClose && isModified ? confirmCloseMessages : undefined
+        pricingTable.id && isModified ? confirmCloseMessages : undefined
       }
-      shown={shown}
+      shown={isShowingPricingTableForm}
       setShown={(val) => {
         if (!val) {
           resetForm()
         }
-        setShown(val)
+        setIsShowingPricingTableForm(val)
       }}
-      title={'Pricing Table'}
+      title={
+        pricingTable.name ? `Pricing Table: ${pricingTable.name}` : 'Untitled'
+      }
       primaryAction={
-        <Button
-          type="primary"
-          onPress={() => {
-            savePricingTable.mutate({
-              ...updatedPricingTable,
-              pricing_table_products: updatedPricingTableProducts.map((p) => ({
-                ...p,
-                monthly_stripe_price_id: p.monthly_stripe_price
-                  ? p.monthly_stripe_price.id
-                  : null,
-                annual_stripe_price_id: p.annual_stripe_price
-                  ? p.annual_stripe_price.id
-                  : null,
-                monthly_stripe_price: undefined,
-                annual_stripe_price: undefined,
-              })),
-            })
-          }}
-          disabled={!isModified || savePricingTable.isLoading}
-        >
-          Save
-        </Button>
+        !isDeleting ? (
+          <Button
+            type="primary"
+            onPress={() => {
+              savePricingTable.mutate({
+                ...updatedPricingTable,
+                pricing_table_products: updatedPricingTableProducts.map(
+                  (p) => ({
+                    ...p,
+                    monthly_stripe_price_id: p.monthly_stripe_price
+                      ? p.monthly_stripe_price.id
+                      : null,
+                    annual_stripe_price_id: p.annual_stripe_price
+                      ? p.annual_stripe_price.id
+                      : null,
+                    monthly_stripe_price: undefined,
+                    annual_stripe_price: undefined,
+                  }),
+                ),
+              })
+            }}
+            disabled={!isModified || savePricingTable.isLoading}
+          >
+            Save
+          </Button>
+        ) : undefined
       }
       secondaryAction={
-        <Button
-          onPress={closeWithConfirm}
-          disabled={savePricingTable.isLoading}
-        >
-          Cancel
-        </Button>
+        !isDeleting ? (
+          <Button
+            onPress={closeWithConfirm}
+            disabled={savePricingTable.isLoading}
+          >
+            Cancel
+          </Button>
+        ) : undefined
+      }
+      footerContent={
+        deletePricingTable && !isDeleting ? (
+          <Button type="destructive" onPress={() => setIsDeleting(true)}>
+            Delete
+          </Button>
+        ) : undefined
       }
     >
-      <Box css={{ stack: 'y', gapY: 'xlarge' }}>
-        <Box>
-          <Box css={{ font: 'heading', marginBottom: 'medium' }}>Settings</Box>
-          <FormFieldGroup
-            legend="Intervals"
-            description="Choose the billing intervals customers can select from your pricing table. Only monthly and annual intervals are supported at this time."
-            layout="column"
-          >
-            <Switch
-              label="Monthly"
-              defaultChecked={updatedPricingTable.monthly_enabled}
-              onChange={(e) => {
-                setUpdatedPricingTable({
-                  ...updatedPricingTable,
-                  monthly_enabled: e.target.checked,
-                })
-              }}
-            />
-            <Switch
-              label="Annual"
-              defaultChecked={updatedPricingTable.annual_enabled}
-              onChange={(e) => {
-                setUpdatedPricingTable({
-                  ...updatedPricingTable,
-                  annual_enabled: e.target.checked,
-                })
-              }}
-            />
-          </FormFieldGroup>
-        </Box>
-
-        <Box>
-          <Box css={{ font: 'heading' }}>Products</Box>
+      {isDeleting ? (
+        <Box css={{ stack: 'x', paddingTop: 'large' }}>
           <Box
             css={{
-              font: 'caption',
-              color: 'secondary',
-              marginBottom: 'medium',
+              stack: 'y',
+              keyline: 'neutral',
+              padding: 'large',
+              borderRadius: 'medium',
+              gapY: 'large',
             }}
           >
-            These are the products that will be displayed in your pricing table
-            with their associated features. Example: Basic, Premium, Pro
-          </Box>
-
-          {(savePricingTable.error as Error | undefined)?.message && (
-            <Box
-              css={{
-                color: 'critical',
-                fontWeight: 'semibold',
-                textAlign: 'center',
-              }}
-            >
-              {(savePricingTable.error as Error).message}
+            <Box css={{ font: 'heading', textAlign: 'center' }}>
+              Are you sure you want to delete{' '}
+              {pricingTable.name ? pricingTable.name : 'Pricing Table'}?
             </Box>
-          )}
-
-          <PricingTablesProductList
-            pricingTable={updatedPricingTable}
-            pricingTableProducts={updatedPricingTableProducts}
-            isEditable={true}
-            setPricingTableProducts={setUpdatedPricingTableProducts}
-          />
-          <PricingTableAddProductForm
-            monthlyEnabled={updatedPricingTable.monthly_enabled}
-            annualEnabled={updatedPricingTable.annual_enabled}
-            pricingTableProducts={updatedPricingTableProducts}
-            setPricingTableProducts={setUpdatedPricingTableProducts}
-          />
-        </Box>
-        <Box>
-          <Box css={{ font: 'heading' }}>Integrate</Box>
-          <Box
-            css={{
-              font: 'caption',
-              color: 'secondary',
-              marginBottom: 'medium',
-            }}
-          >
-            Use the Spackle SDKs to retrieve your pricing table. Read the docs
-            for full integration details.
-          </Box>
-          <Box
-            css={{
-              stack: 'x',
-              alignY: 'bottom',
-              gapX: 'small',
-              marginY: 'small',
-            }}
-          >
-            <TextField
-              disabled
-              value={pricingTable.id}
-              label="Table ID"
-              size="small"
-            />
-            <Button
-              size="small"
-              onPress={async () => {
-                await clipboardWriteText(pricingTable.id)
-                showToast('Copied to clipboard')
-              }}
-            >
-              <Icon name="clipboard" />
-            </Button>
-          </Box>
-          {secretToken && publishableToken ? (
-            <Tabs size="small">
-              <TabList>
-                <Tab tabKey="curl">cURL</Tab>
-                <Tab tabKey="browser">Browser</Tab>
-                <Tab tabKey="nodejs">Node.js</Tab>
-                <Tab tabKey="php">PHP</Tab>
-                <Tab tabKey="python">Python</Tab>
-                <Tab tabKey="ruby">Ruby</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel tabKey="curl">
-                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
-                    <TextArea
-                      defaultValue={curlCode}
-                      disabled={true}
-                      resizeable={false}
-                      rows={3}
-                      wrap="off"
-                    />
-                    <Button
-                      onPress={async () => {
-                        await clipboardWriteText(curlCode)
-                        showToast('Copied to clipboard')
-                      }}
-                    >
-                      <Icon name="clipboard" />
-                      Copy
-                    </Button>
-                  </Box>
-                </TabPanel>
-                <TabPanel tabKey="browser">
-                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
-                    <TextArea
-                      defaultValue={browserCode}
-                      disabled={true}
-                      resizeable={false}
-                      rows={5}
-                      wrap="off"
-                    />
-                    <Button
-                      onPress={async () => {
-                        await clipboardWriteText(browserCode)
-                        showToast('Copied to clipboard')
-                      }}
-                    >
-                      <Icon name="clipboard" />
-                      Copy
-                    </Button>
-                  </Box>
-                </TabPanel>
-                <TabPanel tabKey="nodejs">
-                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
-                    <TextArea
-                      defaultValue={nodeCode}
-                      disabled={true}
-                      resizeable={false}
-                      rows={4}
-                      wrap="off"
-                    />
-                    <Button
-                      onPress={async () => {
-                        await clipboardWriteText(nodeCode)
-                        showToast('Copied to clipboard')
-                      }}
-                    >
-                      <Icon name="clipboard" />
-                      Copy
-                    </Button>
-                  </Box>
-                </TabPanel>
-                <TabPanel tabKey="php">
-                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
-                    <TextArea
-                      defaultValue={phpCode}
-                      disabled={true}
-                      resizeable={false}
-                      rows={6}
-                      wrap="off"
-                    />
-                    <Button
-                      onPress={async () => {
-                        await clipboardWriteText(phpCode)
-                        showToast('Copied to clipboard')
-                      }}
-                    >
-                      <Icon name="clipboard" />
-                      Copy
-                    </Button>
-                  </Box>
-                </TabPanel>
-                <TabPanel tabKey="python">
-                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
-                    <TextArea
-                      defaultValue={pythonCode}
-                      disabled={true}
-                      resizeable={false}
-                      rows={4}
-                      wrap="off"
-                    />
-                    <Button
-                      onPress={async () => {
-                        await clipboardWriteText(pythonCode)
-                        showToast('Copied to clipboard')
-                      }}
-                    >
-                      <Icon name="clipboard" />
-                      Copy
-                    </Button>
-                  </Box>
-                </TabPanel>
-                <TabPanel tabKey="ruby">
-                  <Box css={{ paddingY: 'small', stack: 'y', gapY: 'small' }}>
-                    <TextArea
-                      defaultValue={rubyCode}
-                      disabled={true}
-                      resizeable={false}
-                      rows={4}
-                      wrap="off"
-                    />
-                    <Button
-                      onPress={async () => {
-                        await clipboardWriteText(rubyCode)
-                        showToast('Copied to clipboard')
-                      }}
-                    >
-                      <Icon name="clipboard" />
-                      Copy
-                    </Button>
-                  </Box>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          ) : (
             <Box
               css={{
                 stack: 'x',
-                alignX: 'center',
                 alignY: 'center',
-                width: 'fill',
-                height: 'fill',
+                alignX: 'center',
+                gapX: 'medium',
               }}
             >
-              <Spinner />
+              <Button
+                type="destructive"
+                onPress={() => deletePricingTable?.mutate(pricingTable.id)}
+              >
+                Delete
+              </Button>
+              <Button onPress={() => setIsDeleting(false)}>Cancel</Button>
             </Box>
+          </Box>
+        </Box>
+      ) : (
+        <Box css={{ stack: 'y', gapY: 'xlarge' }}>
+          <PricingTableFormSettings
+            pricingTable={updatedPricingTable}
+            setUpdatedPricingTable={setUpdatedPricingTable}
+          />
+          <PricingTableFormProducts
+            error={savePricingTable.error as Error | undefined}
+            pricingTable={updatedPricingTable}
+            pricingTableProducts={updatedPricingTableProducts}
+            setPricingTableProducts={setUpdatedPricingTableProducts}
+          />
+          {pricingTable.id && (
+            <PricingTableFormIntegrate
+              pricingTable={updatedPricingTable}
+              secretToken={secretToken?.token}
+              publishableToken={publishableToken?.token}
+            />
           )}
         </Box>
-      </Box>
+      )}
     </FocusView>
   )
 }
