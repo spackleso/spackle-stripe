@@ -102,43 +102,49 @@ const PricingTableForm = ({
         pricingTable.name ? `Pricing Table: ${pricingTable.name}` : 'Untitled'
       }
       primaryAction={
-        <Button
-          type="primary"
-          onPress={() => {
-            savePricingTable.mutate({
-              ...updatedPricingTable,
-              pricing_table_products: updatedPricingTableProducts.map((p) => ({
-                ...p,
-                monthly_stripe_price_id: p.monthly_stripe_price
-                  ? p.monthly_stripe_price.id
-                  : null,
-                annual_stripe_price_id: p.annual_stripe_price
-                  ? p.annual_stripe_price.id
-                  : null,
-                monthly_stripe_price: undefined,
-                annual_stripe_price: undefined,
-              })),
-            })
-          }}
-          disabled={!isModified || savePricingTable.isLoading}
-        >
-          Save
-        </Button>
+        !isDeleting ? (
+          <Button
+            type="primary"
+            onPress={() => {
+              savePricingTable.mutate({
+                ...updatedPricingTable,
+                pricing_table_products: updatedPricingTableProducts.map(
+                  (p) => ({
+                    ...p,
+                    monthly_stripe_price_id: p.monthly_stripe_price
+                      ? p.monthly_stripe_price.id
+                      : null,
+                    annual_stripe_price_id: p.annual_stripe_price
+                      ? p.annual_stripe_price.id
+                      : null,
+                    monthly_stripe_price: undefined,
+                    annual_stripe_price: undefined,
+                  }),
+                ),
+              })
+            }}
+            disabled={!isModified || savePricingTable.isLoading}
+          >
+            Save
+          </Button>
+        ) : undefined
       }
       secondaryAction={
-        <Button
-          onPress={closeWithConfirm}
-          disabled={savePricingTable.isLoading}
-        >
-          Cancel
-        </Button>
+        !isDeleting ? (
+          <Button
+            onPress={closeWithConfirm}
+            disabled={savePricingTable.isLoading}
+          >
+            Cancel
+          </Button>
+        ) : undefined
       }
       footerContent={
-        deletePricingTable && (
+        deletePricingTable && !isDeleting ? (
           <Button type="destructive" onPress={() => setIsDeleting(true)}>
             Delete
           </Button>
-        )
+        ) : undefined
       }
     >
       {isDeleting ? (

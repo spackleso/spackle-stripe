@@ -20,9 +20,11 @@ import { usePricingTableForm } from '../contexts/PricingTableFormContext'
 import { queryClient } from '../query'
 import { useMutation } from '@tanstack/react-query'
 import useStripeContext from '../hooks/useStripeContext'
+import useNavigation from '../contexts/NavigationContext'
 
 const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
   const { post } = useApi()
+  const navigation = useNavigation()
   const { userContext } = useStripeContext()
   const { setIsShowingPricingTableForm } = usePricingTableForm()
 
@@ -81,6 +83,10 @@ const PricingTable = ({ pricingTable }: { pricingTable: PricingTable }) => {
         queryKey: ['pricingTables', userContext.account.id],
       })
       setIsShowingPricingTableForm(false)
+      navigation.navigate({
+        key: 'pricingTables',
+        param: '',
+      })
     },
   })
 
