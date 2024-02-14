@@ -16,7 +16,7 @@ const AppView = () => {
       title="Spackle"
       brandColor="#FFFFFF"
       brandIcon={BrandIcon}
-      actions={navState.key !== 'home' && <ActionBar />}
+      actions={<ActionBar />}
     >
       {navState.key === 'home' ? (
         <HomeView />

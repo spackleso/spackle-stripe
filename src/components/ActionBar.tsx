@@ -6,10 +6,6 @@ const ActionBar = () => {
   const { navigate, navState } = useNavigation()
   const { setIsShowingFeaturesForm } = useFeaturesForm()
 
-  if (navState.key === 'home') {
-    return null
-  }
-
   return (
     <Box
       css={{
@@ -19,7 +15,18 @@ const ActionBar = () => {
         distribute: 'space-between',
       }}
     >
-      {navState.key === 'pricingTable' ? (
+      <Link
+        type="secondary"
+        disabled={navState.key === 'home'}
+        onPress={() => navigate({ key: 'home', param: '' })}
+      >
+        <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+          <Icon name="arrowLeft" size="xsmall" />
+          <Icon name="home" size="small" />
+        </Box>
+      </Link>
+
+      {navState.key === 'pricingTable' && (
         <Link
           type="secondary"
           onPress={() => navigate({ key: 'pricingTables', param: '' })}
@@ -29,41 +36,31 @@ const ActionBar = () => {
             <Box>Pricing Tables</Box>
           </Box>
         </Link>
-      ) : (
-        <Link
-          type="secondary"
-          onPress={() => navigate({ key: 'home', param: '' })}
-        >
-          <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
-            <Icon name="arrowLeft" size="xsmall" />
-            <Icon name="home" size="small" />
-          </Box>
-        </Link>
       )}
-      {navState.key.startsWith('pricingTable') && (
+
+      <Box css={{ stack: 'x', gapX: 'small' }}>
         <Button
           type="secondary"
           size="small"
-          href="https://docs.spackle.so/pricing-tables"
-          target="_blank"
+          onPress={() => setIsShowingFeaturesForm(true)}
         >
-          Docs
-          <Icon name="external" size="xsmall" />
+          <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
+            <Icon name="settings" />
+            Manage Features
+          </Box>
         </Button>
-      )}
-      {navState.key === 'entitlements' && (
-        <Box css={{ stack: 'x', gapX: 'small' }}>
+        {navState.key.startsWith('pricingTable') && (
           <Button
             type="secondary"
             size="small"
-            onPress={() => setIsShowingFeaturesForm(true)}
+            href="https://docs.spackle.so/pricing-tables"
+            target="_blank"
           >
-            <Box css={{ stack: 'x', gapX: 'xsmall', alignY: 'center' }}>
-              <Icon name="settings" />
-              Manage Features
-            </Box>
+            Docs
+            <Icon name="external" size="xsmall" />
           </Button>
-
+        )}
+        {navState.key === 'entitlements' && (
           <Button
             type="secondary"
             size="small"
@@ -73,8 +70,8 @@ const ActionBar = () => {
             Docs
             <Icon name="external" size="xsmall" />
           </Button>
-        </Box>
-      )}
+        )}
+      </Box>
     </Box>
   )
 }
