@@ -100,7 +100,7 @@ const CustomerView = () => {
     return (
       <Box>
         {customerState.data.features.length ? (
-          <Box css={{ stack: 'y', gapY: 'large' }}>
+          <Box css={{ stack: 'y', gapY: 'medium' }}>
             <Box
               css={{
                 stack: 'x',
@@ -146,9 +146,11 @@ const CustomerView = () => {
                 </Box>
               </Button>
             </Box>
-            {customerState.data.features.sort(sortFeatures).map((f: any) => (
-              <EntitlementItem key={f.key} entitlement={f} />
-            ))}
+            <Box css={{ stack: 'y', gapY: 'small' }}>
+              {customerState.data.features.sort(sortFeatures).map((f: any) => (
+                <EntitlementItem key={f.key} entitlement={f} />
+              ))}
+            </Box>
           </Box>
         ) : (
           <Box

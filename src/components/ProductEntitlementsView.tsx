@@ -98,7 +98,7 @@ const ProductEntitlementsView = () => {
     return (
       <Box>
         {accountState.data.length ? (
-          <Box css={{ stack: 'y', gapY: 'large' }}>
+          <Box css={{ stack: 'y', gapY: 'medium' }}>
             <Box
               css={{
                 stack: 'x',
@@ -140,9 +140,11 @@ const ProductEntitlementsView = () => {
                 </Box>
               </Button>
             </Box>
-            {productState.data.sort(sortFeatures).map((f: any) => (
-              <EntitlementItem key={f.key} entitlement={f} />
-            ))}
+            <Box css={{ stack: 'y', gapY: 'small' }}>
+              {productState.data.sort(sortFeatures).map((f: any) => (
+                <EntitlementItem key={f.key} entitlement={f} />
+              ))}
+            </Box>
           </Box>
         ) : (
           <Box
