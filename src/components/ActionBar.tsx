@@ -15,25 +15,24 @@ const ActionBar = () => {
         distribute: 'space-between',
       }}
     >
-      <Link
-        type="secondary"
-        disabled={navState.key === 'home'}
-        onPress={() => navigate({ key: 'home', param: '' })}
-      >
-        <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
-          <Icon name="arrowLeft" size="xsmall" />
-          <Icon name="home" size="small" />
-        </Box>
-      </Link>
-
-      {navState.key === 'pricingTable' && (
+      {navState.key === 'pricingTable' ? (
         <Link
           type="secondary"
           onPress={() => navigate({ key: 'pricingTables', param: '' })}
         >
           <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
             <Icon name="arrowLeft" size="xsmall" />
-            <Box>Pricing Tables</Box>
+          </Box>
+        </Link>
+      ) : (
+        <Link
+          type="secondary"
+          disabled={navState.key === 'home'}
+          onPress={() => navigate({ key: 'home', param: '' })}
+        >
+          <Box css={{ stack: 'x', gapX: 'small', alignY: 'center' }}>
+            <Icon name="arrowLeft" size="xsmall" />
+            <Icon name="home" size="small" />
           </Box>
         </Link>
       )}
