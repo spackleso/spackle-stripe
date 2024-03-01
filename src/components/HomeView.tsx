@@ -24,7 +24,7 @@ const HomeView = () => {
       <Box css={{ font: 'heading' }}>Resources</Box>
       <NavItem
         label="Settings"
-        description="Configure your API keys, billing, and more."
+        description="Configure your API keys, billing, and more"
         href={'https://dashboard.stripe.com/settings/apps/so.spackle.stripe'}
       />
       <NavItem
