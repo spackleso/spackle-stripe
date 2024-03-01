@@ -103,11 +103,20 @@ const ConfigurationSettings = () => {
   )
 }
 
+interface MTR {
+  freeTierDollars: number
+  grossUsageDollars: number
+  netUsageDollars: number
+  mtr: number
+}
+
 const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
   const { environment, userContext } = useStripeContext()
+  const [mtr, setMtr] = useState<MTR | null>(null)
+  const host = environment.constants?.API_HOST ?? ''
+  const { post } = useApi()
   const item = entitlements.subscriptions[0].items.data[0]
   const price = item.price as any
-  const host = environment.constants?.API_HOST ?? ''
   const [sig, setSig] = useState('')
 
   useEffect(() => {
@@ -118,17 +127,28 @@ const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
     fetchParams()
   }, [])
 
+  useEffect(() => {
+    const fetchMtr = async () => {
+      const response = await post('/stripe/get_mtr', {})
+      const { mtr } = await response.json()
+      setMtr(mtr)
+    }
+
+    fetchMtr()
+  }, [post])
+
   return (
     <Box css={{ stack: 'y', gapY: 'small' }}>
       <Box>
         <Inline css={{ font: 'bodyEmphasized' }}>Current Plan:</Inline>{' '}
         <Inline>
-          ${price.unit_amount / 100} / {price.product.unit_label}
+          ${price.unit_amount / 100} per {price.product.unit_label} (first
+          $1,000 free)
         </Inline>
       </Box>
       <Box>
         <Inline css={{ font: 'bodyEmphasized' }}>Current MTR:</Inline>{' '}
-        <Inline>$0</Inline>
+        <Inline>${mtr ? mtr.grossUsageDollars : 0}</Inline>
       </Box>
       <Button
         type="primary"
