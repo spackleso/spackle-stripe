@@ -130,7 +130,7 @@ const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
   useEffect(() => {
     const fetchMtr = async () => {
       const response = await post('/stripe/get_mtr', {})
-      const { mtr } = await response.json()
+      const mtr = await response.json()
       setMtr(mtr)
     }
 
