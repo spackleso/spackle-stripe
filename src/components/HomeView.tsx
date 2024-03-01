@@ -1,4 +1,4 @@
-import { Box } from '@stripe/ui-extension-sdk/ui'
+import { Box, Divider } from '@stripe/ui-extension-sdk/ui'
 import useNavigation from '../contexts/NavigationContext'
 import NavItem from './NavItem'
 
@@ -7,6 +7,7 @@ const HomeView = () => {
 
   return (
     <Box css={{ stack: 'y', gapY: 'large' }}>
+      <Box css={{ font: 'heading' }}>Features</Box>
       <NavItem
         label="Pricing Tables"
         description="Create and manage pricing tables for new and returning customers"
@@ -18,6 +19,13 @@ const HomeView = () => {
         onPress={() => {
           navigate({ key: 'entitlements', param: '' })
         }}
+      />
+      <Divider />
+      <Box css={{ font: 'heading' }}>Resources</Box>
+      <NavItem
+        label="Settings"
+        description="Configure your Spackle settings"
+        href={'https://dashboard.stripe.com/settings/apps/so.spackle.stripe'}
       />
       <NavItem
         label="Documentation"
