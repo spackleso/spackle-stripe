@@ -1,10 +1,11 @@
 import { ExtensionContextValue } from '@stripe/ui-extension-sdk/context'
 import fetchStripeSignature from '@stripe/ui-extension-sdk/signature'
+import { NestableJSONValue } from '@stripe/ui-extension-sdk/types/util'
 import { getDashboardUserEmail } from '@stripe/ui-extension-sdk/utils'
 import { useContext, createContext } from 'react'
 
 interface Api {
-  post: (endpoint: string, requestData: any) => Promise<any>
+  post: (endpoint: string, requestData: NestableJSONValue) => Promise<Response>
 }
 
 export const ApiContext = createContext<Api | undefined>(undefined)
@@ -13,7 +14,7 @@ export const createApi = ({
   userContext,
   environment,
 }: ExtensionContextValue) => ({
-  post: async (endpoint: string, requestData: any) => {
+  post: async (endpoint: string, requestData: NestableJSONValue) => {
     let email: string | undefined
     try {
       const response = await getDashboardUserEmail()
@@ -24,9 +25,9 @@ export const createApi = ({
 
     const data = {
       ...requestData,
-      account_name: userContext.account.name,
-      user_email: email,
-      user_name: userContext.name,
+      account_name: userContext.account.name ?? null,
+      user_email: email ?? null,
+      user_name: userContext.name ?? null,
     }
 
     const body = JSON.stringify({
