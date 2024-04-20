@@ -76,7 +76,7 @@ const FeatureForm = ({
         label="Name"
         required={true}
         description="Name of the feature"
-        value={name}
+        defaultValue={name}
         placeholder="Priority Support"
         onChange={(e) => setName(e.target.value)}
       />
