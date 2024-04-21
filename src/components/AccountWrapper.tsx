@@ -1,14 +1,10 @@
 import { Box, Button, Spinner } from '@stripe/ui-extension-sdk/ui'
 import useAccount from '../hooks/useAccount'
-import { ReactNode, useEffect, useCallback } from 'react'
+import { ReactNode, useEffect } from 'react'
 import useApi from '../hooks/useApi'
 import useStripeContext from '../hooks/useStripeContext'
 import { useMutation } from '@tanstack/react-query'
 import { queryClient } from '../query'
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
 
 const LoadingSpinner = ({ children }: { children?: ReactNode }) => {
   return (
@@ -91,57 +87,13 @@ const SetupInterstitial = ({ account }: { account: any }) => {
 }
 
 const AccountWrapper = ({ children }: { children: ReactNode }) => {
-  const { post } = useApi()
   const { userContext } = useStripeContext()
-  const {
-    data: account,
-    refetch,
-    isLoading,
-  } = useAccount(userContext.account.id)
-
-  const startSync = useCallback(async () => {
-    await post('/stripe/sync_account', {})
-  }, [post])
-
-  const pollAccount = useCallback(async (): Promise<boolean> => {
-    await delay(3000)
-    const { data } = await refetch()
-
-    if (data.initial_sync_complete) {
-      return true
-    } else if (!data.initial_sync_started_at) {
-      await startSync()
-    } else {
-      const diff =
-        (new Date() as unknown as number) -
-        (new Date(data.initial_sync_started_at) as unknown as number)
-      if (diff > 15 * 60 * 1000) {
-        await startSync()
-      }
-    }
-
-    return await pollAccount()
-  }, [refetch, startSync])
-
-  useEffect(() => {
-    if (!account || !account.has_acknowledged_setup) {
-      return
-    }
-
-    if (!account.initial_sync_started_at) {
-      startSync()
-      pollAccount()
-    } else if (!account.initial_sync_complete) {
-      pollAccount()
-    }
-  }, [account, pollAccount, startSync])
+  const { data: account, isLoading } = useAccount(userContext.account.id)
 
   if (isLoading) {
     return <LoadingSpinner />
   } else if (!account.has_acknowledged_setup) {
     return <SetupInterstitial account={account} />
-  } else if (!account.initial_sync_complete) {
-    return <LoadingSpinner>Running initial setup...</LoadingSpinner>
   } else {
     return <>{children}</>
   }
