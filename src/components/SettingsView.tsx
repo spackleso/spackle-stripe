@@ -141,6 +141,18 @@ const CurrentPlan = ({
     fetchUsage()
   }, [post])
 
+  const formatUsage = useCallback(
+    (key: keyof Usage) => {
+      const value = usage?.[key]
+      if (value) {
+        return toHumanQuantity(value)
+      } else {
+        return '...'
+      }
+    },
+    [usage],
+  )
+
   const formatEntitlement = useCallback(
     (entitlement: string) => {
       const limit = entitlements.data?.limit(entitlement)
@@ -164,28 +176,27 @@ const CurrentPlan = ({
           <TableRow>
             <TableCell>Features</TableCell>
             <TableCell>
-              {usage?.numFeatures ?? '...'} /{' '}
-              {formatEntitlement('num_features')}
+              {formatUsage('numFeatures')} / {formatEntitlement('num_features')}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Entitlement Checks</TableCell>
             <TableCell>
-              {usage?.numEntitlementChecks ?? '...'} /{' '}
+              {formatUsage('numEntitlementChecks')} /{' '}
               {formatEntitlement('num_entitlement_checks')}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Pricing Tables</TableCell>
             <TableCell>
-              {usage?.numPricingTables ?? '...'} /{' '}
+              {formatUsage('numPricingTables')} /{' '}
               {formatEntitlement('num_pricing_tables')}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Users</TableCell>
             <TableCell>
-              {usage?.numUsers ?? '...'} / {formatEntitlement('num_users')}
+              {formatUsage('numUsers')} / {formatEntitlement('num_users')}
             </TableCell>
           </TableRow>
         </Table>
