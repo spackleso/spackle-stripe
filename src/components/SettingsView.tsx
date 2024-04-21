@@ -6,11 +6,7 @@ import {
   Link,
   Spinner,
   Table,
-  TableBody,
   TableCell,
-  TableFooter,
-  TableHead,
-  TableHeaderCell,
   TableRow,
   TextField,
 } from '@stripe/ui-extension-sdk/ui'
@@ -23,10 +19,14 @@ import {
 import useStripeContext from '../hooks/useStripeContext'
 import useToken from '../hooks/useToken'
 import { SettingsView as StripeSettingsView } from '@stripe/ui-extension-sdk/ui'
-import { Entitlements, useEntitlements } from '../hooks/useEntitlements'
-import { useState, useEffect } from 'react'
+import {
+  EntitlementsQueryResponse,
+  useEntitlements,
+} from '../hooks/useEntitlements'
+import { useState, useEffect, useCallback } from 'react'
 import useApi from '../hooks/useApi'
 import usePublishableToken from '../hooks/usePublishableToken'
+import { toHumanQuantity } from '../utils'
 
 const ConfigurationSettings = () => {
   const { userContext } = useStripeContext()
@@ -103,20 +103,24 @@ const ConfigurationSettings = () => {
   )
 }
 
-interface MTR {
-  freeTierDollars: number
-  grossUsageDollars: number
-  netUsageDollars: number
-  mtr: number
+interface Usage {
+  numEntitlementChecks: number
+  numFeatures: number
+  numPricingTables: number
+  numUsers: number
 }
 
-const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
+const CurrentPlan = ({
+  entitlements,
+}: {
+  entitlements: EntitlementsQueryResponse
+}) => {
   const { environment, userContext } = useStripeContext()
-  const [mtr, setMtr] = useState<MTR | null>(null)
+  const [usage, setUsage] = useState<Usage | null>(null)
   const host = environment.constants?.API_HOST ?? ''
   const { post } = useApi()
-  const item = entitlements.subscriptions[0].items.data[0]
-  const price = item.price as any
+  const item = entitlements.data?.entitlements.subscriptions[0].items.data[0]
+  const price = item?.price as any
   const [sig, setSig] = useState('')
 
   useEffect(() => {
@@ -128,27 +132,63 @@ const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
   }, [])
 
   useEffect(() => {
-    const fetchMtr = async () => {
-      const response = await post('/stripe/get_mtr', {})
-      const mtr = await response.json()
-      setMtr(mtr)
+    const fetchUsage = async () => {
+      const response = await post('/stripe/get_usage', {})
+      const usage = await response.json()
+      setUsage(usage)
     }
 
-    fetchMtr()
+    fetchUsage()
   }, [post])
+
+  const formatEntitlement = useCallback(
+    (entitlement: string) => {
+      const limit = entitlements.data?.limit(entitlement)
+      if (typeof limit === 'number') {
+        return toHumanQuantity(limit)
+      } else {
+        return '∞'
+      }
+    },
+    [entitlements.data],
+  )
 
   return (
     <Box css={{ stack: 'y', gapY: 'small' }}>
       <Box>
         <Inline css={{ font: 'bodyEmphasized' }}>Current Plan:</Inline>{' '}
-        <Inline>
-          ${price.unit_amount / 100} per {price.product.unit_label} (first
-          $1,000 free)
-        </Inline>
+        <Inline>{price.product.name}</Inline>
       </Box>
       <Box>
-        <Inline css={{ font: 'bodyEmphasized' }}>Current MTR:</Inline>{' '}
-        <Inline>${mtr ? mtr.grossUsageDollars : 0}</Inline>
+        <Table>
+          <TableRow>
+            <TableCell>Features</TableCell>
+            <TableCell>
+              {usage?.numFeatures ?? '...'} /{' '}
+              {formatEntitlement('num_features')}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Entitlement Checks</TableCell>
+            <TableCell>
+              {usage?.numEntitlementChecks ?? '...'} /{' '}
+              {formatEntitlement('num_entitlement_checks')}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Pricing Tables</TableCell>
+            <TableCell>
+              {usage?.numPricingTables ?? '...'} /{' '}
+              {formatEntitlement('num_pricing_tables')}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Users</TableCell>
+            <TableCell>
+              {usage?.numUsers ?? '...'} / {formatEntitlement('num_users')}
+            </TableCell>
+          </TableRow>
+        </Table>
       </Box>
       <Button
         type="primary"
@@ -164,10 +204,8 @@ const CurrentPlan = ({ entitlements }: { entitlements: Entitlements }) => {
 const NewPlan = () => {
   const { environment, userContext } = useStripeContext()
   const host = environment.constants?.API_HOST ?? ''
-  const { post } = useApi()
   const [email, setEmail] = useState('')
   const [sig, setSig] = useState('')
-  const [mtr, setMtr] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchParams = async () => {
@@ -178,18 +216,18 @@ const NewPlan = () => {
     fetchParams()
   }, [])
 
-  useEffect(() => {
-    const fetchMtr = async () => {
-      const response = await post('/stripe/get_mtr_estimate', {})
-      const { mtr } = await response.json()
-      setMtr(mtr)
-    }
-
-    fetchMtr()
-  }, [post])
-
   return (
     <Box css={{ stack: 'y', gapY: 'medium' }}>
+      <Box>
+        <Box>
+          <Inline css={{ font: 'bodyEmphasized' }}>Current Plan:</Inline>{' '}
+          <Inline>Trialing - Test mode only</Inline>
+        </Box>
+        <Box css={{ font: 'caption' }}>
+          Spackle is free to use in test mode as you get set up. Add a billing
+          method to access all of Spackle&apos;s features in live mode.
+        </Box>
+      </Box>
       <Box
         css={{
           stack: 'y',
@@ -224,79 +262,6 @@ const NewPlan = () => {
           </Link>
         </Box>
       </Box>
-      <Box>
-        <Box>
-          <Inline css={{ font: 'bodyEmphasized' }}>Current Plan:</Inline>{' '}
-          <Inline>Trialing - Test mode only</Inline>
-        </Box>
-        <Box css={{ font: 'caption' }}>
-          Spackle is free to use in test mode as you get set up. Add a billing
-          method to access all of Spackle&apos;s features in live mode. The
-          first $1,000 of MTR is always free.{' '}
-        </Box>
-      </Box>
-      <Box css={{ stack: 'y', gapY: 'medium' }}>
-        <Box css={{ width: 'fit' }}>
-          <Box css={{ stack: 'y' }}>
-            <Inline css={{ font: 'bodyEmphasized' }}>Estimated Cost</Inline>
-            <Inline css={{ font: 'caption' }}>
-              Based on last month&apos;s usage
-            </Inline>
-          </Box>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>Charge type</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  <Inline css={{ font: 'caption' }}>MTR Subtotal</Inline>
-                </TableCell>
-                <TableCell>
-                  <Inline css={{ font: 'caption' }}>${mtr}</Inline>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <Inline css={{ font: 'caption' }}>
-                    First $1,000 MTR Free
-                  </Inline>
-                </TableCell>
-                <TableCell>
-                  <Inline css={{ font: 'caption' }}>-$1,000</Inline>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <Inline css={{ font: 'caption' }}>MTR</Inline>
-                </TableCell>
-                <TableCell>
-                  <Inline css={{ font: 'caption' }}>
-                    ${Math.max((mtr || 0) - 1000, 0)}
-                  </Inline>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell>
-                  <Inline css={{ font: 'caption', fontWeight: 'bold' }}>
-                    Total ($3 per $1,000 MTR)
-                  </Inline>
-                </TableCell>
-                <TableCell>
-                  <Inline css={{ font: 'caption', fontWeight: 'bold' }}>
-                    ${Math.ceil(Math.max((mtr || 0) - 1000, 0) / 1000) * 3}
-                  </Inline>
-                </TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </Box>
-      </Box>
     </Box>
   )
 }
@@ -321,9 +286,7 @@ const BillingSettings = () => {
         {entitlements.isLoading ? (
           <Spinner />
         ) : entitlements.data?.entitlements.subscriptions.length ? (
-          <CurrentPlan
-            entitlements={entitlements.data.entitlements as Entitlements}
-          />
+          <CurrentPlan entitlements={entitlements} />
         ) : (
           <NewPlan />
         )}

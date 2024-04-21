@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import useApi from './useApi'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
 
 type FeatureBase = {
   id: number
@@ -27,6 +27,12 @@ export type Entitlements = {
   features: Feature[]
   subscriptions: Stripe.Subscription[]
 }
+
+export type EntitlementsQueryResponse = UseQueryResult<{
+  entitlements: Entitlements
+  flag: (key: string) => boolean
+  limit: (key: string) => number
+}>
 
 export const useEntitlements = (accountId: string) => {
   const { post } = useApi()

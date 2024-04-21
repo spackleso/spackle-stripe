@@ -63,3 +63,10 @@ export function stripePriceDisplay(price: Stripe.Price): string {
 
   return display
 }
+
+export const toHumanQuantity = (quantity: number) => {
+  if (typeof quantity !== 'number') {
+    return quantity
+  }
+  return quantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
